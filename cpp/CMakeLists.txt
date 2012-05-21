@@ -4,7 +4,7 @@ project (FSMDesigner)
 # Set version number
 set (FSMDesigner_VERSION_MAJOR 5)
 set (FSMDesigner_VERSION_MINOR 1)
-set (FSMDesigner_VERSION_PATCH 1)
+set (FSMDesigner_VERSION_PATCH 2)
   
 ##########################################
 # Libraries needed
