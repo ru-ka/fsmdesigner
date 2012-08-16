@@ -2,10 +2,30 @@ cmake_minimum_required (VERSION 2.8)
 project (FSMDesigner)
 
 # Set version number
+#########################
 set (FSMDesigner_VERSION_MAJOR 5)
 set (FSMDesigner_VERSION_MINOR 1)
 set (FSMDesigner_VERSION_PATCH 2)
   
+### Determine revision
+SET(revisionsCount 0)
+IF(WIN32)
+	execute_process(
+		COMMAND git-get-revision.bat
+		OUTPUT_VARIABLE revisionsCount
+		OUTPUT_STRIP_TRAILING_WHITESPACE)
+ELSE(WIN32)
+	execute_process(
+		COMMAND git log --all --pretty=oneline
+		COMMAND wc -l
+		OUTPUT_VARIABLE revisionsCount
+		OUTPUT_STRIP_TRAILING_WHITESPACE)
+ENDIF(WIN32)  
+
+## Add to Patch Version
+set (FSMDesigner_VERSION_PATCH ${FSMDesigner_VERSION_PATCH}~${revisionsCount})
+message(STATUS "Patch version set from GIT to: ${revisionsCount}")
+
 ##########################################
 # Libraries needed
 ##########################################
@@ -14,6 +34,7 @@ set(CMAKE_MODULE_PATH "./macros/")
 
 ## QT4 ###################################
 find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtSVG QtScript REQUIRED )
+message(STATUS "QT4 use File to include: ${QT_USE_FILE} with incdir: ${QT_INCLUDE_DIR}")
 include(${QT_USE_FILE})
  
 
@@ -21,13 +42,6 @@ include(${QT_USE_FILE})
 # Compilation Parameters
 ########################################## 
       
-## Enable CCACHE and DISTCC
-#set(CMAKE_CXX_COMPILER ccache)
-#set(CMAKE_CXX_COMPILER distcc)
-#set(CMAKE_CXX_COMPILER_ARG1 g++)
-#set(CMAKE_CXX_COMPILER_ARG2 -j8)
-#set(CMAKE_CXX_FLAGS_DEBUG -j8)
- 
 ## Debug
 set(CMAKE_BUILD_TYPE Debug)
 
@@ -36,16 +50,11 @@ set(CMAKE_VERBOSE_MAKEFILE false)
  
  
 ##########################################
-## Output directories
+## Output Directories and Crosscompiling
 ##########################################
 
-IF (CMAKE_CROSSCOMPILING)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "./build-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}/")
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "./build-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}/")
-ELSE (CMAKE_CROSSCOMPILING)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "./build/")
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "./build/")
-ENDIF (CMAKE_CROSSCOMPILING)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "./build/")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "./build/")
 
 ##########################################
 # Sources definitions
@@ -119,6 +128,7 @@ endforeach(package)
 
 ## Core library QT QXML
 #####################
+message(STATUS "QT Libraries")
 add_library(core_qxml_lib SHARED ${core_src} ${core-qxml_src})
 target_link_libraries(core_qxml_lib ${QT_LIBRARIES})
 
@@ -198,6 +208,7 @@ SET(TARGETS_TO_INSTALL fsmdesignerGenVerilog fsmdesigner gui_lib genverilog_lib 
 ## Install binary and libraries
 install(TARGETS ${TARGETS_TO_INSTALL} 
         RUNTIME DESTINATION bin COMPONENT runtime
+        ARCHIVE DESTINATION lib COMPONENT runtime
         LIBRARY DESTINATION lib COMPONENT runtime)
 
 
@@ -224,24 +235,20 @@ SET(CPACK_GENERATOR TBZ2)
 
 ## Debian ##########################################
 IF(NOT WIN32)
-
-    ## Determine revision
-    SET(revisionsCount 0)
-    execute_process(
-        COMMAND git log --all --pretty=oneline
-        COMMAND wc -l
-        OUTPUT_VARIABLE revisionsCount
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+  
     
     # Determine Architecture
     execute_process(
         COMMAND dpkg --print-architecture
         OUTPUT_VARIABLE arch
         OUTPUT_STRIP_TRAILING_WHITESPACE)
+		
+    ## Append Arch to patch version
+    SET(CPACK_PACKAGE_VERSION_PATCH ${CPACK_PACKAGE_VERSION_PATCH}-${arch})
 
     set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${arch})
         
-    ## Append to patch version
+    ## Append Architecture to patch version
     SET(CPACK_PACKAGE_VERSION_PATCH ${FSMDesigner_VERSION_PATCH}~${revisionsCount}-${arch})
     SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "richard.leys@ziti.uni-heidelberg.de")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt4-xml (>= 4.6)")
@@ -253,6 +260,9 @@ ENDIF(NOT WIN32)
 ## Windows installer ###############################
 IF(WIN32)
 
+	### Reset Patch Version for Windows installer to avoid Multiple installation folders
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "FSMDesigner ${FSMDesigner_VERSION_MAJOR}.${FSMDesigner_VERSION_MINOR}")
+
      ## Package QT  Libraries DLLs
      FOREACH(qtlib ${QT_LIBRARIES})
      	string(REGEX REPLACE
@@ -260,11 +270,38 @@ IF(WIN32)
      				"\\1.dll"
      				resLib
      				${qtlib})
-     	message(STATUS "Packaging ${resLib}")
+        message(STATUS "NSIS Installer Packaging ${resLib}")
      	INSTALL(FILES ${resLib}
     	    DESTINATION bin
     	    COMPONENT runtime)
      ENDFOREACH(qtlib ${QT_LIBRARIES})
+    
+     ### If CrossCompiling -> Package mingw runtime dll
+    #IF(CMAKE_CROSSCOMPILING)
+        set (MINGW_LIBS libgcc_s_dw2-1.dll libgcc_s_sjlj-1.dll libstdc++-6.dll mingwm10.dll)
+        FOREACH(extra_lib ${MINGW_LIBS})
+        
+            find_file(${extra_lib}_path ${extra_lib} PATHS ${CMAKE_FIND_ROOT_PATH} /usr/lib/gcc/x86_64-w64-mingw32/4.6/ PATH_SUFFIXES lib CMAKE_FIND_ROOT_PATH_BOTH)
+            #message(STATUS "NSIS Installer Packaging extra runtime library ${extra_lib} from ${${extra_lib}_path}")
+            if(${${extra_lib}_path} MATCHES ".*-NOTFOUND")
+			
+				 message(STATUS "NSIS Installer Not Packaging extra runtime library ${extra_lib} (not found)")
+				
+			else(${${extra_lib}_path} MATCHES ".*-NOTFOUND")
+			
+				message(STATUS "NSIS Installer Packaging extra runtime library ${extra_lib} from ${${extra_lib}_path}")
+				INSTALL(FILES ${${extra_lib}_path}
+					DESTINATION bin
+					COMPONENT runtime)
+			
+			   
+			
+			endif(${${extra_lib}_path} MATCHES ".*-NOTFOUND")
+			
+			
+                
+        ENDFOREACH(extra_lib ${MINGW_LIBS})
+    #ENDIF(CMAKE_CROSSCOMPILING)
     
      ## Runtime component is required
      set(CPACK_COMPONENT_RUNTIME_REQUIRED true)
