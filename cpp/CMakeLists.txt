@@ -9,7 +9,7 @@ set (FSMDesigner_VERSION_PATCH 2)
 ##########################################
 # Libraries needed
 ##########################################
-   
+    
 set(CMAKE_MODULE_PATH "./macros/")
 
 ## QT4 ###################################
