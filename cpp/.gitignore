@@ -8,4 +8,5 @@ cmake_install.cmake
 /_CPack_Packages
 CPack*
 *.exe
-*.deb
+*.deb*
+*.tar*
