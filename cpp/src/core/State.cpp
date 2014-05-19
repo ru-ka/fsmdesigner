@@ -156,7 +156,7 @@ void State::setHammingOutput() {
 
     for (i = 1; i <= output.size(); i++)
     {
-    	info[i] = output[i - 1] - '0';
+    	info[output.size() - i + 1] = output[i - 1] - '0';
     }
 
     cout << "information bits = ";
