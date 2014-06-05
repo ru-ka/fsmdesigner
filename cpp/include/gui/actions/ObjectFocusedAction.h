@@ -75,4 +75,4 @@ template<class T> class ObjectFocusedAction : public QUndoCommand, public SceneR
 
 };
 
-#endif /* UNDODELETELINKJOIN_H_ */
+#endif /* OBJECTFOCUSEDACTION_H_ */ 

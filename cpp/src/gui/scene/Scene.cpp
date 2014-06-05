@@ -100,7 +100,7 @@ void Scene::initializeScene() {
 
 	//-- Created items map (id<->object), and Join map
 	map<int, StateItem*> itemsMap;
-	map<int,JoinItem*> joinsMap;
+	map<int, JoinItem* > joinsMap;
 
 
 
