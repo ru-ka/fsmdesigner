@@ -103,7 +103,7 @@ class State: public UniqueIDObject {
          * Returns the name of the state
          * @return
          */
-        string getName();
+        string getName() const;
 
         /**
          * Sets the position of the graphical element
@@ -115,7 +115,7 @@ class State: public UniqueIDObject {
          * Returns the Graphical position of this element
          * @return
          */
-        pair<double, double> getPosition();
+        pair<double, double> getPosition() const;
 
         /**
          * Is the current state defined as reset ?
@@ -135,7 +135,7 @@ class State: public UniqueIDObject {
          * String representing the output of this state
          * @return
          */
-        string getOutput();
+        string getOutput() const;
 
         /**
          *
@@ -151,7 +151,7 @@ class State: public UniqueIDObject {
         void addOutput(unsigned int value);
 
 
-        unsigned int getColor();
+        unsigned int getColor() const;
 
         void setColor(unsigned int newColor);
 
@@ -169,7 +169,7 @@ class State: public UniqueIDObject {
          * @param outputIndex
          * @return
          */
-        char getOutputAt(int outputIndex);
+        char getOutputAt(int outputIndex) const;
 
 #define FOREACH_STATE_STARTING_TRANSITIONS(state) \
      for (list<Trans*>::iterator it = state->getStartingTransitions().begin();it!=state->getStartingTransitions().end();it++) { \

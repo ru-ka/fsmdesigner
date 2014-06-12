@@ -192,5 +192,10 @@ class MergedMainWindow: public QMainWindow, public Ui_MergedMainWindow  {
         /// If the UI settings have changed
         void settingsChanged();
 
+
+        void about();
+
+        void killme();
+
 };
 

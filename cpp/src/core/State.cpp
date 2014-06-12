@@ -67,7 +67,7 @@ void State::setName(string name) {
 
 }
 
-string State::getName() {
+string State::getName() const {
     return this->name;
 }
 
@@ -76,7 +76,7 @@ void State::setPosition(pair<double, double> position) {
 }
 
 
-pair<double, double> State::getPosition() {
+pair<double, double> State::getPosition() const {
     return this->position;
 }
 
@@ -88,7 +88,7 @@ void State::setReset(bool reset) {
     this->reset = reset;
 }
 
-string State::getOutput() {
+string State::getOutput() const {
     return this->output;
 }
 
@@ -105,7 +105,7 @@ void State::addOutput(unsigned int value) {
     this->output = this->output.append(Utils::itos(value));
 }
 
-unsigned int State::getColor() {
+unsigned int State::getColor() const {
     return this->color;
 }
 
@@ -128,7 +128,7 @@ void State::setOutputAt(int outputIndex, char val) {
 
 }
 
-char State::getOutputAt(int outputIndex) {
+char State::getOutputAt(int outputIndex) const{
 
     //-- Check argument
     if (outputIndex >= this->output.length()) {

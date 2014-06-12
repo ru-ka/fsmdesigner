@@ -175,7 +175,12 @@ MergedMainWindow::MergedMainWindow() :
     //---- Table
     this->connect(this->actionGlobal, SIGNAL(triggered()),
             SLOT(showGlobalTable()));
+  
+    //---- About
+    this->connect(this->action_About, SIGNAL(triggered()), SLOT(about()));
 
+    //---- Debug related
+    this->connect(this->action_Killme, SIGNAL(triggered()), SLOT(killme()));
 
 }
 
@@ -617,3 +622,28 @@ void MergedMainWindow::exportAsSVG() {
 
 }
 
+
+void MergedMainWindow::about() {
+  QMessageBox  qmb("About FSMDesigner5 - DEBUG",
+			   "<b>About FSMDesigner4</b><br /><br />"
+			   "<p>The current version of this program is 1.0.</p>"
+			   "<p>The FSMDesigner4 is a advanced tool to create finite<br />"
+			   "state machines(FSM) in a interaktiv way and translate<br />"
+			   "them into hardware description language(HDL).</p>"
+			   "<p>FSMDesigner is a product of the Institute of Computer<br />"
+			   "Engineering at the University of Mannheim.<br />"
+			   "See http://ra.informatik.uni-mannheim.de "
+			   "for more information.</p>"
+			   , QMessageBox::Critical, QMessageBox::Ok,
+			   QMessageBox::NoButton, QMessageBox::NoButton,this,
+			   (Qt::WFlags) Qt::Dialog );
+//  qmb.setIconPixmap(*logo);
+  qmb.adjustSize();
+  qmb.exec();
+}
+
+
+void MergedMainWindow::killme() {
+  int* killme_pointer = NULL;
+  *killme_pointer += 7;
+}

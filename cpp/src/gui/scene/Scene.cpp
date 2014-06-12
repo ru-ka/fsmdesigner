@@ -903,6 +903,7 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
 	else if (keyEvent->key() == Qt::Key_Delete) {
 
 		QList<QGraphicsItem*> selectedItems = this->selectedItems();
+    // TODO:
 		for (QList<QGraphicsItem*>::iterator it = selectedItems.begin(); it
 				< selectedItems.end(); it++) {
 
