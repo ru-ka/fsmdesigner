@@ -624,20 +624,41 @@ void MergedMainWindow::exportAsSVG() {
 
 
 void MergedMainWindow::about() {
-  QMessageBox  qmb("About FSMDesigner5 - DEBUG",
-			   "<b>About FSMDesigner4</b><br /><br />"
-			   "<p>The current version of this program is 1.0.</p>"
-			   "<p>The FSMDesigner4 is a advanced tool to create finite<br />"
-			   "state machines(FSM) in a interaktiv way and translate<br />"
-			   "them into hardware description language(HDL).</p>"
-			   "<p>FSMDesigner is a product of the Institute of Computer<br />"
-			   "Engineering at the University of Mannheim.<br />"
-			   "See http://ra.informatik.uni-mannheim.de "
-			   "for more information.</p>"
-			   , QMessageBox::Critical, QMessageBox::Ok,
-			   QMessageBox::NoButton, QMessageBox::NoButton,this,
-			   (Qt::WFlags) Qt::Dialog );
-//  qmb.setIconPixmap(*logo);
+  QString fsm_version = QString::fromStdString(Utils::getMajorVersion());
+  fsm_version.append(".");
+  fsm_version += QString::fromStdString(Utils::getMinorVersion());
+  //TODO: include patch version?
+//  fsm_version.append(".");
+//  fsm_version += QString::fromStdString(Utils::getPatchVersion());
+  // Box title
+  QString qmb_title_str("About FSMDesigner ");
+  qmb_title_str += fsm_version;
+  // Box text
+  QString qmb_text_str("<b>About FSMDesigner ");
+  qmb_text_str += fsm_version;
+  qmb_text_str += QString("</b><br /><br />"
+     "<p>The current version of this program is ");
+  qmb_text_str += fsm_version;
+  qmb_text_str += QString("</p>"
+     "<p>The FSMDesigner ");
+  qmb_text_str += fsm_version;
+  qmb_text_str += QString(" is a advanced tool to create finite<br />"
+     "state machines(FSM) in a interaktiv way and translate<br />"
+     "them into hardware description language(HDL).</p>"
+     "<p>FSMDesigner is a product of the Institute of Computer<br />"
+     "Engineering at the University of Mannheim.<br />"
+     "See http://sourceforge.net/apps/mediawiki/fsmdesigner/?source=navbar "
+//     "See http://ra.informatik.uni-mannheim.de "
+     "for more information.</p>");
+  QMessageBox  qmb(qmb_title_str
+     , qmb_text_str
+     , QMessageBox::Critical, QMessageBox::Ok
+     , QMessageBox::NoButton, QMessageBox::NoButton
+     , this
+     , (Qt::WFlags) Qt::Dialog );
+  //TODO set icon
+  QPixmap logo(":/icons/FSMDesignerlogosmall.png");
+  qmb.setIconPixmap(logo);
   qmb.adjustSize();
   qmb.exec();
 }

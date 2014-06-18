@@ -95,7 +95,6 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="action_About"/>
-    <addaction name="actionAbout_Qt"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menu_Objects">
@@ -681,14 +680,6 @@
    </property>
    <property name="whatsThis">
     <string>Starts preferences-dialog for changing toolsettings.</string>
-   </property>
-  </action>
-  <action name="actionAbout_Qt">
-   <property name="text">
-    <string>About Qt</string>
-   </property>
-   <property name="whatsThis">
-    <string>Shows About Qt.</string>
    </property>
   </action>
   <action name="action_ClearMenu">

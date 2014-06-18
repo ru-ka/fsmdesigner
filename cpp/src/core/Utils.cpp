@@ -134,6 +134,10 @@ string Utils::getMinorVersion() {
 	return string(FSMDesigner_VERSION_MINOR_STR);
 }
 
+string Utils::getPatchVersion() {
+	return string(FSMDesigner_VERSION_PATCH_STR);
+}
+
 string Utils::itos(int i) {
     stringstream s;
     s << i;

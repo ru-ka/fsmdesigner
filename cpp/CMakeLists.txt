@@ -5,7 +5,7 @@ project (FSMDesigner)
 #########################
 set (FSMDesigner_VERSION_MAJOR 5)
 set (FSMDesigner_VERSION_MINOR 2)
-set (FSMDesigner_VERSION_PATCH 0)
+set (FSMDesigner_VERSION_PATCH 1)
 
 ### Determine revision
 SET(revisionsCount 0)
