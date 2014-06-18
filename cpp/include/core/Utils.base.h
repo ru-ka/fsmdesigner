@@ -81,6 +81,9 @@ public:
 	/// Returns Minor Version as set by CMake at compilation time
 	static string getMinorVersion();
 
+	/// Returns Patch Version as set by CMake at compilation time
+	static string getPatchVersion();
+
 
 	static string itos(int i);
 
