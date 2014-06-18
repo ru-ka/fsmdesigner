@@ -1,7 +1,7 @@
 /*
  * FSMDesigner.h
  *
- * This fil mainly contains enums or so
+ * This file mainly contains enums or so
  *
  *  Created on: May 20, 2011
  *      Author: rleys
