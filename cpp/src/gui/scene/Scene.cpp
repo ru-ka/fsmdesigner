@@ -76,6 +76,10 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
   //---------------
   this->setFSMVerificator(new FSMVerificator(this));
 
+  // TODO: temporary solution. Fix multiple pointers to the same state by an
+  // appropriate schema.
+  current_state_item = NULL;
+
 }
 
 void Scene::initializeScene() {
@@ -358,24 +362,14 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     //----------------------
     case STATE: {
 
-        //-- Get Item under
-        QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
-            Qt::IntersectsItemShape, Qt::AscendingOrder);
-        QGraphicsItem* itemUnder =
-            itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
+        Q_ASSERT( current_state_item );
+        StateItem * stateItem = current_state_item;
 
         //-- Create a new State
         State * state = this->fsm->addState();
 
-        //-- Create new Item or take the one on the stack
-        StateItem * stateItem = NULL;
-        if (itemUnder != NULL && itemUnder->type() == StateItem::Type) {
-
-          qDebug() << "Adding state from placed element " << QString::fromStdString(state->getName());
-          stateItem = dynamic_cast<StateItem*> (itemUnder);
-          stateItem->setModel(state);
-
-        }
+        qDebug() << "Adding state from placed element " << QString::fromStdString(state->getName());
+        stateItem->setModel(state);
 
         //-- Place centered on mouse
         state->setPosition(pair<double,double>(e->scenePos().x(),e->scenePos().y()));
@@ -385,6 +379,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
         this->toPlaceStack.clear();
         this->setPlaceMode(CHOOSE);
 
+        qDebug() << "Done ;) ";
       }
       break;
       //-- END OF State -------//
@@ -851,7 +846,6 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
     stackFirst->setVisible(true);
     stackFirst->setEnabled(true);
     this->placeUnderMouse(stackFirst, e->scenePos());
-
   }
 
 
@@ -988,6 +982,7 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
       || mode==FSMDesigner::HYPERTRANS || mode==FSMDesigner::LINKDEPARTURE)
     this->clearPlaceStack();
 
+
   //-- If back to choose requested, then perform cleaning and such
   //-------------------------------------
   if (mode==FSMDesigner::CHOOSE) {
@@ -1067,6 +1062,7 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
         case STATE: {
             //-- Create an Item to navigate under the mouse
             StateItem * st = new StateItem();
+            current_state_item = st;
             this->addToToPlaceStack(st);
 
             break;
@@ -1156,6 +1152,7 @@ void Scene::clearPlaceStack() {
     this->removeItem( first_item ); // Get ownership back from scene
     delete toPlaceStack.takeFirst();
   }
+  current_state_item = NULL;
 }
 
 
