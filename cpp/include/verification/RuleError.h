@@ -24,8 +24,9 @@ using namespace std;
 #include <FSMDesigner.h>
 
 /**
- * This represent an error occured while executing a verification rule.
- * It holds enough information for the user to find back what king of objects where concerned and such
+ * This represent an error occurred while executing a verification rule.
+ * It holds enough information for the user to find back what king of objects
+ * where concerned and such
  *
  */
 class RuleError {

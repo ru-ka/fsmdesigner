@@ -27,6 +27,9 @@ using namespace std;
 #include <gui/actions/DeleteTransitionAction.h>
 #include <gui/actions/DeleteHyperTransitionAction.h>
 
+//-- Commands
+#include <gui/commands/AddStateCommand.h>
+
 //-- Others
 #include <gui/common/GUIUtils.h>
 
@@ -50,168 +53,168 @@ using namespace FSMDesigner;
 
 #include "Scene.h"
 Scene::Scene(Fsm * fsm, QObject *parent) :
-	QGraphicsScene(-5000,-5000,10000,10000,parent) {
+  QGraphicsScene(-5000,-5000,10000,10000,parent) {
 
-	this->setBackgroundBrush(Qt::white);
-	//this->setBackgroundBrush(QPixmap());
-	//this->setStickyFocus(true);
+  this->setBackgroundBrush(Qt::white);
+  //this->setBackgroundBrush(QPixmap());
+  //this->setStickyFocus(true);
 
-	// Variables
-	//-------------
-	this->fsm = fsm;
+  // Variables
+  //-------------
+  this->fsm = fsm;
 
-	//-- Place
-	this->placeMode = FSMDesigner::NONE;
-	this->placeLock = FSMDesigner::UNLOCKED;
+  //-- Place
+  this->placeMode = FSMDesigner::NONE;
+  this->placeLock = FSMDesigner::UNLOCKED;
 
-	// Variables
-	//------------------
-	this->placeLinkEndState = NULL;
-	this->placeLinkStartState = NULL;
+  // Variables
+  //------------------
+  this->placeLinkEndState = NULL;
+  this->placeLinkStartState = NULL;
 
-	// Verification
-	//---------------
-	this->setFSMVerificator(new FSMVerificator(this));
+  // Verification
+  //---------------
+  this->setFSMVerificator(new FSMVerificator(this));
 
 }
 
 void Scene::initializeScene() {
 
-	// Clean scene
-	//----------
-	this->clearSelection();
-	this->clear();
-	//	QList <QGraphicsItem *> cil = this->items()  ;
-	//	while (!cil.isEmpty()) {
-	//		QGraphicsItem* i = cil.takeFirst();
-	//		this->removeItem(i);
-	//		delete i;
-	//	}
+  // Clean scene
+  //----------
+  this->clearSelection();
+  this->clear();
+  //  QList <QGraphicsItem *> cil = this->items()  ;
+  //  while (!cil.isEmpty()) {
+  //    QGraphicsItem* i = cil.takeFirst();
+  //    this->removeItem(i);
+  //    delete i;
+  //  }
 
 
-	// Draw FSM
-	//------------------
+  // Draw FSM
+  //------------------
 
-	//-- Get current FSM to draw
-	Fsm * currentFSM =this->fsm;
+  //-- Get current FSM to draw
+  Fsm * currentFSM =this->fsm;
 
-	// Prepare some datas
-	//------------------------------
+  // Prepare some datas
+  //------------------------------
 
-	//-- Created items map (id<->object), and Join map
-	map<int, StateItem*> itemsMap;
-	map<int, JoinItem* > joinsMap;
-
-
-
-	// Place Joins
-	//--------------------
-	FOREACH_JOIN(this->fsm)
+  //-- Created items map (id<->object), and Join map
+  map<int, StateItem*> itemsMap;
+  map<int, JoinItem* > joinsMap;
 
 
 
-		//-- Prepare Item
-		JoinItem * joinItem = new JoinItem((*it).second);
-		joinsMap[(*it).first] = joinItem;
-
-		//-- Use Undo to place on the scene
-		DeleteJoinAction * undoJoin = new DeleteJoinAction(joinItem, NULL);
-
-		//-- If target state is defined, set transition and trackpoints to it
-		//----------------------------
-		if (joinItem->getModel()->getTargetState()!=NULL) {
-
-			//-- Target State
-			State * endState = joinItem->getModel()->getTargetState();
-			StateItem * endStateItem = itemsMap[endState->getId()];
-			if (endStateItem == NULL) {
-				endStateItem = new StateItem(endState);
-				itemsMap[endState->getId()] = endStateItem;
-				this->addItem(endStateItem);
-			}
-
-			//-- Use Undo to place on the scene
-			//undoJoin->setEndItem(endStateItem);
-
-		} else {
-		    qDebug() << "No target state onto join";
-		}
-
-		//-- place
-		undoJoin->setRelatedScene(this);
-		undoJoin->undo();
-
-	END_FOREACH_JOIN
-
-	// Loop over states until no more
-	//-------------------
-	FOREACH_STATE(currentFSM)
-
-		// Get Current State
-		State * currentState = state;
-		if (currentState == NULL)
-			continue;
-
-		//-- Create a GUI state if necessary
-		StateItem * stateItem = itemsMap.find(currentState->getId())!=itemsMap.end() ? itemsMap[currentState->getId()] : NULL;
-		if (stateItem == NULL) {
-			stateItem = new StateItem(currentState);
-			itemsMap[currentState->getId()] = stateItem;
-			this->addItem(stateItem);
-		}
-
-		// Create transitions from this item
-		//-----------
-		Transline * lastTransitionLine = NULL;
-		list<Trans*> stateStartingTransitions =
-				currentState->getStartingTransitions();
-		list<Trans*>::iterator i;
-		for (i = stateStartingTransitions.begin(); i
-				!= stateStartingTransitions.end(); i++) {
-
-			// Get Trans
-			Trans * transition = *i;
-			lastTransitionLine = NULL;
-
-			//-- Calculate the start and end as a trackpoints
-
-			// Start
-			Trackpoint * start = new Trackpoint(currentState->getPosition().first,
-					currentState->getPosition().second, 0);
-
-			// End
-			/*currentFSM->getStatebyID(transition->end);
-			State * endState = currentFSM->getCurrentState();
-			currentFSM->getStatebyID(currentState->sid);*/
-			State * endState = transition->getEndState();
-
-			//-- Find/create end Gui item
-			StateItem * endStateItem = itemsMap.find(endState->getId())!=itemsMap.end() ? itemsMap[endState->getId()] : NULL;
-			if (endStateItem == NULL) {
-				endStateItem = new StateItem(endState);
-				itemsMap[endState->getId()] = endStateItem;
-				this->addItem(endStateItem);
-			}
-
-			//-- Use Undo to place on the scene
-			Transline * lineToAdd = new Transline((TransitionBase*)transition);
-			DeleteTransitionAction * undoTransition = new DeleteTransitionAction(lineToAdd);
-			//undoTransition->setStartItem(stateItem);
-			//undoTransition->setEndItem(endStateItem);
-			undoTransition->setRelatedScene(this);
-			undoTransition->undo();
-			delete undoTransition;
-			delete lineToAdd;
-
-		} // ENd OF transitions loop
+  // Place Joins
+  //--------------------
+  FOREACH_JOIN(this->fsm)
 
 
-	END_FOREACH_STATE
-	//-- END LOOP OVER STATES
 
-	// Loop over links entrances
-	//----------------------------
-	FOREACH_LINKS(currentFSM)
+    //-- Prepare Item
+    JoinItem * joinItem = new JoinItem((*it).second);
+    joinsMap[(*it).first] = joinItem;
+
+    //-- Use Undo to place on the scene
+    DeleteJoinAction * undoJoin = new DeleteJoinAction(joinItem, NULL);
+
+    //-- If target state is defined, set transition and trackpoints to it
+    //----------------------------
+    if (joinItem->getModel()->getTargetState()!=NULL) {
+
+      //-- Target State
+      State * endState = joinItem->getModel()->getTargetState();
+      StateItem * endStateItem = itemsMap[endState->getId()];
+      if (endStateItem == NULL) {
+        endStateItem = new StateItem(endState);
+        itemsMap[endState->getId()] = endStateItem;
+        this->addItem(endStateItem);
+      }
+
+      //-- Use Undo to place on the scene
+      //undoJoin->setEndItem(endStateItem);
+
+    } else {
+        qDebug() << "No target state onto join";
+    }
+
+    //-- place
+    undoJoin->setRelatedScene(this);
+    undoJoin->undo();
+
+  END_FOREACH_JOIN
+
+  // Loop over states until no more
+  //-------------------
+  FOREACH_STATE(currentFSM)
+
+    // Get Current State
+    State * currentState = state;
+    if (currentState == NULL)
+      continue;
+
+    //-- Create a GUI state if necessary
+    StateItem * stateItem = itemsMap.find(currentState->getId())!=itemsMap.end() ? itemsMap[currentState->getId()] : NULL;
+    if (stateItem == NULL) {
+      stateItem = new StateItem(currentState);
+      itemsMap[currentState->getId()] = stateItem;
+      this->addItem(stateItem);
+    }
+
+    // Create transitions from this item
+    //-----------
+    Transline * lastTransitionLine = NULL;
+    list<Trans*> stateStartingTransitions =
+        currentState->getStartingTransitions();
+    list<Trans*>::iterator i;
+    for (i = stateStartingTransitions.begin(); i
+        != stateStartingTransitions.end(); i++) {
+
+      // Get Trans
+      Trans * transition = *i;
+      lastTransitionLine = NULL;
+
+      //-- Calculate the start and end as a trackpoints
+
+      // Start
+      Trackpoint * start = new Trackpoint(currentState->getPosition().first,
+          currentState->getPosition().second, 0);
+
+      // End
+      /*currentFSM->getStatebyID(transition->end);
+      State * endState = currentFSM->getCurrentState();
+      currentFSM->getStatebyID(currentState->sid);*/
+      State * endState = transition->getEndState();
+
+      //-- Find/create end Gui item
+      StateItem * endStateItem = itemsMap.find(endState->getId())!=itemsMap.end() ? itemsMap[endState->getId()] : NULL;
+      if (endStateItem == NULL) {
+        endStateItem = new StateItem(endState);
+        itemsMap[endState->getId()] = endStateItem;
+        this->addItem(endStateItem);
+      }
+
+      //-- Use Undo to place on the scene
+      Transline * lineToAdd = new Transline((TransitionBase*)transition);
+      DeleteTransitionAction * undoTransition = new DeleteTransitionAction(lineToAdd);
+      //undoTransition->setStartItem(stateItem);
+      //undoTransition->setEndItem(endStateItem);
+      undoTransition->setRelatedScene(this);
+      undoTransition->undo();
+      delete undoTransition;
+      delete lineToAdd;
+
+    } // ENd OF transitions loop
+
+
+  END_FOREACH_STATE
+  //-- END LOOP OVER STATES
+
+  // Loop over links entrances
+  //----------------------------
+  FOREACH_LINKS(currentFSM)
 
         //-- Use Undo Class to place
         LinkArrival * linkArrival = new LinkArrival(link,itemsMap[link->getTargetState()->getId()]);
@@ -219,9 +222,9 @@ void Scene::initializeScene() {
         undoLinkArrival->setRelatedScene(this);
         undoLinkArrival->undo();
 
-	END_FOREACH_LINKS
+  END_FOREACH_LINKS
 
-	// Place Hypertransitions
+  // Place Hypertransitions
     //---------------------------
     FOREACH_HYPERTRANSITIONS(this->fsm)
 
@@ -241,7 +244,7 @@ void Scene::initializeScene() {
 }
 
 QUndoStack * Scene::getUndoStack() {
-	return &(this->undoStack);
+  return &(this->undoStack);
 }
 
 /**
@@ -264,343 +267,334 @@ void Scene::redo() {
 
 void Scene::addToToPlaceStack(QGraphicsItem * item) {
 
-	//-- If the stack is not empty,
-	//---------------------------
+  //-- If the stack is not empty,
+  //---------------------------
 
-	//-- Apply rules to items
+  //-- Apply rules to items
 
-	// Not visible and not enabled
-	this->addItem(item);
-	item->setVisible(false);
-	item->setEnabled(false);
-	//item->setSelected(true);
+  // Not visible and not enabled
+  this->addItem(item);
+  item->setVisible(false);
+  item->setEnabled(false);
+  //item->setSelected(true);
 
 
-	//-- Add to stack
-	this->toPlaceStack.push_front(item);
+  //-- Add to stack
+  this->toPlaceStack.push_front(item);
 }
 
 void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 
 
-	QGraphicsScene::mousePressEvent(e);
+  QGraphicsScene::mousePressEvent(e);
 
 
 
-	//-- First element has to be placed, removed from stack and reenabled
-	if (this->toPlaceStack.size() > 0) {
+  //-- First element has to be placed, removed from stack and reenabled
+  if (this->toPlaceStack.size() > 0) {
 
-		qDebug() << "Mouse Press, releasing to be placed element:"
-				<< e->scenePos();
+    qDebug() << "Mouse Press, releasing to be placed element:"
+        << e->scenePos();
 
-		//-- If the first is a transline, we don't really want to place it
-		//-- Invisible elements are not yet to be considered. They wil be made visible after first movement
-		if (!this->toPlaceStack.first()->isVisible()) {
+    //-- If the first is a transline, we don't really want to place it
+    //-- Invisible elements are not yet to be considered. They will be made visible after first movement
+    if (!this->toPlaceStack.first()->isVisible()) {
 
-		} else if (this->toPlaceStack.first()->type() == Transline::Type) {
+    } else if (this->toPlaceStack.first()->type() == Transline::Type) {
 
-			QGraphicsItem * tr = this->toPlaceStack.takeFirst();
+      QGraphicsItem * tr = this->toPlaceStack.takeFirst();
 
-			/*
-			//-- Delete only if the transline is not from a trackpoint
-			if (!FSMGraphicsItem<>::isTrackPoint(
-					FSMGraphicsItem<>::toTransline(tr)->getStartItem())) {
-				this->removeItem(tr);
-				delete tr;
-			}*/
+      /*
+      //-- Delete only if the transline is not from a trackpoint
+      if (!FSMGraphicsItem<>::isTrackPoint(
+          FSMGraphicsItem<>::toTransline(tr)->getStartItem())) {
+        this->removeItem(tr);
+        delete tr;
+      }*/
 
-			//this->toPlaceStack.first()->setVisible(false);
-
-
-			//-- only ensure the line is enabled
-			tr->setEnabled(true);
+      //this->toPlaceStack.first()->setVisible(false);
 
 
-			//-- If the transline does not lead to anywhere, and don't be long to a trackpoint delete
-			if (FSMGraphicsItem<>::toTransline(tr)->getEndItem()==NULL &&
-					!FSMGraphicsItem<>::isTrackPoint(FSMGraphicsItem<>::toTransline(tr)->getStartItem() )) {
-				delete tr;
-
-			}
+      //-- only ensure the line is enabled
+      tr->setEnabled(true);
 
 
-		} else {
+      //-- If the transline does not lead to anywhere, and don't be long to a trackpoint delete
+      if (FSMGraphicsItem<>::toTransline(tr)->getEndItem()==NULL &&
+          !FSMGraphicsItem<>::isTrackPoint(FSMGraphicsItem<>::toTransline(tr)->getStartItem() )) {
+        delete tr;
 
-			// Get and remove
-			QGraphicsItem * first = this->toPlaceStack.takeFirst();
+      }
 
-			// Reenable
-			first->setEnabled(true);
 
-			// Position
-			this->placeUnderMouse(first, e->scenePos());
+    } else {
 
-		}
+      // Get and remove
+      QGraphicsItem * first = this->toPlaceStack.takeFirst();
 
-	}
+      // Reenable
+      first->setEnabled(true);
+
+      // Position
+      this->placeUnderMouse(first, e->scenePos());
+
+    }
+
+  }
 
 
 }
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 
-	// Placing if not in choose mode
-	//------------------
-	if (this->placeMode != CHOOSE) {
+  // Placing if not in choose mode
+  //------------------
+  if (this->placeMode != CHOOSE) {
 
-		// Do action depending on place mode
-		switch (this->placeMode) {
+    // Do action depending on place mode
+    switch (this->placeMode) {
 
-		// State
-		//----------------------
-		case STATE: {
+    // State
+    //----------------------
+    case STATE: {
 
-			//-- Get Item under
-			QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
-					Qt::IntersectsItemShape, Qt::AscendingOrder);
-			QGraphicsItem* itemUnder =
-					itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
+        //-- Get Item under
+        QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
+            Qt::IntersectsItemShape, Qt::AscendingOrder);
+        QGraphicsItem* itemUnder =
+            itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
 
-			//-- Create a new State
-			State * state = this->fsm->addState();
+        //-- Create a new State
+        State * state = this->fsm->addState();
 
-			//-- Create new Item or take the one on the stack
-			StateItem * stateItem = NULL;
-			if (itemUnder != NULL && itemUnder->type() == StateItem::Type) {
+        //-- Create new Item or take the one on the stack
+        StateItem * stateItem = NULL;
+        if (itemUnder != NULL && itemUnder->type() == StateItem::Type) {
 
-				qDebug() << "Adding state from placed element " << QString::fromStdString(state->getName());
-				stateItem = dynamic_cast<StateItem*> (itemUnder);
-				stateItem->setModel(state);
+          qDebug() << "Adding state from placed element " << QString::fromStdString(state->getName());
+          stateItem = dynamic_cast<StateItem*> (itemUnder);
+          stateItem->setModel(state);
 
-			} else if(this->selectedItems().size()>0 && this->selectedItems().first()->type()== StateItem::Type) {
-				stateItem = dynamic_cast<StateItem*> (this->selectedItems().first());
-				stateItem->setModel(state);
-			}
+        }
 
-			else {
-				qDebug() << "Adding new state";
-				stateItem = new StateItem(state);
-				this->addItem(stateItem);
-			}
+        //-- Place centered on mouse
+        state->setPosition(pair<double,double>(e->scenePos().x(),e->scenePos().y()));
+        stateItem->setPos(e->scenePos().x(),e->scenePos().y());
 
-			//-- Place centered on mouse
-			state->setPosition(pair<double,double>(e->scenePos().x(),e->scenePos().y()));
-			stateItem->setPos(e->scenePos().x(),e->scenePos().y());
+        // Close interaction
+        this->toPlaceStack.clear();
+        this->setPlaceMode(CHOOSE);
 
-			// Close interaction
-			this->toPlaceStack.clear();
-			this->setPlaceMode(CHOOSE);
-
-		}
-			break;
-			//-- END OF State -------//
+      }
+      break;
+      //-- END OF State -------//
 
         // Transition
         //--------------------------
-		case TRANS: {
+    case TRANS: {
 
-			//-- Get Item under
-			QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
-					Qt::IntersectsItemShape, Qt::AscendingOrder);
+      //-- Get Item under
+      QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
+          Qt::IntersectsItemShape, Qt::AscendingOrder);
 
-			// Wipe transline if on top and already started the transaction
-			if (this->placeTransitionStack.size() > 0 && itemsUnder.size() > 0
-					&& itemsUnder.front()->type() == Transline::Type) {
-				itemsUnder.pop_front();
-			}
+      // Wipe transline if on top and already started the transaction
+      if (this->placeTransitionStack.size() > 0 && itemsUnder.size() > 0
+          && itemsUnder.front()->type() == Transline::Type) {
+        itemsUnder.pop_front();
+      }
 
-			QGraphicsItem* itemUnder =
-					itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
+      QGraphicsItem* itemUnder =
+          itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
 
-			// Place trackpoint (not for hypertransition!)
-			//---------------
-			if (itemUnder == NULL && this->placeTransitionStack.size() > 0
-			                      && this->placeTransitionStack.back()->type()!=FSMGraphicsItem<>::HYPERTRANS ) {
+      // Place trackpoint (not for hypertransition!)
+      //---------------
+      if (itemUnder == NULL && this->placeTransitionStack.size() > 0
+                            && this->placeTransitionStack.back()->type()!=FSMGraphicsItem<>::HYPERTRANS ) {
 
-				//-- Nothing under, add a trackpoint between last item on stack, and nothing
-				TrackpointItem * item = new TrackpointItem(new Trackpoint(e->scenePos().x(), e->scenePos().y(), 0),
-						this->placeTransitionStack.first(), NULL);
-				item->setPos(e->scenePos());
-				this->addItem(item);
+        //-- Nothing under, add a trackpoint between last item on stack, and nothing
+        TrackpointItem * item = new TrackpointItem(new Trackpoint(e->scenePos().x(), e->scenePos().y(), 0),
+            this->placeTransitionStack.first(), NULL);
+        item->setPos(e->scenePos());
+        this->addItem(item);
 
-				//-- Trackpoint is last element on the transition stack
-				this->placeTransitionStack.push_front(item);
+        //-- Trackpoint is last element on the transition stack
+        this->placeTransitionStack.push_front(item);
 
-				//-- We want to place its next line (to have the mouse follow the next line)
-				//this->addToToPlaceStack(item->getNextTransline());
-			}
-			// Use Item under (Ok if Join or State)
-			//---------------
-			else if (itemUnder != NULL && (itemUnder->type() == StateItem::Type || itemUnder->type() == JoinItem::Type)) {
-
-
-				//-- If there is a previous trackpoint, it ends on this item item
-				if (this->placeTransitionStack.size() > 0
-						&& FSMGraphicsItem<>::isTrackPoint(
-								this->placeTransitionStack.first())) {
-					dynamic_cast<TrackpointItem*> (this->placeTransitionStack[0])->setEndItem(
-							itemUnder);
-				} else {
-
-				}
-				this->placeTransitionStack.push_front(itemUnder);
-
-			}
-
-			// If nothing on the stack, do nothing further
-			if (this->placeTransitionStack.size() == 0)
-				break;
-
-			// Check that if we should end the transition
-			// The objects are commited to model
-			//-----------------------------------------------
-
-			// If we have found that we can end the transition
-			bool endOfTransition = false;
-
-			//-- Determine type of transition
-			bool stateToState = this->placeTransitionStack.size() > 1
-					&& this->placeTransitionStack.front()->type()
-							== StateItem::Type
-					&& this->placeTransitionStack.back()->type()
-							== StateItem::Type;
-
-			bool joinToState = this->placeTransitionStack.size() > 1
-					&& this->placeTransitionStack.front()->type()
-							== StateItem::Type
-					&& this->placeTransitionStack.back()->type()
-							== JoinItem::Type;
-
-			bool stateToJoin = this->placeTransitionStack.size() > 1
-								&& this->placeTransitionStack.front()->type()
-										== JoinItem::Type
-								&& this->placeTransitionStack.back()->type()
-										== StateItem::Type;
-
-			bool hypertransitionToState = this->placeTransitionStack.size() > 1
-			                                && this->placeTransitionStack.front()->type()
-			                                        == StateItem::Type
-			                                && this->placeTransitionStack.back()->type()
-			                                        == HyperTransition::Type;
-
-			//-- Transition from state to state
-			//-----------------
-			if (stateToState || joinToState || stateToJoin) {
-
-			    //-- Keep added/referenced transition
-			    Trans * transition= NULL;
-
-				//---- Add to model depending on type
-				//---------------------
-				if (stateToState) {
-
-					//-- Add Transition
-				    transition = this->fsm->addTrans(
-							dynamic_cast<StateItem*> (this->placeTransitionStack.back())->getModel(),
-							dynamic_cast<StateItem*> (this->placeTransitionStack.front())->getModel());
-
-				} else if (joinToState) {
-
-					//-- Update join model to target the state
-					State * targetState = FSMGraphicsItem<>::toStateItem(this->placeTransitionStack.front())->getModel();
-					FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.back())->getModel()->setTargetState(targetState);
-
-					//-- Update eventual transition going to this join to the new target
-					QList<Transline*>  incoming = FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.back())->getIncomingTransitions();
-					for (QList<Transline*>::iterator it = incoming.begin();it != incoming.end(); it++) {
-						((Trans *)(*it)->getModel())->setEndState(FSMGraphicsItem<>::toStateItem(this->placeTransitionStack.front())->getModel());
-					}
-
-				} else if (stateToJoin) {
-
-					//-- Target is target of the joint
-					State * targetState = FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.front())->getModel()->getTargetState();
-					int joinId = FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.front())->getModel()->getId();
-
-					//-- Add a transition pointing to the join point destination
-					transition = this->fsm->addTrans(dynamic_cast<StateItem*> (this->placeTransitionStack.back())->getModel(),targetState);
-
-					//-- Add one last trackpoint representing the join before the join graphic item
-					TrackpointItem * joinTrackpoint = new TrackpointItem(new Trackpoint(0,0,NULL));
-					joinTrackpoint->getModel()->setJoin(FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.front())->getModel());
-					//this->placeTransitionStack.insert(this->placeTransitionStack.indexOf(this->placeTransitionStack.front())-1,joinTrackpoint);
-					this->placeTransitionStack.insert(1,joinTrackpoint);
-
-					qDebug() << "Join target: " << targetState->getId() << " is id: " << joinTrackpoint->getModel()->getJoin()->getId();
-
-				}
-
-				//---- Trackpoints (Go from end to start because of stacking)
-				//-------------------
-				Transline* lastTransline = NULL;
-				for (int i = this->placeTransitionStack.size() - 1; i >= 0; i--) {
-
-					//-- Add Trackpoint model to transition
-					if (FSMGraphicsItem<>::isTrackPoint(
-							this->placeTransitionStack[i])) {
-
-						TrackpointItem * trackPoint =
-								FSMGraphicsItem<>::toTrackPoint(
-										this->placeTransitionStack[i]);
-
-						//-- Add to transition if we are placing a transition
-						if (stateToJoin|| stateToState) {
-
-							transition->appendTrackpoint(
-									trackPoint->getModel());
-						}
-						//-- Add to JoinItem if we are starting on a Join
-						else if (joinToState) {
-							FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.back())->getModel()->addTrackpoint(trackPoint->getModel());
-						}
-
-						//-- If trackpoint points to join, it is not designed to go on the scene
-						if (trackPoint->getModel()->getJoin()==NULL) {
-							trackPoint->modelChanged();
-							lastTransline = trackPoint->getPreviousTransline();
-						}
-					}
-
-				} // End trackpoints --//
-
-				//-- If no last transline, we have to create a new one
-				if (lastTransline == NULL) {
-					lastTransline = new Transline(transition,
-							this->placeTransitionStack.back(), this->placeTransitionStack.front());
-					this->addItem(lastTransline);
-				}
-
-				//-- Mark end of transition
-				endOfTransition = true;
+        //-- We want to place its next line (to have the mouse follow the next line)
+        //this->addToToPlaceStack(item->getNextTransline());
+      }
+      // Use Item under (Ok if Join or State)
+      //---------------
+      else if (itemUnder != NULL && (itemUnder->type() == StateItem::Type || itemUnder->type() == JoinItem::Type)) {
 
 
-				//-- Add Text
-				//--------------------------
-				if (stateToState || stateToJoin) {
-					TranslineText * translineText = new TranslineText(QString(
-					        transition->getName().c_str()),(Trans*)lastTransline->getModel());
+        //-- If there is a previous trackpoint, it ends on this item item
+        if (this->placeTransitionStack.size() > 0
+            && FSMGraphicsItem<>::isTrackPoint(
+                this->placeTransitionStack.first())) {
+          dynamic_cast<TrackpointItem*> (this->placeTransitionStack[0])->setEndItem(
+              itemUnder);
+        } else {
+
+        }
+        this->placeTransitionStack.push_front(itemUnder);
+
+      }
+
+      // If nothing on the stack, do nothing further
+      if (this->placeTransitionStack.size() == 0)
+        break;
+
+      // Check that if we should end the transition
+      // The objects are commited to model
+      //-----------------------------------------------
+
+      // If we have found that we can end the transition
+      bool endOfTransition = false;
+
+      //-- Determine type of transition
+      bool stateToState = this->placeTransitionStack.size() > 1
+          && this->placeTransitionStack.front()->type()
+              == StateItem::Type
+          && this->placeTransitionStack.back()->type()
+              == StateItem::Type;
+
+      bool joinToState = this->placeTransitionStack.size() > 1
+          && this->placeTransitionStack.front()->type()
+              == StateItem::Type
+          && this->placeTransitionStack.back()->type()
+              == JoinItem::Type;
+
+      bool stateToJoin = this->placeTransitionStack.size() > 1
+                && this->placeTransitionStack.front()->type()
+                    == JoinItem::Type
+                && this->placeTransitionStack.back()->type()
+                    == StateItem::Type;
+
+      bool hypertransitionToState = this->placeTransitionStack.size() > 1
+                                      && this->placeTransitionStack.front()->type()
+                                              == StateItem::Type
+                                      && this->placeTransitionStack.back()->type()
+                                              == HyperTransition::Type;
+
+      //-- Transition from state to state
+      //-----------------
+      if (stateToState || joinToState || stateToJoin) {
+
+          //-- Keep added/referenced transition
+          Trans * transition= NULL;
+
+        //---- Add to model depending on type
+        //---------------------
+        if (stateToState) {
+
+          //-- Add Transition
+            transition = this->fsm->addTrans(
+              dynamic_cast<StateItem*> (this->placeTransitionStack.back())->getModel(),
+              dynamic_cast<StateItem*> (this->placeTransitionStack.front())->getModel());
+
+        } else if (joinToState) {
+
+          //-- Update join model to target the state
+          State * targetState = FSMGraphicsItem<>::toStateItem(this->placeTransitionStack.front())->getModel();
+          FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.back())->getModel()->setTargetState(targetState);
+
+          //-- Update eventual transition going to this join to the new target
+          QList<Transline*>  incoming = FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.back())->getIncomingTransitions();
+          for (QList<Transline*>::iterator it = incoming.begin();it != incoming.end(); it++) {
+            ((Trans *)(*it)->getModel())->setEndState(FSMGraphicsItem<>::toStateItem(this->placeTransitionStack.front())->getModel());
+          }
+
+        } else if (stateToJoin) {
+
+          //-- Target is target of the joint
+          State * targetState = FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.front())->getModel()->getTargetState();
+          int joinId = FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.front())->getModel()->getId();
+
+          //-- Add a transition pointing to the join point destination
+          transition = this->fsm->addTrans(dynamic_cast<StateItem*> (this->placeTransitionStack.back())->getModel(),targetState);
+
+          //-- Add one last trackpoint representing the join before the join graphic item
+          TrackpointItem * joinTrackpoint = new TrackpointItem(new Trackpoint(0,0,NULL));
+          joinTrackpoint->getModel()->setJoin(FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.front())->getModel());
+          //this->placeTransitionStack.insert(this->placeTransitionStack.indexOf(this->placeTransitionStack.front())-1,joinTrackpoint);
+          this->placeTransitionStack.insert(1,joinTrackpoint);
+
+          qDebug() << "Join target: " << targetState->getId() << " is id: " << joinTrackpoint->getModel()->getJoin()->getId();
+
+        }
+
+        //---- Trackpoints (Go from end to start because of stacking)
+        //-------------------
+        Transline* lastTransline = NULL;
+        for (int i = this->placeTransitionStack.size() - 1; i >= 0; i--) {
+
+          //-- Add Trackpoint model to transition
+          if (FSMGraphicsItem<>::isTrackPoint(
+              this->placeTransitionStack[i])) {
+
+            TrackpointItem * trackPoint =
+                FSMGraphicsItem<>::toTrackPoint(
+                    this->placeTransitionStack[i]);
+
+            //-- Add to transition if we are placing a transition
+            if (stateToJoin|| stateToState) {
+
+              transition->appendTrackpoint(
+                  trackPoint->getModel());
+            }
+            //-- Add to JoinItem if we are starting on a Join
+            else if (joinToState) {
+              FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.back())->getModel()->addTrackpoint(trackPoint->getModel());
+            }
+
+            //-- If trackpoint points to join, it is not designed to go on the scene
+            if (trackPoint->getModel()->getJoin()==NULL) {
+              trackPoint->modelChanged();
+              lastTransline = trackPoint->getPreviousTransline();
+            }
+          }
+
+        } // End trackpoints --//
+
+        //-- If no last transline, we have to create a new one
+        if (lastTransline == NULL) {
+          lastTransline = new Transline(transition,
+              this->placeTransitionStack.back(), this->placeTransitionStack.front());
+          this->addItem(lastTransline);
+        }
+
+        //-- Mark end of transition
+        endOfTransition = true;
 
 
-					//-- Place in between the two state
-					lastTransline->setEnabled(true);
-					qreal textx = this->placeTransitionStack.back()->x() -(this->placeTransitionStack.back()->x() - this->placeTransitionStack.front()->x())/2;
-					qreal texty = this->placeTransitionStack.back()->y() -(this->placeTransitionStack.back()->y() - this->placeTransitionStack.front()->y())/2;
-					translineText->setPos(textx,texty);
-					this->addItem(translineText);
-				}
+        //-- Add Text
+        //--------------------------
+        if (stateToState || stateToJoin) {
+          TranslineText * translineText = new TranslineText(QString(
+                  transition->getName().c_str()),(Trans*)lastTransline->getModel());
 
-				// Clean
-				//----------------------
-				// All items to be placed have been placed
-				this->placeTransitionStack.clear();
-				this->setPlaceMode(CHOOSE);
 
-			} // End State to State finish--/
-			// hypertransition to State
-			//--------------------
-			else if (hypertransitionToState) {
+          //-- Place in between the two state
+          lastTransline->setEnabled(true);
+          qreal textx = this->placeTransitionStack.back()->x() -(this->placeTransitionStack.back()->x() - this->placeTransitionStack.front()->x())/2;
+          qreal texty = this->placeTransitionStack.back()->y() -(this->placeTransitionStack.back()->y() - this->placeTransitionStack.front()->y())/2;
+          translineText->setPos(textx,texty);
+          this->addItem(translineText);
+        }
 
-			    //-- Update Hypertransition model to target the state
+        // Clean
+        //----------------------
+        // All items to be placed have been placed
+        this->placeTransitionStack.clear();
+        this->setPlaceMode(CHOOSE);
+
+      } // End State to State finish--/
+      // hypertransition to State
+      //--------------------
+      else if (hypertransitionToState) {
+
+          //-- Update Hypertransition model to target the state
                 State * targetState = FSMGraphicsItem<>::toStateItem(this->placeTransitionStack.front())->getModel();
                 FSMGraphicsItem<>::toHyperTransition(this->placeTransitionStack.back())->getModel()->setTargetState(targetState);
 
@@ -617,155 +611,155 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
                 //-- Mark end of transition
                 endOfTransition = true;
 
-			}
+      }
 
-			// End of transition or add a new Transition that follow the mouse
-			//------------------------------------------------------
-			if (!endOfTransition) {
+      // End of transition or add a new Transition that follow the mouse
+      //------------------------------------------------------
+      if (!endOfTransition) {
 
-				// Not end of transition, add a transition item from last element (state or trackpoint) to the possible next
-				//--------------
+        // Not end of transition, add a transition item from last element (state or trackpoint) to the possible next
+        //--------------
 
-				//-- If last stacked element, is a trackpoint, the transline to move is the next transline
-				if (this->placeTransitionStack.first()->type()
-						== TrackpointItem::Type) {
+        //-- If last stacked element, is a trackpoint, the transline to move is the next transline
+        if (this->placeTransitionStack.first()->type()
+            == TrackpointItem::Type) {
 
-					//-- Should follow the mouse
-					this->addToToPlaceStack(
-							dynamic_cast<TrackpointItem*> (this->placeTransitionStack.first())->getNextTransline());
+          //-- Should follow the mouse
+          this->addToToPlaceStack(
+              dynamic_cast<TrackpointItem*> (this->placeTransitionStack.first())->getNextTransline());
 
-				} else {
+        } else {
 
-					//-- Otherwise, create a new transline
-					//-- Prepare transline
-					Transline * transition = new Transline(NULL,
-							this->placeTransitionStack.first(), NULL);
+          //-- Otherwise, create a new transline
+          //-- Prepare transline
+          Transline * transition = new Transline(NULL,
+              this->placeTransitionStack.first(), NULL);
 
-					//-- Add to transition stack
-					//this->placeTransitionStack.push_front(transition);
+          //-- Add to transition stack
+          //this->placeTransitionStack.push_front(transition);
 
-					//-- Should follow the mouse
-					this->addToToPlaceStack(transition);
-				}
-			}
-			break;
-		}
+          //-- Should follow the mouse
+          this->addToToPlaceStack(transition);
+        }
+      }
+      break;
+    }
         //-- END OF Transition -------//
 
         // Link
         //------------------------------
-		case LINKDEPARTURE: {
+    case LINKDEPARTURE: {
 
-			//-- Get Item under
-			QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
-					Qt::IntersectsItemShape, Qt::AscendingOrder);
-			QGraphicsItem* itemUnder =
-					itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
+      //-- Get Item under
+      QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
+          Qt::IntersectsItemShape, Qt::AscendingOrder);
+      QGraphicsItem* itemUnder =
+          itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
 
-			//-- Action if clicked on a state
-			if (itemUnder == NULL || itemUnder->type() != StateItem::Type) {
-				break;
-			}
-			StateItem * clickedState = dynamic_cast<StateItem*> (itemUnder);
+      //-- Action if clicked on a state
+      if (itemUnder == NULL || itemUnder->type() != StateItem::Type) {
+        break;
+      }
+      StateItem * clickedState = dynamic_cast<StateItem*> (itemUnder);
 
-			//-- First state To be clicked is the source
-			if (this->placeLinkStartState == NULL) {
+      //-- First state To be clicked is the source
+      if (this->placeLinkStartState == NULL) {
 
-				//-- Record and unselect
-				this->placeLinkStartState = clickedState;
-				this->placeLinkStartState->setSelected(false);
-			}
-			//-- Second state to be clicked is the destination
-			else if (this->placeLinkEndState == NULL) {
+        //-- Record and unselect
+        this->placeLinkStartState = clickedState;
+        this->placeLinkStartState->setSelected(false);
+      }
+      //-- Second state to be clicked is the destination
+      else if (this->placeLinkEndState == NULL) {
 
-				//-- Record and unselect
-				this->placeLinkEndState = clickedState;
-				this->placeLinkEndState->setSelected(false);
-			}
+        //-- Record and unselect
+        this->placeLinkEndState = clickedState;
+        this->placeLinkEndState->setSelected(false);
+      }
 
-			//-- If both states are set, proceed
-			//-----------
-			if (this->placeLinkEndState != NULL && this->placeLinkStartState
-					!= NULL) {
+      //-- If both states are set, proceed
+      //-----------
+      if (this->placeLinkEndState != NULL && this->placeLinkStartState
+          != NULL) {
 
-				// Prepare Model
-				//------------------------
+        // Prepare Model
+        //------------------------
 
-			    Link * link = this->getFsm()->getLinkbyGoal(this->placeLinkEndState->getModel());
+          Link * link = this->getFsm()->getLinkbyGoal(this->placeLinkEndState->getModel());
 
-				//-- Add Link to destination if necessary
-				if (link==NULL) {
-				    link = this->getFsm()->addLink(this->placeLinkEndState->getModel(),(double) e->scenePos().x(),
-							(double) e->scenePos().y());
-				}
-
-
-
-				//-- Add Link transition from start
-				Trans * linkToTransition = this->getFsm()->addTrans(
-						this->placeLinkStartState->getModel()->getId(),
-						this->placeLinkEndState->getModel()->getId());
-				Trackpoint * tp = linkToTransition->appendTrackpoint(
-						(double) e->scenePos().x(), (double) e->scenePos().y());
-
-				tp->setTargetLink(link);
-
-				// Add Items to GUI using toPlace stack
-				//-----------------
-
-				//-- Prepare destination
-				LinkArrival* linkToEndStateItem = this->placeLinkToState(
-										this->placeLinkEndState, link);
-
-				//-- Prepare Start
-				LinkDeparture * linkFromStartItem = new LinkDeparture(tp,
-						this->placeLinkStartState);
-
-				//-- Sync colors
-				linkFromStartItem->setBrush(linkToEndStateItem->brush());
+        //-- Add Link to destination if necessary
+        if (link==NULL) {
+            link = this->getFsm()->addLink(this->placeLinkEndState->getModel(),(double) e->scenePos().x(),
+              (double) e->scenePos().y());
+        }
 
 
-				//-- End (At first because it cleans everything)
-				//-- && Place
-				this->setPlaceMode(CHOOSE);
 
-				//-- Place Link to State if necessary
-				if (linkToEndStateItem->scene() == NULL)
-					this->addToToPlaceStack(linkToEndStateItem);
+        //-- Add Link transition from start
+        Trans * linkToTransition = this->getFsm()->addTrans(
+            this->placeLinkStartState->getModel()->getId(),
+            this->placeLinkEndState->getModel()->getId());
+        Trackpoint * tp = linkToTransition->appendTrackpoint(
+            (double) e->scenePos().x(), (double) e->scenePos().y());
 
-				//-- Place transition from start
-				this->addToToPlaceStack(linkFromStartItem);
+        tp->setTargetLink(link);
 
-				// Clean
-				//--------------------
-				this->placeLinkStartState = NULL;
-				this->placeLinkEndState = NULL;
-			}
+        // Add Items to GUI using toPlace stack
+        //-----------------
 
-			break;
-			//-- END OF Link -------------//
+        //-- Prepare destination
+        LinkArrival* linkToEndStateItem = this->placeLinkToState(
+                    this->placeLinkEndState, link);
 
-			/*default:
-			 break;*/
-		}
-		//-- EOF Link --//
+        //-- Prepare Start
+        LinkDeparture * linkFromStartItem = new LinkDeparture(tp,
+            this->placeLinkStartState);
 
-		// Place a JointPoint
-		//--------------------------
-		case JOIN: {
+        //-- Sync colors
+        linkFromStartItem->setBrush(linkToEndStateItem->brush());
 
-			//-- Get Item under
-			QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
-					Qt::IntersectsItemShape, Qt::AscendingOrder);
-			QGraphicsItem* itemUnder =
-					itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
 
-			JoinItem * JoinItem = FSMGraphicsItem<>::toJoinItem(itemUnder);
+        //-- End (At first because it cleans everything)
+        //-- && Place
+        this->setPlaceMode(CHOOSE);
 
-			//-- Add to FSM
-			this->getFsm()->addJoin(JoinItem->getModel());
+        //-- Place Link to State if necessary
+        if (linkToEndStateItem->scene() == NULL)
+          this->addToToPlaceStack(linkToEndStateItem);
 
-			// Ask user to target a state
+        //-- Place transition from start
+        this->addToToPlaceStack(linkFromStartItem);
+
+        // Clean
+        //--------------------
+        this->placeLinkStartState = NULL;
+        this->placeLinkEndState = NULL;
+      }
+
+      break;
+      //-- END OF Link -------------//
+
+      /*default:
+       break;*/
+    }
+    //-- EOF Link --//
+
+    // Place a JointPoint
+    //--------------------------
+    case JOIN: {
+
+      //-- Get Item under
+      QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
+          Qt::IntersectsItemShape, Qt::AscendingOrder);
+      QGraphicsItem* itemUnder =
+          itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
+
+      JoinItem * JoinItem = FSMGraphicsItem<>::toJoinItem(itemUnder);
+
+      //-- Add to FSM
+      this->getFsm()->addJoin(JoinItem->getModel());
+
+      // Ask user to target a state
             //----------------------------------------
 
             // Start Transline Placement
@@ -783,15 +777,15 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 
 
 
-			break;
-		}
-		//-- EOF JoinItem
+      break;
+    }
+    //-- EOF JoinItem
 
-		// Place an HyperTransition
-		//---------------------------------
-		case HYPERTRANS: {
+    // Place an HyperTransition
+    //---------------------------------
+    case HYPERTRANS: {
 
-		    //-- Get Hypertransition item (under the mouse because just released)
+        //-- Get Hypertransition item (under the mouse because just released)
             HyperTransition * hypertransition = FSMGraphicsItem<>::toHyperTransition(this->items(e->scenePos(),
                     Qt::IntersectsItemShape, Qt::AscendingOrder).front());
 
@@ -823,120 +817,120 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 
             break;
 
-		}
+    }
 
 
-		}
-
-
-
-		//-- EOF Place Mode --------------//
-
-	}
-
-	// To Place elements Stack
-	//------------------------------
+    }
 
 
 
-	//-- Parent job
-	// Only now, to avoid selection update on an item whose model has not been prepared
-	QGraphicsScene::mouseReleaseEvent(e);
+    //-- EOF Place Mode --------------//
+
+  }
+
+  // To Place elements Stack
+  //------------------------------
+
+
+
+  //-- Parent job
+  // Only now, to avoid selection update on an item whose model has not been prepared
+  QGraphicsScene::mouseReleaseEvent(e);
 
 }
 
 void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
 
-	//----------------- Mouse Following stacks --------------//
+  //----------------- Mouse Following stacks --------------//
 
-	// Mouse following
-	//---------------------------------
-	if (this->toPlaceStack.size() > 0) {
+  // Mouse following
+  //---------------------------------
+  if (this->toPlaceStack.size() > 0) {
 
-		QGraphicsItem * stackFirst = this->toPlaceStack.first();
-		stackFirst->setVisible(true);
-		stackFirst->setEnabled(true);
-		this->placeUnderMouse(stackFirst, e->scenePos());
+    QGraphicsItem * stackFirst = this->toPlaceStack.first();
+    stackFirst->setVisible(true);
+    stackFirst->setEnabled(true);
+    this->placeUnderMouse(stackFirst, e->scenePos());
 
-	}
+  }
 
 
-	QGraphicsScene::mouseMoveEvent(e);
+  QGraphicsScene::mouseMoveEvent(e);
 }
 
 void Scene::placeUnderMouse(QGraphicsItem * item, QPointF mousePosition) {
 
-	/*item->setPos(mousePosition.x() - (item->boundingRect().width() / 2),
-	 mousePosition.y() - (item->boundingRect().height() / 2));*/
+  /*item->setPos(mousePosition.x() - (item->boundingRect().width() / 2),
+   mousePosition.y() - (item->boundingRect().height() / 2));*/
 
-	//-- If we have a transline, we only want to position the endpoint
-	if (item->type() == Transline::Type) {
+  //-- If we have a transline, we only want to position the endpoint
+  if (item->type() == Transline::Type) {
 
-		Transline * line = dynamic_cast<Transline*> (item);
-		line->setEndPoint(mousePosition);
-	} else {
-		item->setPos(mousePosition);
-	}
+    Transline * line = dynamic_cast<Transline*> (item);
+    line->setEndPoint(mousePosition);
+  } else {
+    item->setPos(mousePosition);
+  }
 
 }
 
 void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
 
-	// Call Parent
-	//-------------------
-	QGraphicsScene::keyReleaseEvent(keyEvent);
+  // Call Parent
+  //-------------------
+  QGraphicsScene::keyReleaseEvent(keyEvent);
 
-	//qDebug() << "Krelease in scene widget: " << keyEvent->isAccepted();
+  //qDebug() << "Krelease in scene widget: " << keyEvent->isAccepted();
 
 
-	//-- IF event was already accepted, don't process it
-	if (keyEvent->isAccepted())
-		return;
+  //-- IF event was already accepted, don't process it
+  if (keyEvent->isAccepted())
+    return;
 
-	// ESC sets place mode to choose
-	//---------------
-	if (keyEvent->key() == Qt::Key_Escape && this->getPlaceMode() != CHOOSE) {
-		this->setPlaceMode(CHOOSE);
-	}
-	// Suppr deletes items
-	//---------------------
-	else if (keyEvent->key() == Qt::Key_Delete) {
+  // ESC sets place mode to choose
+  //---------------
+  if (keyEvent->key() == Qt::Key_Escape && this->getPlaceMode() != CHOOSE) {
+    this->setPlaceMode(CHOOSE);
+  }
+  // Suppr deletes items
+  //---------------------
+  else if (keyEvent->key() == Qt::Key_Delete) {
 
-		QList<QGraphicsItem*> selectedItems = this->selectedItems();
+    QList<QGraphicsItem*> selectedItems = this->selectedItems();
     // TODO:
-		for (QList<QGraphicsItem*>::iterator it = selectedItems.begin(); it
-				< selectedItems.end(); it++) {
+    for (QList<QGraphicsItem*>::iterator it = selectedItems.begin(); it
+        < selectedItems.end(); it++) {
 
-			//--  Check item is still on the scene
-			if ((*it)->scene() == NULL) {
-				continue;
-			}
+      //--  Check item is still on the scene
+      if ((*it)->scene() == NULL) {
+        continue;
+      }
 
-			//-- remove / delete from scene
-			//this->removeItem(*it);
+      //-- remove / delete from scene
+      //this->removeItem(*it);
 
-			QList<QUndoCommand*> undoCommands;
-			if ((*it)->type() == StateItem::Type) {
+      QList<QUndoCommand*> undoCommands;
+      if ((*it)->type() == StateItem::Type) {
 
-				undoCommands = dynamic_cast<StateItem*> (*it)->remove();
+        undoCommands = dynamic_cast<StateItem*> (*it)->remove();
 
-			} else if ((*it)->type() == Transline::Type) {
+      } else if ((*it)->type() == Transline::Type) {
 
-				undoCommands = dynamic_cast<Transline*> (*it)->remove();
+        undoCommands = dynamic_cast<Transline*> (*it)->remove();
 
-			} else if ((*it)->type() == LinkDeparture::Type) {
+      } else if ((*it)->type() == LinkDeparture::Type) {
 
-				undoCommands = dynamic_cast<LinkDeparture*> (*it)->remove();
+        undoCommands = dynamic_cast<LinkDeparture*> (*it)->remove();
 
-			} else if ((*it)->type() == TrackpointItem::Type) {
+      } else if ((*it)->type() == TrackpointItem::Type) {
 
-				undoCommands = dynamic_cast<TrackpointItem*> (*it)->remove();
+        undoCommands = dynamic_cast<TrackpointItem*> (*it)->remove();
 
-			} else if ((*it)->type() == LinkArrival::Type) {
+      } else if ((*it)->type() == LinkArrival::Type) {
 
-				undoCommands = dynamic_cast<LinkArrival*> (*it)->remove();
+        undoCommands = dynamic_cast<LinkArrival*> (*it)->remove();
 
-			} else if ((*it)->type() == HyperTransition::Type) {
+      } else if ((*it)->type() == HyperTransition::Type) {
 
                 undoCommands = dynamic_cast<HyperTransition*> (*it)->remove();
 
@@ -946,25 +940,25 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
 
             }
 
-			//-- Add gathered Undo commands to stack
-			for (QList<QUndoCommand*>::iterator cit = undoCommands.begin(); cit
-					< undoCommands.end(); cit++) {
-				this->undoStack.push(*cit);
-			}
+      //-- Add gathered Undo commands to stack
+      for (QList<QUndoCommand*>::iterator cit = undoCommands.begin(); cit
+          < undoCommands.end(); cit++) {
+        this->undoStack.push(*cit);
+      }
 
-			// Only do once
-			break;
+      // Only do once
+      break;
 
-		}
+    }
 
-	} else if (keyEvent->key() == Qt::Key_Z && keyEvent->modifiers()
-			== Qt::CTRL) {
+  } else if (keyEvent->key() == Qt::Key_Z && keyEvent->modifiers()
+      == Qt::CTRL) {
 
-		//-- Do undo
-		//cout << "*I Undoing" << endl;
-		//this->undo();
+    //-- Do undo
+    //cout << "*I Undoing" << endl;
+    //this->undo();
 
-	}  else if (keyEvent->key() == Qt::Key_Y && keyEvent->modifiers()
+  }  else if (keyEvent->key() == Qt::Key_Y && keyEvent->modifiers()
             == Qt::CTRL) {
 
         //-- Do Redo
@@ -976,76 +970,81 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
 }
 
 Fsm * Scene::getFsm() {
-	return this->fsm;
+  return this->fsm;
 }
 void Scene::setFsm(Fsm * fsm) {
 
-	this->fsm = fsm;
+  this->fsm = fsm;
 }
 
 #define CLEAN_POINTER_QLIST(list)\
-		while (!list.isEmpty()) \
-			 delete list.takeFirst();
+    while (!list.isEmpty()) \
+       delete list.takeFirst();
 
 void Scene::setPlaceMode(FSMDesigner::Item mode) {
 
-	//-- If back to choose requested, then perform cleaning and such
-	//-------------------------------------
-	if (mode==FSMDesigner::CHOOSE) {
+  // TODO: quick hack, redesign setPlaceMode-method
+  if (mode==FSMDesigner::STATE || mode==FSMDesigner::TRANS || mode==FSMDesigner::JOIN
+      || mode==FSMDesigner::HYPERTRANS || mode==FSMDesigner::LINKDEPARTURE)
+    this->clearPlaceStack();
 
-		//-- Restore any cursor change
-		QApplication::restoreOverrideCursor();
+  //-- If back to choose requested, then perform cleaning and such
+  //-------------------------------------
+  if (mode==FSMDesigner::CHOOSE) {
 
-		//-- Clear selected elements
-		this->clearSelection();
+    //-- Restore any cursor change
+    QApplication::restoreOverrideCursor();
 
-
-
-		// Clean to place stack
-		//-----------------------------------
-
-		//-- Clean things to be placed as they will never come up
-		while (!this->toPlaceStack.isEmpty()) {
-
-			QGraphicsItem* firstItem = this->toPlaceStack.takeFirst();
-			//-- Transline that belong to a trackpoint are removed by trackpoint
-			if (FSMGraphicsItem<>::isTransline(firstItem) &&
-				FSMGraphicsItem<>::isTrackPoint(FSMGraphicsItem<>::toTransline(firstItem)->getStartItem())) {
-
-			} else
-				delete firstItem;
-		}
-		//CLEAN_POINTER_QLIST(this->toPlaceStack)
-
-		// Clean Transition place stack
-		//---------------------------------------
-
-		//-- Clear Trackpoints that were in placement
-		while (!this->placeTransitionStack.isEmpty()) {
-
-			QGraphicsItem* firstItem = this->placeTransitionStack.takeFirst();
-			//-- Transline that belong to a trackpoint are removed by trackpoint
-			if (FSMGraphicsItem<>::isTrackPoint(firstItem)) {
-				this->removeItem(firstItem);
-				delete firstItem;
-			}
-		}
-
-		// Reset variables
-		//---------------------
-		this->placeLinkStartState = NULL;
-		this->placeLinkEndState = NULL;
-	}
+    //-- Clear selected elements
+    this->clearSelection();
 
 
-	//-- If In Lock mode, don't change back to choose and repeat
-	if (this->getPlaceModeLock() != FSMDesigner::LOCKED ) {
-		//-- Record
-		this->placeMode = mode;
-	}
 
-	//-- Make some preparation
-	switch (this->placeMode) {
+    // Clean to place stack
+    //-----------------------------------
+
+    //-- Clean things to be placed as they will never come up
+    while (!this->toPlaceStack.isEmpty()) {
+
+      QGraphicsItem* firstItem = this->toPlaceStack.takeFirst();
+      //-- Transline that belong to a trackpoint are removed by trackpoint
+      if (FSMGraphicsItem<>::isTransline(firstItem) &&
+        FSMGraphicsItem<>::isTrackPoint(FSMGraphicsItem<>::toTransline(firstItem)->getStartItem())) {
+
+      } else
+        delete firstItem;
+    }
+    //CLEAN_POINTER_QLIST(this->toPlaceStack)
+
+    // Clean Transition place stack
+    //---------------------------------------
+
+    //-- Clear Trackpoints that were in placement
+    while (!this->placeTransitionStack.isEmpty()) {
+
+      QGraphicsItem* firstItem = this->placeTransitionStack.takeFirst();
+      //-- Transline that belong to a trackpoint are removed by trackpoint
+      if (FSMGraphicsItem<>::isTrackPoint(firstItem)) {
+        this->removeItem(firstItem);
+        delete firstItem;
+      }
+    }
+
+    // Reset variables
+    //---------------------
+    this->placeLinkStartState = NULL;
+    this->placeLinkEndState = NULL;
+  }
+
+
+  //-- If In Lock mode, don't change back to choose and repeat
+  if (this->getPlaceModeLock() != FSMDesigner::LOCKED ) {
+    //-- Record
+    this->placeMode = mode;
+  }
+
+  //-- Make some preparation
+  switch (this->placeMode) {
 
         case LINKDEPARTURE: {
             //-- Change cursor
@@ -1091,103 +1090,80 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
             break;
         }
 
-	default:
-		break;
+  default:
+    break;
 
-	}
+  }
 
 }
 
 LinkArrival * Scene::placeLinkToState(StateItem * endState, Link * link) {
 
-	// Find An eventual LinkArrival to this state, using the StateItem incoming transitions
-	//------------------------------
-	LinkArrival * linkArrival = endState->findLinkArrival();
+  // Find An eventual LinkArrival to this state, using the StateItem incoming transitions
+  //------------------------------
+  LinkArrival * linkArrival = endState->findLinkArrival();
 
 
-	//-- Create GUI Item if not found
-	if (linkArrival==NULL) {
-	    linkArrival = new LinkArrival(link);
+  //-- Create GUI Item if not found
+  if (linkArrival==NULL) {
+      linkArrival = new LinkArrival(link);
 
-		//-- Add to scene
-		//this->addItem(LinkArrival);
+    //-- Add to scene
+    //this->addItem(LinkArrival);
 
-		//-- Create transition Line to state
-		Transline * transLine = new Transline(NULL, linkArrival, endState);
-		linkArrival->setNextTransline(transLine);
-		this->addItem(transLine);
+    //-- Create transition Line to state
+    Transline * transLine = new Transline(NULL, linkArrival, endState);
+    linkArrival->setNextTransline(transLine);
+    this->addItem(transLine);
 
-	}
+  }
 
 
-	return linkArrival;
+  return linkArrival;
 }
 
 void Scene::alignSelectionVertical() {
 
-	qreal firstPosx = -1;
+  qreal firstPosx = -1;
 
-	//-- Foreach selection
-	QList<QGraphicsItem*> selectedItems = this->selectedItems();
-	for (QList<QGraphicsItem*>::iterator it = selectedItems.begin(); it
-			< selectedItems.end(); it++) {
+  //-- Foreach selection
+  QList<QGraphicsItem*> selectedItems = this->selectedItems();
+  for (QList<QGraphicsItem*>::iterator it = selectedItems.begin(); it
+      < selectedItems.end(); it++) {
 
-		//-- Only states and trackpoints
-		if ((*it)->type() != StateItem::Type && (*it)->type() != TrackpointItem::Type )
-			continue;
+    //-- Only states and trackpoints
+    if ((*it)->type() != StateItem::Type && (*it)->type() != TrackpointItem::Type )
+      continue;
 
-		//-- Record X first position
-		if (firstPosx == -1) {
-			firstPosx = (*it)->pos().x();
-		} else {
-			//-- If already, give it to the others
-			(*it)->setPos(firstPosx, (*it)->y());
-		}
+    //-- Record X first position
+    if (firstPosx == -1) {
+      firstPosx = (*it)->pos().x();
+    } else {
+      //-- If already, give it to the others
+      (*it)->setPos(firstPosx, (*it)->y());
+    }
 
-	}
-
-}
-void Scene::alignSelectionHorizontal() {
+  }
 
 }
 
-void Scene::startPlaceState() {
 
-	//-- Set Place Mode
-	this->setPlaceMode(FSMDesigner::STATE);
-
-}
-
-void Scene::startPlaceTransition() {
-
-	//-- Set Place Mode
-	this->setPlaceMode(FSMDesigner::TRANS);
-}
-
-void Scene::startPlaceHyperTransition() {
-
-    //-- Set Place Mode
-    this->setPlaceMode(FSMDesigner::HYPERTRANS);
-}
-
-void Scene::startPlaceLink() {
-
-	//-- Set Place Mode
-	this->setPlaceMode(FSMDesigner::LINKDEPARTURE);
-}
-
-void Scene::startPlaceJoin() {
-
-	//-- Set Place Mode
-	this->setPlaceMode(FSMDesigner::JOIN);
+//TODO: simplify code
+void Scene::clearPlaceStack() {
+  qDebug() << "Clearing stack. ";
+  while (!toPlaceStack.isEmpty()) {
+    QGraphicsItem* first_item = toPlaceStack.first();
+    this->removeItem( first_item ); // Get ownership back from scene
+    delete toPlaceStack.takeFirst();
+  }
 }
 
 
 void Scene::verify() {
 
-	if (this->getFSMVerificator()!=NULL) {
-		this->getFSMVerificator()->reset();
-	}
+  if (this->getFSMVerificator()!=NULL) {
+    this->getFSMVerificator()->reset();
+  }
 
     Verificator * verificator = new Verificator();
     verificator->addRule(new StateOutputsRule());
@@ -1255,20 +1231,20 @@ void Scene::ruleFailed(VerificatorRule * rule,QList<RuleError*>& errors) {
 
 QList<Transline *> Scene::findTransline(Trans * transitionModel) {
 
-	QList<QGraphicsItem*> allItems = this->items();
-	QList<Transline *> result;
+  QList<QGraphicsItem*> allItems = this->items();
+  QList<Transline *> result;
 
-	//-- Search for the transline
-	for (QList<QGraphicsItem*>::iterator it = allItems.begin();it!=allItems.end();it++) {
+  //-- Search for the transline
+  for (QList<QGraphicsItem*>::iterator it = allItems.begin();it!=allItems.end();it++) {
 
-		if (FSMGraphicsItem<>::isTransline((*it))
-				&& FSMGraphicsItem<>::toTransline(*it)->getModel()!= NULL
-				&& FSMGraphicsItem<>::toTransline(*it)->getModel()==transitionModel) {
-			result+=(FSMGraphicsItem<>::toTransline(*it));
-		}
-	}
+    if (FSMGraphicsItem<>::isTransline((*it))
+        && FSMGraphicsItem<>::toTransline(*it)->getModel()!= NULL
+        && FSMGraphicsItem<>::toTransline(*it)->getModel()==transitionModel) {
+      result+=(FSMGraphicsItem<>::toTransline(*it));
+    }
+  }
 
-	return result;
+  return result;
 
 }
 
@@ -1312,20 +1288,20 @@ TranslineText * Scene::findTranslineText(Trans * transitionModel) {
 
 StateItem * Scene::findStateItem(State * stateModel) {
 
-	QList<QGraphicsItem*> allItems = this->items();
-	QList<Transline *> result;
+  QList<QGraphicsItem*> allItems = this->items();
+  QList<Transline *> result;
 
-	//-- Search for the transline
-	for (QList<QGraphicsItem*>::iterator it = allItems.begin();it!=allItems.end();it++) {
+  //-- Search for the transline
+  for (QList<QGraphicsItem*>::iterator it = allItems.begin();it!=allItems.end();it++) {
 
-		if (FSMGraphicsItem<>::isStateItem((*it))
-				&& FSMGraphicsItem<>::toStateItem(*it)->getModel()!= NULL
-				&& FSMGraphicsItem<>::toStateItem(*it)->getModel()==stateModel) {
-			return FSMGraphicsItem<>::toStateItem(*it);
-		}
-	}
+    if (FSMGraphicsItem<>::isStateItem((*it))
+        && FSMGraphicsItem<>::toStateItem(*it)->getModel()!= NULL
+        && FSMGraphicsItem<>::toStateItem(*it)->getModel()==stateModel) {
+      return FSMGraphicsItem<>::toStateItem(*it);
+    }
+  }
 
-	return NULL;
+  return NULL;
 
 }
 
@@ -1350,22 +1326,18 @@ JoinItem * Scene::findJoinItem(Join * joinModel) {
 
 QList<LinkDeparture*> Scene::findLinkDepartures(Link * link) {
 
-	QList<QGraphicsItem*> allItems = this->items();
-	QList<LinkDeparture *> result;
+  QList<QGraphicsItem*> allItems = this->items();
+  QList<LinkDeparture *> result;
 
-	//-- Search for the LinkDepartures
-	for (QList<QGraphicsItem*>::iterator it = allItems.begin();it!=allItems.end();it++) {
+  //-- Search for the LinkDepartures
+  for (QList<QGraphicsItem*>::iterator it = allItems.begin();it!=allItems.end();it++) {
 
-		if (FSMGraphicsItem<>::isLinkDeparture((*it))
-				&& FSMGraphicsItem<>::toLinkDeparture(*it)->getModel()!= NULL
-				&& FSMGraphicsItem<>::toLinkDeparture(*it)->getModel()->getTargetLink() == link) {
-			result << FSMGraphicsItem<>::toLinkDeparture(*it);
-		}
-	}
+    if (FSMGraphicsItem<>::isLinkDeparture((*it))
+        && FSMGraphicsItem<>::toLinkDeparture(*it)->getModel()!= NULL
+        && FSMGraphicsItem<>::toLinkDeparture(*it)->getModel()->getTargetLink() == link) {
+      result << FSMGraphicsItem<>::toLinkDeparture(*it);
+    }
+  }
 
-	return result;
+  return result;
 }
-
-
-
-

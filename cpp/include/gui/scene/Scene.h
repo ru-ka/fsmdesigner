@@ -43,9 +43,12 @@ class Scene: public QGraphicsScene, public VerificationListener {
         /// The designed FSM
         Fsm * fsm;
 
+        void clearPlaceStack(); //TODO: simplify code, content of
+        //clearPlaceStack could be moved to setPlaceMode(FSMDesigner::item mode)
+        //later on
+
         /** \defgroup FSM Items Placement*/
         /**@{*/
-
     protected:
 
         /// What kind of item we want to place
@@ -136,15 +139,15 @@ class Scene: public QGraphicsScene, public VerificationListener {
 
         void setPlaceMode(FSMDesigner::Item mode);
 
-        void startPlaceState();
+//        void startPlaceState();
 
-        void startPlaceTransition();
+//        void startPlaceTransition();
 
-        void startPlaceHyperTransition();
+//        void startPlaceHyperTransition();
 
-        void startPlaceLink();
+//        void startPlaceLink();
 
-        void startPlaceJoin();
+//        void startPlaceJoin();
 
     public:
 
@@ -183,7 +186,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
         /**
          * Align horizontally only States
          */
-        void alignSelectionHorizontal();
+//        void alignSelectionHorizontal();
 
         /**@}*/
 

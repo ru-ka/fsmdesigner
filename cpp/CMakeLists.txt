@@ -81,6 +81,7 @@ set(GUI_PACKAGES
         gui
         gui/actions 
         gui/common 
+        gui/commands
         gui/fsm 
         gui/input 
         gui/items 
