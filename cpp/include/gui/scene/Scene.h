@@ -48,10 +48,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
         void clearPlaceStack(); //TODO: simplify code, content of
         //clearPlaceStack could be moved to setPlaceMode(FSMDesigner::item mode)
         //later on
-        StateItem *current_state_item; //TODO: simplify code: toPlaceStack cannot
-        // handle temporary states properly right now, since the placement of
-        // an item in the scene is done in the PressEvent. In the releaseEvent
-        // the item is missing. A proper schema will address this issue later on.
+        QGraphicsItem * mouseOverItem;
 
 
         /** \defgroup FSM Items Placement*/

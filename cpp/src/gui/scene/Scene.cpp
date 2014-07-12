@@ -76,9 +76,7 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
   //---------------
   this->setFSMVerificator(new FSMVerificator(this));
 
-  // TODO: temporary solution. Fix multiple pointers to the same state by an
-  // appropriate schema.
-  current_state_item = NULL;
+  mouseOverItem = NULL;
 
 }
 
@@ -362,30 +360,26 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     //----------------------
     case STATE: {
 
-        Q_ASSERT( current_state_item );
-        StateItem * stateItem = current_state_item;
+        // Cleanup temporary graphic items.
+        Q_ASSERT( mouseOverItem );
+        this->removeItem( mouseOverItem );
+        delete mouseOverItem;
+        mouseOverItem = NULL;
 
-        //-- Create a new State
-        State * state = this->fsm->addState();
-
-        qDebug() << "Adding state from placed element " << QString::fromStdString(state->getName());
-        stateItem->setModel(state);
-
-        //-- Place centered on mouse
-        state->setPosition(pair<double,double>(e->scenePos().x(),e->scenePos().y()));
-        stateItem->setPos(e->scenePos().x(),e->scenePos().y());
+        // Generate the appropriate command and pass it to the undostack. 
+        AddStateCommand *stateCommand = new AddStateCommand( this, e );
+        undoStack.push( stateCommand );
 
         // Close interaction
-        this->toPlaceStack.clear();
+        this->toPlaceStack.clear(); // TODO: Remove?
         this->setPlaceMode(CHOOSE);
 
-        qDebug() << "Done ;) ";
       }
       break;
       //-- END OF State -------//
 
-        // Transition
-        //--------------------------
+      // Transition
+      //--------------------------
     case TRANS: {
 
       //-- Get Item under
@@ -1062,7 +1056,8 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
         case STATE: {
             //-- Create an Item to navigate under the mouse
             StateItem * st = new StateItem();
-            current_state_item = st;
+            Q_ASSERT( !mouseOverItem );
+            mouseOverItem = st;
             this->addToToPlaceStack(st);
 
             break;
@@ -1152,7 +1147,6 @@ void Scene::clearPlaceStack() {
     this->removeItem( first_item ); // Get ownership back from scene
     delete toPlaceStack.takeFirst();
   }
-  current_state_item = NULL;
 }
 
 
