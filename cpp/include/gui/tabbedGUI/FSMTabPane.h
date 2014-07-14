@@ -81,11 +81,15 @@ class FSMTabPane: public QTabWidget {
          */
         /**@{*/
 
+        void placeSetChoose();
         void placeSetState();
         void placeSetTransition();
         void placeSetHyperTransition();
         void placeSetLink();
         void placeSetJoin();
+
+        void zoomIn();
+        void zoomOut();
 
         /**
          * Makes a simple Generate Verilog call

@@ -14,10 +14,11 @@ AddStateCommand::AddStateCommand( Scene * _relatedScene,
 
   //-- Create a new state to the underlying model and refer to it in the GUI item
   state = fsm->addState();
-  fsm->deleteState(state);
+  stateItem->setModel( state );
   // The state should be added via the redo-method. The Fsm.h API currently
   // does not support the feature to generate a new state, but not to add it
   // internally yet.
+  fsm->deleteState(state);
 
   //-- Place centered on mouse
   state->setPosition(pair<double,double>(mouseEvent->scenePos().x(),mouseEvent->scenePos().y()));
@@ -37,11 +38,10 @@ AddStateCommand::~AddStateCommand() {
 void  AddStateCommand::redo(){
   // Pass the ownership of the state objects to the scene and the model.
   relatedScene->addItem( stateItem ); 
+  fsm->addState( state );
+  // Set GUI properties.
   stateItem->setVisible( true      );
   stateItem->setEnabled( true      );
-  stateItem->setModel  ( state     );
-
-  fsm->addState( state );
 
   relatedScene->update();
 }

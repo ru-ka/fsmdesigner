@@ -76,8 +76,6 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
   //---------------
   this->setFSMVerificator(new FSMVerificator(this));
 
-  mouseOverItem = NULL;
-
 }
 
 void Scene::initializeScene() {
@@ -359,12 +357,6 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     // State
     //----------------------
     case STATE: {
-
-        // Cleanup temporary graphic items.
-        Q_ASSERT( mouseOverItem );
-        this->removeItem( mouseOverItem );
-        delete mouseOverItem;
-        mouseOverItem = NULL;
 
         // Generate the appropriate command and pass it to the undostack. 
         AddStateCommand *stateCommand = new AddStateCommand( this, e );
@@ -834,6 +826,7 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
 
   // Mouse following
   //---------------------------------
+
   if (this->toPlaceStack.size() > 0) {
 
     QGraphicsItem * stackFirst = this->toPlaceStack.first();
@@ -861,6 +854,7 @@ void Scene::placeUnderMouse(QGraphicsItem * item, QPointF mousePosition) {
   }
 
 }
+
 
 void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
 
@@ -971,11 +965,6 @@ void Scene::setFsm(Fsm * fsm) {
 
 void Scene::setPlaceMode(FSMDesigner::Item mode) {
 
-  // TODO: quick hack, redesign setPlaceMode-method
-  if (mode==FSMDesigner::STATE || mode==FSMDesigner::TRANS || mode==FSMDesigner::JOIN
-      || mode==FSMDesigner::HYPERTRANS || mode==FSMDesigner::LINKDEPARTURE)
-    this->clearPlaceStack();
-
 
   //-- If back to choose requested, then perform cleaning and such
   //-------------------------------------
@@ -1035,57 +1024,47 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
   //-- Make some preparation
   switch (this->placeMode) {
 
-        case LINKDEPARTURE: {
-            //-- Change cursor
-            QApplication::setOverrideCursor(Qt::CrossCursor);
+    case LINKDEPARTURE: {
+        //-- Change cursor
+        QApplication::setOverrideCursor(Qt::CrossCursor);
 
-            //-- Highligh all the states that don't already have a link
-            this->clearSelection();
-            QList<QGraphicsItem*> items = this->items();
-            for (QList<QGraphicsItem*>::iterator it = items.begin(); it
-                    < items.end(); it++) {
+        //-- Highligh all the states that don't already have a link
+        this->clearSelection();
+        QList<QGraphicsItem*> items = this->items();
+        for (QList<QGraphicsItem*>::iterator it = items.begin(); it
+                < items.end(); it++) {
 
-                if ((*it)->type() == StateItem::Type) {
-                    (*it)->setSelected(true);
-                }
-
+            if ((*it)->type() == StateItem::Type) {
+                (*it)->setSelected(true);
             }
 
-            break;
-        }
-        case STATE: {
-            //-- Create an Item to navigate under the mouse
-            StateItem * st = new StateItem();
-            Q_ASSERT( !mouseOverItem );
-            mouseOverItem = st;
-            this->addToToPlaceStack(st);
-
-            break;
         }
 
-        case JOIN: {
+        break;
+    }
+    case STATE: {
+        // TODO: replace with custom cursor
+        QApplication::setOverrideCursor(Qt::ForbiddenCursor);
 
-            //-- Create an Item to navigate under the mouse
-            JoinItem * joinItem = new JoinItem();
-            this->addToToPlaceStack(joinItem);
+        break;
+    }
 
-            break;
-        }
+    case JOIN: {
+        // TODO: replace with custom cursor
+        QApplication::setOverrideCursor(Qt::PointingHandCursor);
 
-        case HYPERTRANS: {
+        break;
+    }
 
-            //-- Create an Item to navigate under the mouse
-            HyperTransition * hypertransition = new HyperTransition();
-            this->addToToPlaceStack(hypertransition);
+    case HYPERTRANS: {
+        // TODO: replace with custom cursor
+        QApplication::setOverrideCursor(Qt::BusyCursor);
 
-            break;
-        }
-
-  default:
-    break;
-
+        break;
+    }
+    default:
+      break;
   }
-
 }
 
 LinkArrival * Scene::placeLinkToState(StateItem * endState, Link * link) {
@@ -1136,17 +1115,6 @@ void Scene::alignSelectionVertical() {
 
   }
 
-}
-
-
-//TODO: simplify code
-void Scene::clearPlaceStack() {
-  qDebug() << "Clearing stack. ";
-  while (!toPlaceStack.isEmpty()) {
-    QGraphicsItem* first_item = toPlaceStack.first();
-    this->removeItem( first_item ); // Get ownership back from scene
-    delete toPlaceStack.takeFirst();
-  }
 }
 
 

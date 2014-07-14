@@ -55,6 +55,11 @@ set(CMAKE_VERBOSE_MAKEFILE false)
 ########################################## 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -rdynamic -std=c++0x")
 
+##########################################
+# Defines
+########################################## 
+remove_definitions( -DQT_NO_DEBUG )
+
  
 ##########################################
 ## Output Directories and Crosscompiling

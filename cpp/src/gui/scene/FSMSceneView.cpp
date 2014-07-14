@@ -516,6 +516,16 @@ void FSMSceneView::wheelEvent(QWheelEvent *event) {
 	}
 }
 
+void FSMSceneView::zoomIn() {
+  double factor = 1.08; // The magic number from FSMSceneView
+  this->scale(factor, factor);
+}
+
+void FSMSceneView::zoomOut() {
+  double factor = 1.08; // The magic number from FSMSceneView
+  this->scale(1/factor, 1/factor);
+}
+
 void FSMSceneView::sceneSelectionChanged() {
 
     // Update Help

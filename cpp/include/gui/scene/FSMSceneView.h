@@ -100,6 +100,9 @@ class FSMSceneView: public QGraphicsView,
 
         /** @} */
 
+        void zoomIn();
+        void zoomOut();
+
     protected:
         virtual void wheelEvent(QWheelEvent *event); //Zoom in and out with the  mouse Wheel
         virtual void mousePressEvent(QMouseEvent* e);

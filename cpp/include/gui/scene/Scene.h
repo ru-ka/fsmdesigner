@@ -45,12 +45,6 @@ class Scene: public QGraphicsScene, public VerificationListener {
         /// The designed FSM
         Fsm * fsm;
 
-        void clearPlaceStack(); //TODO: simplify code, content of
-        //clearPlaceStack could be moved to setPlaceMode(FSMDesigner::item mode)
-        //later on
-        QGraphicsItem * mouseOverItem;
-
-
         /** \defgroup FSM Items Placement*/
         /**@{*/
     protected:
@@ -132,6 +126,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
 
         /** \defgroup Place mode methods */
         /**@{*/
+        void setPlaceMode(FSMDesigner::Item mode);
 
     public slots:
         void setPlaceUnlocked() {
@@ -141,7 +136,6 @@ class Scene: public QGraphicsScene, public VerificationListener {
             this->placeLock = FSMDesigner::LOCKED;
         }
 
-        void setPlaceMode(FSMDesigner::Item mode);
 
     public:
 

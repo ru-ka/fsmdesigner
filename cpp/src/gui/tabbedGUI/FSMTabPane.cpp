@@ -107,6 +107,23 @@ void FSMTabPane::keyPressEvent(QKeyEvent * e) {
 
 }
 
+void FSMTabPane::zoomIn() {
+
+    if (this->currentIndex()>0)
+        dynamic_cast<FSMSceneView*>(this->currentWidget())->zoomIn();
+}
+
+void FSMTabPane::zoomOut() {
+
+    if (this->currentIndex()>0)
+        dynamic_cast<FSMSceneView*>(this->currentWidget())->zoomOut();
+}
+
+void FSMTabPane::placeSetChoose() {
+
+    if (this->currentIndex()>0)
+        dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::CHOOSE);
+}
 
 void FSMTabPane::placeSetState() {
 

@@ -172,6 +172,10 @@ MergedMainWindow::MergedMainWindow() :
     tabPane->connect(this->action_Redo, SIGNAL(triggered()), SLOT(redo()));
     tabPane->connect(this->action_Undo, SIGNAL(triggered()), SLOT(undo()));
 
+    //---- ZoomIn / ZoomOut
+    tabPane->connect(this->action_ZoomIn, SIGNAL(triggered()), SLOT(zoomIn()));
+    tabPane->connect(this->action_ZoomOut, SIGNAL(triggered()), SLOT(zoomOut()));
+
     //---- Table
     this->connect(this->actionGlobal, SIGNAL(triggered()),
             SLOT(showGlobalTable()));

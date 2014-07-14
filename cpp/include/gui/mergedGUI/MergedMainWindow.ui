@@ -177,6 +177,9 @@
    <addaction name="action_Redo"/>
   </widget>
   <widget class="QToolBar" name="ObjecttoolBar">
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
    <property name="windowTitle">
     <string>ObjecttoolBar</string>
    </property>
@@ -196,6 +199,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="separator"/>
+   <addaction name="actionAction_Choose"/>
    <addaction name="action_State"/>
    <addaction name="action_Transition"/>
    <addaction name="action_Hypertrans"/>
@@ -751,6 +755,21 @@
    </property>
    <property name="toolTip">
     <string>Kills the FSMDesigner</string>
+   </property>
+  </action>
+  <action name="actionAction_Choose">
+   <property name="icon">
+    <iconset resource="../../../src/gui/resources/resources.qrc">
+     <normaloff>:/icons/choose.png</normaloff>:/icons/choose.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Choose</string>
+   </property>
+   <property name="toolTip">
+    <string>Choose Mode</string>
+   </property>
+   <property name="whatsThis">
+    <string>&quot;Choose-mode&quot; button.</string>
    </property>
   </action>
  </widget>
