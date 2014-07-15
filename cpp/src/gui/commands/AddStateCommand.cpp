@@ -11,6 +11,9 @@ AddStateCommand::AddStateCommand( Scene * _relatedScene,
 {
   //-- Add new GUI item to the Scene
   stateItem = new StateItem();
+  // Set GUI properties.
+  stateItem->setVisible( true      );
+  stateItem->setEnabled( true      );
 
   //-- Create a new state to the underlying model and refer to it in the GUI item
   state = fsm->addState();
@@ -39,12 +42,10 @@ void  AddStateCommand::redo(){
   // Pass the ownership of the state objects to the scene and the model.
   relatedScene->addItem( stateItem ); 
   fsm->addState( state );
-  // Set GUI properties.
-  stateItem->setVisible( true      );
-  stateItem->setEnabled( true      );
 
   relatedScene->update();
 }
+
 
 void  AddStateCommand::undo(){
   // Get the ownership of the state objects.

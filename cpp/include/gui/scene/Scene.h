@@ -217,6 +217,8 @@ class Scene: public QGraphicsScene, public VerificationListener {
 
         void selectionEmpty();
 
+        void modeChanged();
+
         /** \defgroup Verification */
         /**@{*/
 

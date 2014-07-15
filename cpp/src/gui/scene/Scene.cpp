@@ -29,6 +29,7 @@ using namespace std;
 
 //-- Commands
 #include <gui/commands/AddStateCommand.h>
+#include <gui/commands/DeleteStateCommand.h>
 
 //-- Others
 #include <gui/common/GUIUtils.h>
@@ -363,8 +364,8 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
         undoStack.push( stateCommand );
 
         // Close interaction
-        this->toPlaceStack.clear(); // TODO: Remove?
         this->setPlaceMode(CHOOSE);
+        emit modeChanged();
 
       }
       break;
@@ -874,7 +875,7 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
   if (keyEvent->key() == Qt::Key_Escape && this->getPlaceMode() != CHOOSE) {
     this->setPlaceMode(CHOOSE);
   }
-  // Suppr deletes items
+  // Super deletes items
   //---------------------
   else if (keyEvent->key() == Qt::Key_Delete) {
 
@@ -891,6 +892,13 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
       //-- remove / delete from scene
       //this->removeItem(*it);
 
+      if ( (*it)->type() == StateItem::Type ) {
+        DeleteStateCommand *stateCommand = new DeleteStateCommand( this,
+            dynamic_cast<StateItem*>(*it) );
+        undoStack.push(stateCommand);
+      }
+
+      /*
       QList<QUndoCommand*> undoCommands;
       if ((*it)->type() == StateItem::Type) {
 
@@ -927,6 +935,7 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
           < undoCommands.end(); cit++) {
         this->undoStack.push(*cit);
       }
+      */
 
       // Only do once
       break;
@@ -1039,26 +1048,6 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
             }
 
         }
-
-        break;
-    }
-    case STATE: {
-        // TODO: replace with custom cursor
-        QApplication::setOverrideCursor(Qt::ForbiddenCursor);
-
-        break;
-    }
-
-    case JOIN: {
-        // TODO: replace with custom cursor
-        QApplication::setOverrideCursor(Qt::PointingHandCursor);
-
-        break;
-    }
-
-    case HYPERTRANS: {
-        // TODO: replace with custom cursor
-        QApplication::setOverrideCursor(Qt::BusyCursor);
 
         break;
     }

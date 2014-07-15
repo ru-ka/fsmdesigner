@@ -306,6 +306,9 @@ void FSMTabPane::tabSelectionChanged(int index) {
   this->sceneSelectionChanged(displayedScene);
 
   this->markModeActions();
+
+  connect( this->selectedScene, SIGNAL(modeChanged() ),
+           this               , SLOT  (modeChanged()));
 }
 
 // TODO: Since there are more states than actions, double check the correctness
@@ -321,4 +324,8 @@ void FSMTabPane::markModeActions() {
   emit hyperModeChanged (FSMDesigner::HYPERTRANS    == currentMode);
   emit linkModeChanged  (FSMDesigner::LINKDEPARTURE == currentMode);
   emit joinModeChanged  (FSMDesigner::JOIN          == currentMode);
+}
+
+void FSMTabPane::modeChanged() {
+  this->markModeActions();
 }

@@ -83,6 +83,8 @@ class FSMTabPane: public QTabWidget {
          */
         void tabSelectionChanged(int index);
 
+        void modeChanged();
+
     public Q_SLOTS:
 
         /**

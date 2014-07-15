@@ -158,7 +158,7 @@ MergedMainWindow::MergedMainWindow() :
 
     //---- Editing Actions
     tabPane->connect(this->action_Choose, SIGNAL(triggered()),
-            SLOT(placeSetState()));
+            SLOT(placeSetChoose()));
     tabPane->connect(this->action_State, SIGNAL(triggered()),
             SLOT(placeSetState()));
     tabPane->connect(this->action_Transition, SIGNAL(triggered()),
