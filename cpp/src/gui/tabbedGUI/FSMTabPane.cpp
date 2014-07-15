@@ -43,8 +43,6 @@ FSMTabPane::FSMTabPane(QWidget * parent) : QTabWidget(parent) {
 	this->connect(tabButton, SIGNAL(clicked()), SLOT(addFSM()));
 	this->setCornerWidget(tabButton, Qt::TopLeftCorner);
 
-	//-- Closing a Tab
-
 	//-- Style parameters
 	this->setTabPosition(QTabWidget::West);
 	this->setDocumentMode(true);
@@ -123,37 +121,42 @@ void FSMTabPane::placeSetChoose() {
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::CHOOSE);
+    markModeActions();
 }
 
 void FSMTabPane::placeSetState() {
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::STATE);
+    markModeActions();
 }
 
 void FSMTabPane::placeSetTransition(){
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::TRANS);
+    markModeActions();
 }
 
 void FSMTabPane::placeSetHyperTransition(){
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::HYPERTRANS);
+    markModeActions();
 }
 
 void FSMTabPane::placeSetLink(){
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::LINKDEPARTURE);
-
+    markModeActions();
 }
 
 void FSMTabPane::placeSetJoin(){
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::JOIN);
+    markModeActions();
 
 }
 
@@ -286,24 +289,36 @@ void FSMTabPane::deleteFSM(int index) {
 
 void FSMTabPane::tabSelectionChanged(int index) {
 
-    // Propagate NULL if -1 or 0 (because 0 will be welcome Tab)
-    //--------------------------------
-    Scene * displayedScene = NULL;
-    if (index>=1) {
-        displayedScene = dynamic_cast<FSMSceneView*>(this->widget(index))->getRelatedScene();
-        dynamic_cast<FSMSceneView*>(this->widget(index))->setFocus();
-    }
+  // Propagate NULL if -1 or 0 (because 0 will be welcome Tab)
+  //--------------------------------
+  Scene * displayedScene = NULL;
+  if (index>=1) {
+      displayedScene = dynamic_cast<FSMSceneView*>(this->widget(index))->getRelatedScene();
+      dynamic_cast<FSMSceneView*>(this->widget(index))->setFocus();
+  }
 
-    // Maintain Pointer
-    //--------------------
-    this->selectedScene = displayedScene;
+  // Maintain Pointer
+  //--------------------
+  this->selectedScene = displayedScene;
 
-    // Send Signal
-    //----------------
-    this->sceneSelectionChanged(displayedScene);
+  // Send Signal
+  //----------------
+  this->sceneSelectionChanged(displayedScene);
 
-
+  this->markModeActions();
 }
 
-
-
+// TODO: Since there are more states than actions, double check the correctness
+// of method.
+void FSMTabPane::markModeActions() {
+  if (selectedScene == NULL)
+    return;
+  FSMDesigner::Item currentMode = dynamic_cast<Scene*>(selectedScene)->getPlaceMode();
+  qDebug() << "currentMode = " << currentMode;
+  emit chooseModeChanged(FSMDesigner::CHOOSE        == currentMode);
+  emit stateModeChanged (FSMDesigner::STATE         == currentMode);
+  emit transModeChanged (FSMDesigner::TRANS         == currentMode);
+  emit hyperModeChanged (FSMDesigner::HYPERTRANS    == currentMode);
+  emit linkModeChanged  (FSMDesigner::LINKDEPARTURE == currentMode);
+  emit joinModeChanged  (FSMDesigner::JOIN          == currentMode);
+}

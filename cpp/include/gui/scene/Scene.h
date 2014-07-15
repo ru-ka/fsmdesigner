@@ -139,7 +139,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
 
     public:
 
-        FSMDesigner::Item getPlaceMode() {
+        FSMDesigner::Item getPlaceMode() const {
             return this->placeMode;
         }
 

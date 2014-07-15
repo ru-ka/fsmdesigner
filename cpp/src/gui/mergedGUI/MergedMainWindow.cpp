@@ -157,6 +157,8 @@ MergedMainWindow::MergedMainWindow() :
             SLOT(createProject(QString)));
 
     //---- Editing Actions
+    tabPane->connect(this->action_Choose, SIGNAL(triggered()),
+            SLOT(placeSetState()));
     tabPane->connect(this->action_State, SIGNAL(triggered()),
             SLOT(placeSetState()));
     tabPane->connect(this->action_Transition, SIGNAL(triggered()),
@@ -167,6 +169,20 @@ MergedMainWindow::MergedMainWindow() :
             SLOT(placeSetLink()));
     tabPane->connect(this->action_Join, SIGNAL(triggered()),
             SLOT(placeSetJoin()));
+    //---- Update edit state
+    connect( tabPane, SIGNAL(chooseModeChanged(bool)),
+             action_Choose, SLOT( setChecked(bool))  );
+    connect( tabPane, SIGNAL(stateModeChanged(bool)),
+             action_State, SLOT( setChecked(bool))  );
+    connect( tabPane, SIGNAL(transModeChanged(bool)),
+             action_Transition, SLOT( setChecked(bool))  );
+    connect( tabPane, SIGNAL(hyperModeChanged(bool)),
+             action_Hypertrans, SLOT( setChecked(bool))  );
+    connect( tabPane, SIGNAL(linkModeChanged(bool)),
+             action_Link, SLOT( setChecked(bool))  );
+    connect( tabPane, SIGNAL(joinModeChanged(bool)),
+             action_Join, SLOT( setChecked(bool))  );
+    
 
     //---- Undo / Redo
     tabPane->connect(this->action_Redo, SIGNAL(triggered()), SLOT(redo()));

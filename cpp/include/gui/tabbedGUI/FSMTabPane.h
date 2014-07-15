@@ -66,6 +66,16 @@ class FSMTabPane: public QTabWidget {
          */
         void sceneSelectionChanged(Scene *);
 
+        void chooseModeChanged(bool);
+        void stateModeChanged (bool);
+        void transModeChanged (bool);
+        void hyperModeChanged (bool);
+        void linkModeChanged  (bool);
+        void joinModeChanged  (bool);
+
+    private:
+        void markModeActions();
+
     protected slots:
 
         /**

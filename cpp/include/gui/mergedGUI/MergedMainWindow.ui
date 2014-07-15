@@ -199,7 +199,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="separator"/>
-   <addaction name="actionAction_Choose"/>
+   <addaction name="action_Choose"/>
    <addaction name="action_State"/>
    <addaction name="action_Transition"/>
    <addaction name="action_Hypertrans"/>
@@ -500,6 +500,9 @@
    </property>
   </action>
   <action name="action_State">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../src/gui/resources/resources.qrc">
      <normaloff>:/icons/state.png</normaloff>:/icons/state.png</iconset>
@@ -515,6 +518,9 @@
    </property>
   </action>
   <action name="action_Transition">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../src/gui/resources/resources.qrc">
      <normaloff>:/icons/trans.png</normaloff>:/icons/trans.png</iconset>
@@ -530,6 +536,9 @@
    </property>
   </action>
   <action name="action_Hypertrans">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -548,6 +557,9 @@
    </property>
   </action>
   <action name="action_Link">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -566,6 +578,9 @@
    </property>
   </action>
   <action name="action_Join">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../src/gui/resources/resources.qrc">
      <normaloff>:/icons/join.png</normaloff>:/icons/join.png</iconset>
@@ -757,7 +772,13 @@
     <string>Kills the FSMDesigner</string>
    </property>
   </action>
-  <action name="actionAction_Choose">
+  <action name="action_Choose">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../src/gui/resources/resources.qrc">
      <normaloff>:/icons/choose.png</normaloff>:/icons/choose.png</iconset>
