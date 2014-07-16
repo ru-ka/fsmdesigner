@@ -74,7 +74,7 @@ Transline::Transline(TransitionBase * model, QGraphicsItem * startItem,
 	if (startItem!=endItem)
 		this->setEndItem(endItem);
 	else
-	    this->endItem = endItem;
+	  this->endItem = endItem;
 
 	//this->endPoint.setX(startItem!=NULL?startItem->x():0);
 	//this->endPoint.setY(startItem!=NULL?startItem->y():0);

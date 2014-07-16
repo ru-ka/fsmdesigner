@@ -1,0 +1,10 @@
+http://stackoverflow.com/tags/qgraphicsscene/hot
+
+move-command:
+http://stackoverflow.com/questions/14631098/qt-properly-integrating-undo-framework-with-qgraphicsscene/14634337#14634337
+
+
+
+Some thoughts:
+1) Several independent items might be merged to a item group and moved together.
+2) A general item-move command could reduce code redundancy.

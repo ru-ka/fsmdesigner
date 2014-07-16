@@ -45,6 +45,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
         /// The designed FSM
         Fsm * fsm;
 
+
         /** \defgroup FSM Items Placement*/
         /**@{*/
     protected:
@@ -135,6 +136,8 @@ class Scene: public QGraphicsScene, public VerificationListener {
         void setPlaceLocked() {
             this->placeLock = FSMDesigner::LOCKED;
         }
+        
+        void receivedSelectionChanged();
 
 
     public:
@@ -204,18 +207,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
         void redo();
 
 
-        /**
-         *  Triggers a selection empty signal if nothing is selected
-         */
-        void selectionMonitor() {
-            if (this->selectedItems().size() == 0) {
-                this->selectionEmpty();
-            }
-        }
-
     Q_SIGNALS:
-
-        void selectionEmpty();
 
         void modeChanged();
 

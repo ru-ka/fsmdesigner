@@ -476,8 +476,8 @@ bool StateItem::recordPosition() {
 
 	// Record using an action
 	///------------------
-	MoveStateAction * moveState = new MoveStateAction(this->pos(),this);
-	dynamic_cast<Scene*>(this->scene())->getUndoStack()->push(moveState);
+//	MoveStateAction * moveState = new MoveStateAction(this->pos(),this);
+//	dynamic_cast<Scene*>(this->scene())->getUndoStack()->push(moveState);
 
 
 	// Modified

@@ -77,6 +77,7 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
   //---------------
   this->setFSMVerificator(new FSMVerificator(this));
 
+  connect( this, SIGNAL(selectionChanged()), this, SLOT(receivedSelectionChanged()));
 }
 
 void Scene::initializeScene() {
@@ -347,6 +348,16 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 }
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
+  qDebug() << "selectedItems.size() = " << this->selectedItems().size();
+  // REMOVE??
+  // TODO: simplify code through restructuring.
+  // Is there a movement of the selected item?
+  //QList<QGraphicsItem *> selectedItems = this->selectedItems();
+  //if ( selectedItems.size() == 1 ) {
+  //  if ( selectedItems.first()->
+  //}
+  // ENDREMOVE
+
 
   // Placing if not in choose mode
   //------------------
@@ -365,7 +376,6 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 
         // Close interaction
         this->setPlaceMode(CHOOSE);
-        emit modeChanged();
 
       }
       break;
@@ -942,27 +952,15 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
 
     }
 
-  } else if (keyEvent->key() == Qt::Key_Z && keyEvent->modifiers()
-      == Qt::CTRL) {
-
-    //-- Do undo
-    //cout << "*I Undoing" << endl;
-    //this->undo();
-
-  }  else if (keyEvent->key() == Qt::Key_Y && keyEvent->modifiers()
-            == Qt::CTRL) {
-
-        //-- Do Redo
-       // cout << "*I Redoing" << endl;
-        //this->redo();
-
-    }
-
+  } 
 }
+
 
 Fsm * Scene::getFsm() {
   return this->fsm;
 }
+
+
 void Scene::setFsm(Fsm * fsm) {
 
   this->fsm = fsm;
@@ -1028,6 +1026,7 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
   if (this->getPlaceModeLock() != FSMDesigner::LOCKED ) {
     //-- Record
     this->placeMode = mode;
+    emit modeChanged(); 
   }
 
   //-- Make some preparation
@@ -1288,4 +1287,9 @@ QList<LinkDeparture*> Scene::findLinkDepartures(Link * link) {
   }
 
   return result;
+}
+
+
+void Scene::receivedSelectionChanged() {
+  qDebug() << "received SelectionChanged()";
 }

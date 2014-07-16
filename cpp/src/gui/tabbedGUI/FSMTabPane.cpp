@@ -121,42 +121,36 @@ void FSMTabPane::placeSetChoose() {
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::CHOOSE);
-    markModeActions();
 }
 
 void FSMTabPane::placeSetState() {
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::STATE);
-    markModeActions();
 }
 
 void FSMTabPane::placeSetTransition(){
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::TRANS);
-    markModeActions();
 }
 
 void FSMTabPane::placeSetHyperTransition(){
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::HYPERTRANS);
-    markModeActions();
 }
 
 void FSMTabPane::placeSetLink(){
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::LINKDEPARTURE);
-    markModeActions();
 }
 
 void FSMTabPane::placeSetJoin(){
 
     if (this->currentIndex()>0)
         dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::JOIN);
-    markModeActions();
 
 }
 

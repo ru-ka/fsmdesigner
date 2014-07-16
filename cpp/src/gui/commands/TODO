@@ -1,0 +1,4 @@
+generate ItemGroupContainer, if there are a couple of selected items.
+
+MakeItemGroupCommand
+ClearItemGroupCommand

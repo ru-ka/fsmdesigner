@@ -105,9 +105,9 @@ public:
 	 * Remove the element from FSM
 	 * @return true if deleted, false if not
 	 */
-	virtual QList<QUndoCommand*> remove(QUndoCommand * parentComand = NULL) {
-		return QList<QUndoCommand*>();
-	}
+//	virtual QList<QUndoCommand*> remove(QUndoCommand * parentComand = NULL) {
+//		return QList<QUndoCommand*>();
+//	}
 
 	/// Getter for internal model
 	T * getModel() {
@@ -135,8 +135,8 @@ public:
 	 */
 	virtual void keyRelease ( QKeyEvent * event ) {
 
-		if (event->key()==Qt::Key_Delete)
-			this->remove();
+//		if (event->key()==Qt::Key_Delete)
+//			this->remove();
 	}
 
 

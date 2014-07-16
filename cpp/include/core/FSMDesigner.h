@@ -37,6 +37,11 @@ typedef enum {
 	UNLOCKED
 } PlaceLockMode;
 
+//-- Commands
+typedef enum {
+  MOVESTATECOMMAND
+} CommandEnum;
+
 
 
 }
