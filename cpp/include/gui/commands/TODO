@@ -1,0 +1,20 @@
+CreateItemGroupCommand:
+1) Select 2 items, select two other items. Should these commands be merged?
+2) Should CreateGroupCommands be undone, if the next action selects a single
+element?
+3) Should CreateGroupCommands be undone, if the next command is a
+DeleteGroupCommand?
+4) What happens, if there are two separate itemGroups? For instance, select 2
+items and generate a itemGroup. Add another state. Create another group.
+5) Highlight the states properly
+6) bLastCommandItemGroup (undo, if no move event occurs)
+7) lastSelectedItemGroup (DeleteItemGroupCommand, if there is a selection of
+any other mode like STATE or TRANS)
+
+
+DeleteItemGroupCommand:
+1) When to delete an itemGroup?
+
+
+
+Add MoveItemGroup command.

@@ -32,6 +32,7 @@ using namespace std;
 #include <gui/commands/DeleteStateCommand.h>
 #include <gui/commands/MoveStateCommand.h>
 #include <gui/commands/CreateItemGroupCommand.h>
+#include <gui/commands/DeleteItemGroupCommand.h>
 
 
 //-- Others
@@ -362,28 +363,16 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     qDebug() << "Move detected.";
   }
 
-  //if ( oldPos != this->sel
-  // TODO: (QUICKHACK) move to the right place, 
-  if(e->modifiers() == Qt::ControlModifier) {
-    QList<QGraphicsItem *> selectedItems = this->selectedItems();
-    qDebug() << "selectedItems.size() = " << selectedItems.size();
-    QList<QGraphicsItem *>::iterator it;
-    for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
-      if( (*it)->type() == QGraphicsItemGroup::Type ) {
-        qDebug() << "Item group" << endl;
-        QList<QGraphicsItem *> childItems = (*it)->childItems();
-        this->destroyItemGroup( dynamic_cast<QGraphicsItemGroup*>(*it) );
-        QList<QGraphicsItem *>::iterator child_it = childItems.begin();
-        for ( ; child_it != childItems.end(); ++child_it) {
-          (*child_it)->setSelected(false);
-          (*child_it)->clearFocus();
-        }
-      }
+  // Destroy an itemgroup.
+  if(e->modifiers() == Qt::ControlModifier && this->selectedItems().size() == 1) {
+    if( this->selectedItems().first()->type() == QGraphicsItemGroup::Type ) {
+      qDebug() << "Item group" << endl;
+      QGraphicsItemGroup * currentItem =
+        dynamic_cast<QGraphicsItemGroup *>(this->selectedItems().first() );
+      DeleteItemGroupCommand * groupCommand =
+        new DeleteItemGroupCommand( this, currentItem );
+      undoStack.push( groupCommand );
     }
-  }
-  if (this->selectedItems().size() == 1) {
-    QGraphicsItem * my_item = this->selectedItems().first();
-    qDebug() << "*my_item->type = " << my_item->type();
   } else if (this->selectedItems().size() > 1) {
     CreateItemGroupCommand * groupCommand =
       new CreateItemGroupCommand( this, this->selectedItems() );
