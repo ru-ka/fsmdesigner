@@ -3,7 +3,6 @@
 
 MoveStateCommand::MoveStateCommand( Scene * _relatedScene,
                                     StateItem * _stateItem,
-                                    const QPointF &_oldPos,
                                     QUndoCommand * _parentCommand) :
                                     QUndoCommand(_parentCommand), 
                                     relatedScene(_relatedScene),

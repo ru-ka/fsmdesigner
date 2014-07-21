@@ -37,32 +37,31 @@ class MoveStateCommand : public QUndoCommand {
     QPointF     newPos      ;
 
 
-    public:
+  public:
     enum { Id = FSMDesigner::MOVESTATECOMMAND };
-      /**
-       * Constructor.
-       *
-       */
-      MoveStateCommand( Scene         * _relatedScene,
-                        StateItem     * _stateItem,
-                        const QPointF & _oldPos,
-                        QUndoCommand  * _parentCommand = NULL);
+    /**
+     * Constructor.
+     *
+     */
+    MoveStateCommand( Scene         * _relatedScene,
+                      StateItem     * _stateItem,
+                      QUndoCommand  * _parentCommand = NULL);
 
-      /**
-       * Default Destructor
-       */
-      virtual ~MoveStateCommand();
+    /**
+     * Default Destructor
+     */
+    virtual ~MoveStateCommand();
 
-      /** \defgroup UndoRedo Undo Redo Methods to be implemented */
-      /** @{ */
+    /** \defgroup UndoRedo Undo Redo Methods to be implemented */
+    /** @{ */
 
-      virtual int id() const;
-      virtual void redo();
-      virtual void undo();
-      virtual bool mergeWith(const QUndoCommand * command);
-      /** @} */
+    virtual int id() const;
+    virtual void redo();
+    virtual void undo();
+    virtual bool mergeWith(const QUndoCommand * command);
+    /** @} */
 
-      StateItem * getItem()   const;
+    StateItem * getItem()   const;
 };
 
 #endif /* __MOVESTATECOMMAND_H__ */

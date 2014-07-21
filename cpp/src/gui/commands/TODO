@@ -1,4 +1,3 @@
 generate ItemGroupContainer, if there are a couple of selected items.
 
-MakeItemGroupCommand
-ClearItemGroupCommand
+ClearItemGroupCommand // Tried once, but its not the best solution.

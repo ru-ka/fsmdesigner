@@ -39,7 +39,9 @@ typedef enum {
 
 //-- Commands
 typedef enum {
-  MOVESTATECOMMAND
+  MOVESTATECOMMAND,
+  CREATEITEMGROUPCOMMAND,
+  DELETEITEMGROUPCOMMAND
 } CommandEnum;
 
 

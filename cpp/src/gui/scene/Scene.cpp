@@ -30,6 +30,9 @@ using namespace std;
 //-- Commands
 #include <gui/commands/AddStateCommand.h>
 #include <gui/commands/DeleteStateCommand.h>
+#include <gui/commands/MoveStateCommand.h>
+#include <gui/commands/CreateItemGroupCommand.h>
+
 
 //-- Others
 #include <gui/common/GUIUtils.h>
@@ -290,6 +293,11 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 
   QGraphicsScene::mousePressEvent(e);
 
+  if (this->selectedItems().size() == 1) {
+    oldPos = this->selectedItems().first()->pos();
+    qDebug() << "ItemPos = oldPos = " << this->selectedItems().first()->pos();
+  }
+
 
 
   //-- First element has to be placed, removed from stack and reenabled
@@ -348,15 +356,40 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 }
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
-  qDebug() << "selectedItems.size() = " << this->selectedItems().size();
-  // REMOVE??
-  // TODO: simplify code through restructuring.
-  // Is there a movement of the selected item?
-  //QList<QGraphicsItem *> selectedItems = this->selectedItems();
-  //if ( selectedItems.size() == 1 ) {
-  //  if ( selectedItems.first()->
-  //}
-  // ENDREMOVE
+  // QUICKHACK
+  if ( this->selectedItems().size() == 1 &&
+      oldPos != this->selectedItems().first()->pos() ) {
+    qDebug() << "Move detected.";
+  }
+
+  //if ( oldPos != this->sel
+  // TODO: (QUICKHACK) move to the right place, 
+  if(e->modifiers() == Qt::ControlModifier) {
+    QList<QGraphicsItem *> selectedItems = this->selectedItems();
+    qDebug() << "selectedItems.size() = " << selectedItems.size();
+    QList<QGraphicsItem *>::iterator it;
+    for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
+      if( (*it)->type() == QGraphicsItemGroup::Type ) {
+        qDebug() << "Item group" << endl;
+        QList<QGraphicsItem *> childItems = (*it)->childItems();
+        this->destroyItemGroup( dynamic_cast<QGraphicsItemGroup*>(*it) );
+        QList<QGraphicsItem *>::iterator child_it = childItems.begin();
+        for ( ; child_it != childItems.end(); ++child_it) {
+          (*child_it)->setSelected(false);
+          (*child_it)->clearFocus();
+        }
+      }
+    }
+  }
+  if (this->selectedItems().size() == 1) {
+    QGraphicsItem * my_item = this->selectedItems().first();
+    qDebug() << "*my_item->type = " << my_item->type();
+  } else if (this->selectedItems().size() > 1) {
+    CreateItemGroupCommand * groupCommand =
+      new CreateItemGroupCommand( this, this->selectedItems() );
+    undoStack.push(groupCommand);
+  }
+  // ENDTODO
 
 
   // Placing if not in choose mode
@@ -868,6 +901,19 @@ void Scene::placeUnderMouse(QGraphicsItem * item, QPointF mousePosition) {
 
 
 void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
+  // TODO: (QUICKHACK) move to the right place, 
+  if(keyEvent->key() == Qt::Key_Escape) {
+    QList<QGraphicsItem *> selectedItems = this->selectedItems();
+    qDebug() << "selectedItems.size() = " << selectedItems.size();
+    QList<QGraphicsItem *>::iterator it;
+    for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
+      if( (*it)->type() == QGraphicsItemGroup::Type ) {
+        qDebug() << "Item group" << endl;
+        this->destroyItemGroup( dynamic_cast<QGraphicsItemGroup*>(*it) );
+      }
+    }
+  }
+  // ENDTODO
 
   // Call Parent
   //-------------------
@@ -1292,4 +1338,5 @@ QList<LinkDeparture*> Scene::findLinkDepartures(Link * link) {
 
 void Scene::receivedSelectionChanged() {
   qDebug() << "received SelectionChanged()";
+  selectionChanged = true;
 }

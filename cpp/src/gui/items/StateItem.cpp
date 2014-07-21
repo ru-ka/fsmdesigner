@@ -44,51 +44,52 @@ using namespace std;
 #include "StateItem.h"
 
 StateItem::StateItem(State * model, QGraphicsItem * parent) :
-	QGraphicsItemGroup(parent) {
+  QGraphicsItemGroup(parent) {
 
-	// TODO: Set state size parameterizable through preferences
+  // TODO: Set state size parameterizable through preferences
 
-	this->setZValue(200000);
+  this->setZValue(200000);
 
-	// Init variables
-	//---------------------
-	this->verificationMark = NULL;
-	this->moveLoopBackTransitions = true;
+  // Init variables
+  //---------------------
+  this->verificationMark = NULL;
+  this->moveLoopBackTransitions = true;
 
-	// Create Representation
-	//-------------------------------
+  // Create Representation
+  //-------------------------------
 
-	// Create TextItem
-	this->stateText = new StateItemText();
-	this->stateText->setVisible(true);
-	this->stateText->setZValue(2);
-	this->addToGroup(this->stateText);
+  // Create TextItem
+  this->stateText = new StateItemText();
+  this->stateText->setVisible(true);
+  this->stateText->setFlag(ItemIsSelectable, false);
+  this->stateText->setZValue(2);
+  this->addToGroup(this->stateText);
 
-	// Create Ellipse
-	this->stateEllipse = new StateItemEllipse(QRectF(0, 0, 50, 50));
-	this->stateEllipse->setVisible(true);
-	this->stateEllipse->setZValue(1);
-	this->addToGroup(this->stateEllipse);
+  // Create Ellipse
+  this->stateEllipse = new StateItemEllipse(QRectF(0, 0, 50, 50));
+  this->stateEllipse->setVisible(true);
+  this->stateEllipse->setZValue(1);
+  this->addToGroup(this->stateEllipse);
 
-	// Set movable and selectable
-	this->setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges | ItemIsFocusable);
-	this->show();
-	this->setVisible(true);
+  // Set movable and selectable
+  this->setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges | ItemIsFocusable);
+  this->show();
+  this->setVisible(true);
 
-	// Translate to have upper-left corner not be 0,0 but 0,0 be in the middle of the bounding area rect
-	this->setTransform(QTransform::fromTranslate(-25, -25));
+  // Translate to have upper-left corner not be 0,0 but 0,0 be in the middle of the bounding area rect
+  this->setTransform(QTransform::fromTranslate(-25, -25));
 
 
-	// Parameters from model
-	//------------
-	this->setModel(model);
+  // Parameters from model
+  //------------
+  this->setModel(model);
 
 }
 
 StateItem::~StateItem() {
 
-		delete this->stateText;
-		delete this->stateEllipse;
+    delete this->stateText;
+    delete this->stateEllipse;
 }
 
 
@@ -96,60 +97,60 @@ void StateItem::modelChanged() {
 
     FSMGraphicsItem<State>::modelChanged();
 
-	//-- Propagate to ellipse
-	this->stateEllipse->setModel(this->getModel());
+  //-- Propagate to ellipse
+  this->stateEllipse->setModel(this->getModel());
 
 
-	if (this->getModel() != NULL) {
+  if (this->getModel() != NULL) {
 
-	    //-- Position from model
+      //-- Position from model
         this->setPos(this->model->getPosition().first, this->model->getPosition().second);
         this->itemChange(QGraphicsItem::ItemPositionChange,QVariant(QPointF(this->pos())));
 
-		//-- Update reset states and so on
-	    this->stateText->setPlainText(QString::fromStdString(this->getModel()->getName()));
+    //-- Update reset states and so on
+      this->stateText->setPlainText(QString::fromStdString(this->getModel()->getName()));
         //this->stateText->update();
-		this->setToolTip("Output: "+QString::fromStdString(this->getModel()->getOutput()));
+    this->setToolTip("Output: "+QString::fromStdString(this->getModel()->getOutput()));
 
-	}
+  }
 
-	//this->update();
+  //this->update();
 
 }
 
 void StateItem::verificationErrorAdded(FSMVerifyError * error)  {
 
-	if (this->verificationMark!=NULL)
-		return;
+  if (this->verificationMark!=NULL)
+    return;
 
-	//-- There is now a verification error
+  //-- There is now a verification error
 
-	//-- Add an exclamation mark button
-	QGraphicsPixmapItem * exclamation = new QGraphicsPixmapItem(QPixmap(
-			":/icons/ExclamationMark2").scaled(24,24));
-	exclamation->setToolTip(error->getMessage());
-	exclamation->setParentItem(this);
-	exclamation->setZValue(1000);
+  //-- Add an exclamation mark button
+  QGraphicsPixmapItem * exclamation = new QGraphicsPixmapItem(QPixmap(
+      ":/icons/ExclamationMark2").scaled(24,24));
+  exclamation->setToolTip(error->getMessage());
+  exclamation->setParentItem(this);
+  exclamation->setZValue(1000);
 
-	exclamation->setTransform(QTransform::fromTranslate(-16, -16));
-	this->addToGroup(exclamation);
+  exclamation->setTransform(QTransform::fromTranslate(-16, -16));
+  this->addToGroup(exclamation);
 
-	//-- Register Item as verification mark
-	this->verificationMark = exclamation;
+  //-- Register Item as verification mark
+  this->verificationMark = exclamation;
 
 
 }
 
 void StateItem::verificationErrorRemoved(FSMVerifyError * error)  {
 
-	//-- If there is a verification mark, and no errors anymore, then remove
-	if (this->verificationMark!=NULL && this->verificationErrors.size()==0) {
+  //-- If there is a verification mark, and no errors anymore, then remove
+  if (this->verificationMark!=NULL && this->verificationErrors.size()==0) {
 
-		//this->scene()->removeItem(this->verificationMark);
-		//this->removeFromGroup(this->verificationMark);
-		SGC::getInstance()->requestDelete(this->verificationMark);
-		this->verificationMark = NULL;
-	}
+    //this->scene()->removeItem(this->verificationMark);
+    //this->removeFromGroup(this->verificationMark);
+    SGC::getInstance()->requestDelete(this->verificationMark);
+    this->verificationMark = NULL;
+  }
 
 }
 
@@ -160,236 +161,236 @@ QString StateItem::text() {
 
 
 bool StateItem::recordText() {
-	return false;
+  return false;
 }
 
 void StateItem::setText(QString s) {
 
-	// Record text
-	this->model->setName(s.toStdString());
-	this->stateText->setPlainText(s);
+  // Record text
+  this->model->setName(s.toStdString());
+  this->stateText->setPlainText(s);
 
     //this->setFont(QFont("Sans Serif",-1,QFont::Bold));
 
-	//this->stateText->update();
+  //this->stateText->update();
 
-	//-- Reevaluate and reposition the text in the middle
+  //-- Reevaluate and reposition the text in the middle
 
-	// text size
-	/*QFontMetrics fontMetrics = QFontMetrics(this->stateText->font());
-	 int textWidth = fontMetrics.width(text());
-	 textWidth += 5;
-	 int textHeight = fontMetrics.height();
-	 textHeight += 5;
+  // text size
+  /*QFontMetrics fontMetrics = QFontMetrics(this->stateText->font());
+   int textWidth = fontMetrics.width(text());
+   textWidth += 5;
+   int textHeight = fontMetrics.height();
+   textHeight += 5;
 
-	 // Rectmiddle
-	 int middlex = this->stateEllipse->rect().width()/2;
-	 int middley = this->stateEllipse->rect().height()/2;
+   // Rectmiddle
+   int middlex = this->stateEllipse->rect().width()/2;
+   int middley = this->stateEllipse->rect().height()/2;
 
-	 // Pos
-	 this->stateText->setPos(middlex-textWidth/2,middley-textHeight/2);
-	 */
+   // Pos
+   this->stateText->setPos(middlex-textWidth/2,middley-textHeight/2);
+   */
 
 }
 
 void StateItem::setStateItemColor(QColor color) {
-	// Set Color
-	this->model->setColor((unsigned int) color.value());
-	this->stateEllipse->setColor(color);
+  // Set Color
+  this->model->setColor((unsigned int) color.value());
+  this->stateEllipse->setColor(color);
 }
 
 QColor StateItem::getStateItemColor() {
-	return this->stateEllipse->getColor();
+  return this->stateEllipse->getColor();
 }
 
 void StateItem::paint(QPainter *painter,
-		const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    const QStyleOptionGraphicsItem *option, QWidget *widget) {
 
-	// Antialiasing
-	painter->setRenderHint(QPainter::Antialiasing);
+  // Antialiasing
+  painter->setRenderHint(QPainter::Antialiasing);
 
-	// Opacity propagation
-	painter->setOpacity(this->effectiveOpacity());
+  // Opacity propagation
+  painter->setOpacity(this->effectiveOpacity());
 
-	// Just delegate normaly for now
-	QGraphicsItemGroup::paint(painter, option, widget);
+  // Just delegate normaly for now
+  QGraphicsItemGroup::paint(painter, option, widget);
 
-	//cout << "Repainting item " << endl;
+  //cout << "Repainting item " << endl;
 
-	return;
+  return;
 }
 
 QRectF StateItem::boundingRect() const {
 
-	//-- Get Parent Bounding rect
-	QRectF parent = QGraphicsItemGroup::boundingRect();
+  //-- Get Parent Bounding rect
+  QRectF parent = QGraphicsItemGroup::boundingRect();
 
-	//-- Increase to match reset radius?
-	if (this->isVisible() && this->stateEllipse!=NULL && model!=NULL && model->isReset()) {
-	    parent.adjust(-7,-7,7,7);
-	}
+  //-- Increase to match reset radius?
+  if (this->isVisible() && this->stateEllipse!=NULL && model!=NULL && model->isReset()) {
+      parent.adjust(-7,-7,7,7);
+  }
 
-	//-- If text is bigger than ourselves, adjust boundingRec
-	/*if (textrect.width() > parent.width()) {
-	    parent.setWidth(textrect.width());
-	    parent.moveLeft(textrect.width()/2);
-	}*/
+  //-- If text is bigger than ourselves, adjust boundingRec
+  /*if (textrect.width() > parent.width()) {
+      parent.setWidth(textrect.width());
+      parent.moveLeft(textrect.width()/2);
+  }*/
 
-	return parent;
+  return parent;
 
 }
 
 QVariant StateItem::itemChange(GraphicsItemChange change,
-		const QVariant & value) {
+    const QVariant & value) {
 
-	// Selection Change
-	//---------------------
-	if (change == QGraphicsItem::ItemSelectedChange) {
+  // Selection Change
+  //---------------------
+  if (change == QGraphicsItem::ItemSelectedChange) {
 
-		// Propagate to text
-		//this->stateText->setSelected(value.toBool());
+    // Propagate to text
+    //this->stateText->setSelected(value.toBool());
 
-		if (value.toBool() == true) {
-			// Do nothing at the moment
-		} else {
-			// Unselected, assure opacity to 1
-			this->setOpacity(1);
-		}
+    if (value.toBool() == true) {
+      // Do nothing at the moment
+    } else {
+      // Unselected, assure opacity to 1
+      this->setOpacity(1);
+    }
 
-	} else if (change == QGraphicsItem::ItemTransformHasChanged) {
+  } else if (change == QGraphicsItem::ItemTransformHasChanged) {
 
-		// Geometry has changed
-		// Update Gradient
+    // Geometry has changed
+    // Update Gradient
 
-		this->stateEllipse->prepareGraphics();
-
-
-	} else if (change == QGraphicsItem::ItemPositionChange) {
-
-		//-- New position
-		QPointF newPosition = value.toPointF();
-
-		//-- Move loop-back transitions with state
-		//------------------------------------------------
-		if (this->moveLoopBackTransitions)
-			for (int i = 0; i < this->outgoingTransitions.size(); i++) {
-
-				//-- Get Transition
-				Transline * tr = this->outgoingTransitions.at(i);
+    this->stateEllipse->prepareGraphics();
 
 
-				//-- Look if model loops
-				//-- Transition might not have a model if we are adding it
-				if (tr->getModel()==NULL || (((Trans*)tr->getModel()))->getStartState() !=  (((Trans*)tr->getModel()))->getEndState())
-					continue;
+  } else if (change == QGraphicsItem::ItemPositionChange) {
 
-				//-- Calculate Dx/Dy
-				qreal dx = newPosition.x() - this->pos().x();
-				qreal dy = newPosition.y() - this->pos().y();
+    //-- New position
+    QPointF newPosition = value.toPointF();
 
-				//-- Yes, go through connections to move items
-				QGraphicsItem * currentItem = tr->getEndItem();
-				do {
+    //-- Move loop-back transitions with state
+    //------------------------------------------------
+    if (this->moveLoopBackTransitions)
+      for (int i = 0; i < this->outgoingTransitions.size(); i++) {
 
-					if (currentItem != NULL && currentItem->type()
-							== TrackpointItem::Type) {
+        //-- Get Transition
+        Transline * tr = this->outgoingTransitions.at(i);
 
 
-						//-- Move Trackpoint
-						currentItem->moveBy(dx, dy);
+        //-- Look if model loops
+        //-- Transition might not have a model if we are adding it
+        if (tr->getModel()==NULL || (((Trans*)tr->getModel()))->getStartState() !=  (((Trans*)tr->getModel()))->getEndState())
+          continue;
 
-						//-- Go to next trackpoint if there is one
-						currentItem
-								= dynamic_cast<TrackpointItem*> (currentItem)->getNextTransline()->getEndItem();
+        //-- Calculate Dx/Dy
+        qreal dx = newPosition.x() - this->pos().x();
+        qreal dy = newPosition.y() - this->pos().y();
 
-					} else {
-						break;
-					}
+        //-- Yes, go through connections to move items
+        QGraphicsItem * currentItem = tr->getEndItem();
+        do {
 
-				} while (currentItem != this);
-
-				//-- Move text with it
-				QGraphicsItem* textItem = this->scene()->itemAt(
-				        (((Trans*)tr->getModel()))->getTextPosition().first,
-				        (((Trans*)tr->getModel()))->getTextPosition().second);
-				if (textItem != NULL) {
-					textItem->moveBy(dx, dy);
-				}
-
-			}
-		//--- EOF Loopback move with
+          if (currentItem != NULL && currentItem->type()
+              == TrackpointItem::Type) {
 
 
-		//-- Update incoming-outgoing transitions
-		for (int i = 0; i < this->incomingTransitions.size(); i++) {
-			this->incomingTransitions.at(i)->preparePath();
-		}
-		for (int i = 0; i < this->outgoingTransitions.size(); i++) {
-			this->outgoingTransitions.at(i)->preparePath();
-		}
+            //-- Move Trackpoint
+            currentItem->moveBy(dx, dy);
 
-	} else if (change == QGraphicsItem::ItemSceneHasChanged && this->scene()
-			== NULL) {
+            //-- Go to next trackpoint if there is one
+            currentItem
+                = dynamic_cast<TrackpointItem*> (currentItem)->getNextTransline()->getEndItem();
 
-		//-- If removed from scene
-		//-- Ensure the incoming transitions forget about us
-		for (QList<Transline*>::iterator it = this->incomingTransitions.begin(); it
-				< this->incomingTransitions.end(); it++)
-			(*it)->setEndItem(NULL);
-		this->incomingTransitions.clear();
+          } else {
+            break;
+          }
 
-		//-- Ensure the outgoing transitions forget about us
-		for (QList<Transline*>::iterator it = this->outgoingTransitions.begin(); it
-				< this->outgoingTransitions.end(); it++)
-			(*it)->setStartItem(NULL);
-		this->outgoingTransitions.clear();
+        } while (currentItem != this);
 
-	} else if (change==QGraphicsItem::ItemScaleHasChanged && this->scene()!=NULL) {
+        //-- Move text with it
+        QGraphicsItem* textItem = this->scene()->itemAt(
+                (((Trans*)tr->getModel()))->getTextPosition().first,
+                (((Trans*)tr->getModel()))->getTextPosition().second);
+        if (textItem != NULL) {
+          textItem->moveBy(dx, dy);
+        }
 
-		//-- Added to scene
-		//----------------------
-		//-- Save position
-		if (this->recordPosition() == true) {
+      }
+    //--- EOF Loopback move with
 
-		}
 
-	}
+    //-- Update incoming-outgoing transitions
+    for (int i = 0; i < this->incomingTransitions.size(); i++) {
+      this->incomingTransitions.at(i)->preparePath();
+    }
+    for (int i = 0; i < this->outgoingTransitions.size(); i++) {
+      this->outgoingTransitions.at(i)->preparePath();
+    }
 
-	return QGraphicsItemGroup::itemChange(change, value);
+  } else if (change == QGraphicsItem::ItemSceneHasChanged && this->scene()
+      == NULL) {
+
+    //-- If removed from scene
+    //-- Ensure the incoming transitions forget about us
+    for (QList<Transline*>::iterator it = this->incomingTransitions.begin(); it
+        < this->incomingTransitions.end(); it++)
+      (*it)->setEndItem(NULL);
+    this->incomingTransitions.clear();
+
+    //-- Ensure the outgoing transitions forget about us
+    for (QList<Transline*>::iterator it = this->outgoingTransitions.begin(); it
+        < this->outgoingTransitions.end(); it++)
+      (*it)->setStartItem(NULL);
+    this->outgoingTransitions.clear();
+
+  } else if (change==QGraphicsItem::ItemScaleHasChanged && this->scene()!=NULL) {
+
+    //-- Added to scene
+    //----------------------
+    //-- Save position
+    if (this->recordPosition() == true) {
+
+    }
+
+  }
+
+  return QGraphicsItemGroup::itemChange(change, value);
 
 }
 
-void	  StateItem::focusOutEvent ( QFocusEvent * event ) {
+void    StateItem::focusOutEvent ( QFocusEvent * event ) {
 
-	QGraphicsItemGroup::focusOutEvent(event);
+  QGraphicsItemGroup::focusOutEvent(event);
 
-	if (this->stateText->textInteractionFlags() & Qt::TextEditorInteraction)
-	    this->stateText->stopEditing();
+  if (this->stateText->textInteractionFlags() & Qt::TextEditorInteraction)
+      this->stateText->stopEditing();
 
 }
 
 void StateItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event) {
 
-	QGraphicsItemGroup::mouseDoubleClickEvent(event);
+  QGraphicsItemGroup::mouseDoubleClickEvent(event);
 
 
-	//-- Start Editing text if we are under it
-	if (this->scene()->items(event->scenePos()).contains(this->stateText) && !(this->stateText->textInteractionFlags() & Qt::TextEditorInteraction)) {
-	    this->setSelected(false);
-	    this->stateText->startEditing();
-		event->accept();
-	}
+  //-- Start Editing text if we are under it
+  if (this->scene()->items(event->scenePos()).contains(this->stateText) && !(this->stateText->textInteractionFlags() & Qt::TextEditorInteraction)) {
+      this->setSelected(false);
+      this->stateText->startEditing();
+    event->accept();
+  }
 
 
 }
 
 void StateItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * event) {
 
-	// Let parent do its stuff (placement and so on)
-	QGraphicsItemGroup::mouseReleaseEvent(event);
+  // Let parent do its stuff (placement and so on)
+  QGraphicsItemGroup::mouseReleaseEvent(event);
 
 
-	//-- Save position when mouse is released to avoid too fine graining
+  //-- Save position when mouse is released to avoid too fine graining
     if (this->recordPosition() == true) {
 
     }
@@ -398,39 +399,39 @@ void StateItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * event) {
 
 void StateItem::mouseMoveEvent(QGraphicsSceneMouseEvent * event) {
 
-	//-- Let parent do its work
-	QGraphicsItemGroup::mouseMoveEvent(event);
+  //-- Let parent do its work
+  QGraphicsItemGroup::mouseMoveEvent(event);
 
-	//-- If we have CTRL activated, don't move looping transitions with
-	if ((event->modifiers() & Qt::CTRL)) {
-		this->moveLoopBackTransitions = false;
-	} else
-		this->moveLoopBackTransitions = true;
+  //-- If we have CTRL activated, don't move looping transitions with
+  if ((event->modifiers() & Qt::CTRL)) {
+    this->moveLoopBackTransitions = false;
+  } else
+    this->moveLoopBackTransitions = true;
 
 
 }
 
 void StateItem::keyReleaseEvent(QKeyEvent * event) {
 
-	//-- Call Parent
-	QGraphicsItemGroup::keyReleaseEvent(event);
+  //-- Call Parent
+  QGraphicsItemGroup::keyReleaseEvent(event);
 
 
-	// Start Editing on F2
-	//--------------------------
-	if (event->key() == Qt::Key_F2) {
-	    this->setSelected(false);
-	    this->stateText->startEditing();
-	}
+  // Start Editing on F2
+  //--------------------------
+  if (event->key() == Qt::Key_F2) {
+      this->setSelected(false);
+      this->stateText->startEditing();
+  }
 
-	/*if (event->isAccepted())
-		return;
+  /*if (event->isAccepted())
+    return;
 
-	if (this->stateText->hasFocus()) {
-		// Don't do anything if text is active
-	} else {
-		FSMGraphicsItem<State>::keyRelease(event);
-	}
+  if (this->stateText->hasFocus()) {
+    // Don't do anything if text is active
+  } else {
+    FSMGraphicsItem<State>::keyRelease(event);
+  }
 */
 
 
@@ -438,26 +439,26 @@ void StateItem::keyReleaseEvent(QKeyEvent * event) {
 
 void StateItem::keyPressEvent ( QKeyEvent * event ) {
 
-	//-- Call parent
-	QGraphicsItemGroup::keyPressEvent(event);
+  //-- Call parent
+  QGraphicsItemGroup::keyPressEvent(event);
 
-	if (this->stateText->textInteractionFlags() & Qt::TextEditorInteraction) {
-		return;
-	}
+  if (this->stateText->textInteractionFlags() & Qt::TextEditorInteraction) {
+    return;
+  }
 
-	// Move using arrows
-	//-----------------------------
-	if (event->key()==Qt::Key_Up) {
-		this->moveBy(0,-1);
-	} else if (event->key()==Qt::Key_Down) {
-		this->moveBy(0,1);
-	}else if (event->key()==Qt::Key_Right) {
-		this->moveBy(1,0);
-	}else if (event->key()==Qt::Key_Left) {
-		this->moveBy(-1,0);
-	}
+  // Move using arrows
+  //-----------------------------
+  if (event->key()==Qt::Key_Up) {
+    this->moveBy(0,-1);
+  } else if (event->key()==Qt::Key_Down) {
+    this->moveBy(0,1);
+  }else if (event->key()==Qt::Key_Right) {
+    this->moveBy(1,0);
+  }else if (event->key()==Qt::Key_Left) {
+    this->moveBy(-1,0);
+  }
 
-	event->accept();
+  event->accept();
 
 
 
@@ -465,22 +466,22 @@ void StateItem::keyPressEvent ( QKeyEvent * event ) {
 
 bool StateItem::recordPosition() {
 
-	// Get FSM
-	if (this->scene() == NULL || this->getModel() == NULL)
-		return false;
+  // Get FSM
+  if (this->scene() == NULL || this->getModel() == NULL)
+    return false;
 
-	// If position is already the one in the model -> don't do anything (to avoid loop on actions)
-	//-----------
-	if (this->x()==this->getModel()->getPosition().first && this->y()==this->getModel()->getPosition().second)
-	    return false;
+  // If position is already the one in the model -> don't do anything (to avoid loop on actions)
+  //-----------
+  if (this->x()==this->getModel()->getPosition().first && this->y()==this->getModel()->getPosition().second)
+      return false;
 
-	// Record using an action
-	///------------------
-//	MoveStateAction * moveState = new MoveStateAction(this->pos(),this);
-//	dynamic_cast<Scene*>(this->scene())->getUndoStack()->push(moveState);
+  // Record using an action
+  ///------------------
+//  MoveStateAction * moveState = new MoveStateAction(this->pos(),this);
+//  dynamic_cast<Scene*>(this->scene())->getUndoStack()->push(moveState);
 
 
-	// Modified
+  // Modified
     return true;
 
 
@@ -488,47 +489,47 @@ bool StateItem::recordPosition() {
 
 QList<QUndoCommand*> StateItem::remove(QUndoCommand * parentCommand) {
 
-	//-- Prepare Undo list
-	QList<QUndoCommand*> undoCommands;
+  //-- Prepare Undo list
+  QList<QUndoCommand*> undoCommands;
 
-	// Remove itself
-	//----------------------------
-	DeleteStateAction * deleteThis = new DeleteStateAction(this);
-	undoCommands.append(deleteThis);
+  // Remove itself
+  //----------------------------
+  DeleteStateAction * deleteThis = new DeleteStateAction(this);
+  undoCommands.append(deleteThis);
 
-	// Remove transitions
-	//-------------------------
-//	QList<QUndoCommand*> transitionUndoCommands;
+  // Remove transitions
+  //-------------------------
+//  QList<QUndoCommand*> transitionUndoCommands;
 
-//	//-- Outgoing
-//	while (!this->outgoingTransitions.isEmpty()) {
-//		this->outgoingTransitions.takeFirst()->remove(deleteThis);
-//	}
+//  //-- Outgoing
+//  while (!this->outgoingTransitions.isEmpty()) {
+//    this->outgoingTransitions.takeFirst()->remove(deleteThis);
+//  }
 //
-//	//-- Incoming
-//	while (!this->incomingTransitions.isEmpty()) {
+//  //-- Incoming
+//  while (!this->incomingTransitions.isEmpty()) {
 //
-//		//-- If Incoming if also outgoing (loopback), then do not double remove
-//		Transline * t = this->incomingTransitions.takeFirst();
-//		if (t->getModel()!=NULL && t->getModel()->getStartState() != t->getModel()->getEndState())
-//			t->remove(deleteThis);
+//    //-- If Incoming if also outgoing (loopback), then do not double remove
+//    Transline * t = this->incomingTransitions.takeFirst();
+//    if (t->getModel()!=NULL && t->getModel()->getStartState() != t->getModel()->getEndState())
+//      t->remove(deleteThis);
 //
-//	}
+//  }
 
 
-	//-- Add All transitions undo to the list
-//	undoCommands.append(transitionUndoCommands);
+  //-- Add All transitions undo to the list
+//  undoCommands.append(transitionUndoCommands);
 
-	return undoCommands;
+  return undoCommands;
 
 }
 
 void StateItem::addIncomingTransition(Transline * transition) {
-	this->incomingTransitions.append(transition);
+  this->incomingTransitions.append(transition);
 }
 
 void StateItem::removeIncomingTransition(Transline * transition) {
-	this->incomingTransitions.removeOne(transition);
+  this->incomingTransitions.removeOne(transition);
 }
 
 QList<Transline*>& StateItem::getIncomingTransitions() {
@@ -558,11 +559,11 @@ void StateItem::addOutgoingTransition(Transline * transition) {
     }
 
     // Add to outgoing
-	this->outgoingTransitions.append(transition);
+  this->outgoingTransitions.append(transition);
 }
 
 void StateItem::removeOutgoingTransition(Transline * transition) {
-	this->outgoingTransitions.removeOne(transition);
+  this->outgoingTransitions.removeOne(transition);
 }
 
 QList<Transline*>& StateItem::getOutgoingTransitions() {
@@ -574,21 +575,21 @@ QList<Transline*>& StateItem::getOutgoingTransitions() {
 
 LinkArrival * StateItem::findLinkArrival() {
 
-	//-- Prepare result
-	LinkArrival * result = NULL;
+  //-- Prepare result
+  LinkArrival * result = NULL;
 
-	// Go through incoming transitions
-	//-------------------
-	for (QList<Transline*>::iterator it = this->incomingTransitions.begin(); it
-					< this->incomingTransitions.end(); it++) {
+  // Go through incoming transitions
+  //-------------------
+  for (QList<Transline*>::iterator it = this->incomingTransitions.begin(); it
+          < this->incomingTransitions.end(); it++) {
 
-		//-- If start is a LinkArrival it is found
-		if ((*it)->getStartItem()->type()==LinkArrival::Type) {
-			return dynamic_cast<LinkArrival*>((*it)->getStartItem());
-		}
+    //-- If start is a LinkArrival it is found
+    if ((*it)->getStartItem()->type()==LinkArrival::Type) {
+      return dynamic_cast<LinkArrival*>((*it)->getStartItem());
+    }
 
-	}
-	return result;
+  }
+  return result;
 
 
 }
@@ -597,14 +598,14 @@ LinkArrival * StateItem::findLinkArrival() {
 
 
 StateItemEllipse::StateItemEllipse(const QRectF& rect) :
-	QGraphicsEllipseItem(rect) {
+  QGraphicsEllipseItem(rect) {
 
-	//this->color = Qt::red;
-	setFlag(ItemIsSelectable, false);
+  //this->color = Qt::red;
+  setFlag(ItemIsSelectable, false);
 
-	// Default Color is Red
-	//----------
-	this->setColor(Qt::red);
+  // Default Color is Red
+  //----------
+  this->setColor(Qt::red);
 }
 
 StateItemEllipse::~StateItemEllipse() {
@@ -613,31 +614,31 @@ StateItemEllipse::~StateItemEllipse() {
 
 void StateItemEllipse::modelChanged() {
 
-    if (this->getModel()==NULL)
-        return;
+  if (this->getModel()==NULL)
+      return;
 
-	//-- Propagate Color
-	this->setColor(QColor::fromRgb(this->model->getColor()));
+  //-- Propagate Color
+  this->setColor(QColor::fromRgb(this->model->getColor()));
 
 
-	//-- Update a full radius as if it were reset, so that if reset was just removed, no traces of the second ellipse stays
-	QRectF updateRect = QGraphicsEllipseItem::boundingRect();
-	updateRect.adjust(-7, -7, 7, 7);
-	this->update(updateRect);
+  //-- Update a full radius as if it were reset, so that if reset was just removed, no traces of the second ellipse stays
+  QRectF updateRect = QGraphicsEllipseItem::boundingRect();
+  updateRect.adjust(-7, -7, 7, 7);
+  this->update(updateRect);
 
 }
 
 QRectF StateItemEllipse::boundingRect() const {
 
-	//-- Get Parent Bounding rect
-	QRectF parent = QGraphicsEllipseItem::boundingRect();
+  //-- Get Parent Bounding rect
+  QRectF parent = QGraphicsEllipseItem::boundingRect();
 
-	//-- Increase to match reset radius?
-	/*if (model!=NULL && model->isReset()) {
-		parent.adjust(-7, -7, 7, 7);
-	}*/
+  //-- Increase to match reset radius?
+  /*if (model!=NULL && model->isReset()) {
+    parent.adjust(-7, -7, 7, 7);
+  }*/
 
-	return parent;
+  return parent;
 
 }
 
@@ -646,46 +647,46 @@ QRectF StateItemEllipse::boundingRect() const {
  */
 void StateItemEllipse::prepareGraphics() {
 
-	bool futureDisplay = GuiSettings::value(SETTINGS_STATE_FUTURE, QVariant(
-				SETTINGS_STATE_FUTURE_DEFAULT)).toBool();
+  bool futureDisplay = GuiSettings::value(SETTINGS_STATE_FUTURE, QVariant(
+        SETTINGS_STATE_FUTURE_DEFAULT)).toBool();
 
-	futureDisplay = true;
-
-
-	//-- Set Brush with item color
-	if (!futureDisplay) {
-
-		this->setBrush(QBrush(this->getColor()));
-		this->setPen(QPen(Qt::black));
+  futureDisplay = true;
 
 
-	}
+  //-- Set Brush with item color
+  if (!futureDisplay) {
 
-	// Future Display
-	//------------------------
-	else {
+    this->setBrush(QBrush(this->getColor()));
+    this->setPen(QPen(Qt::black));
 
-		// Ball Like Gradient
-		//		QRadialGradient gradient(-this->rect().width()/4, -this->rect().height()/4, (this->rect().width() / 2) + 6.5);
-		//		gradient.setColorAt(0, Qt::white);
-		//		gradient.setColorAt(0.5, this->stateItemColor);
-		//gradient.setColorAt(1, Qt::white);
 
-		// Button relief effect
-		//---------------------------------
+  }
 
-		QRadialGradient gradient((this->rect().width() / 2)
-				+ 5, (this->rect().height() / 2) + 5,
-				(this->rect().width() / 2) + 6.5);
-		gradient.setColorAt(0, this->getColor());
-		gradient.setColorAt(0.8, this->getColor());
-		gradient.setColorAt(1, Qt::white);
+  // Future Display
+  //------------------------
+  else {
 
-		QBrush gradientBrush(gradient);
-		this->setBrush(gradient);
-		this->setPen(QPen(Qt::black));
+    // Ball Like Gradient
+    //    QRadialGradient gradient(-this->rect().width()/4, -this->rect().height()/4, (this->rect().width() / 2) + 6.5);
+    //    gradient.setColorAt(0, Qt::white);
+    //    gradient.setColorAt(0.5, this->stateItemColor);
+    //gradient.setColorAt(1, Qt::white);
 
-	}
+    // Button relief effect
+    //---------------------------------
+
+    QRadialGradient gradient((this->rect().width() / 2)
+        + 5, (this->rect().height() / 2) + 5,
+        (this->rect().width() / 2) + 6.5);
+    gradient.setColorAt(0, this->getColor());
+    gradient.setColorAt(0.8, this->getColor());
+    gradient.setColorAt(1, Qt::white);
+
+    QBrush gradientBrush(gradient);
+    this->setBrush(gradient);
+    this->setPen(QPen(Qt::black));
+
+  }
 
 
 
@@ -693,72 +694,72 @@ void StateItemEllipse::prepareGraphics() {
 
 
 void StateItemEllipse::paint(QPainter *painter,
-		const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    const QStyleOptionGraphicsItem *option, QWidget *widget) {
 
-	painter->save();
+  painter->save();
 
-	// Antialiasing
-	painter->setRenderHint(QPainter::Antialiasing);
+  // Antialiasing
+  painter->setRenderHint(QPainter::Antialiasing);
 
-	// Apply opacity
-	painter->setOpacity(this->effectiveOpacity());
+  // Apply opacity
+  painter->setOpacity(this->effectiveOpacity());
 
-	bool futureDisplay = GuiSettings::value(SETTINGS_STATE_FUTURE, QVariant(
-			SETTINGS_STATE_FUTURE_DEFAULT)).toBool();
+  bool futureDisplay = GuiSettings::value(SETTINGS_STATE_FUTURE, QVariant(
+      SETTINGS_STATE_FUTURE_DEFAULT)).toBool();
 
-	//bool futureDisplay = true;
-
-
-	//-- handle the reset state double ellipse
-	//------------------------
-	if (this->getModel()!=NULL && this->getModel()->isReset()) {
+  //bool futureDisplay = true;
 
 
-
-		painter->setPen(this->pen());
-		painter->drawEllipse(QPoint(rect().width() / 2, rect().height() / 2),
-				(int) ((rect().width() / 2) + 7), (int) ((rect().height() / 2)
-						+ 7));
-
-	}
-
-	//-- Paint Ellipse
-
-	// We want to paint ellipse from center
-	painter->translate(-this->transform().dx(), -this->transform().dy());
-
-	//-- Draw Ellipse
-	painter->setBrush(this->brush());
-	painter->setBackground(this->brush());
-	painter->setPen(this->pen());
-	painter->drawEllipse(QPoint(rect().width() / 2, rect().height() / 2),
-			(int) ((rect().width() / 2)), (int) ((rect().height() / 2)));
-
-	/*// Standard Style
-	//-------------------------------
-	if (!futureDisplay) {
-
-		//-- Paint ellipse
-		painter->setBrush(this->brush());
-		painter->setBackground(this->brush());
-		painter->setPen(this->pen());
-		painter->drawEllipse(QPoint(rect().width() / 2, rect().height() / 2),
-				(int) ((rect().width() / 2)), (int) ((rect().height() / 2)));
-
-	}
-	// Future Display Style
-	//---------------------------
-	else {
+  //-- handle the reset state double ellipse
+  //------------------------
+  if (this->getModel()!=NULL && this->getModel()->isReset()) {
 
 
 
+    painter->setPen(this->pen());
+    painter->drawEllipse(QPoint(rect().width() / 2, rect().height() / 2),
+        (int) ((rect().width() / 2) + 7), (int) ((rect().height() / 2)
+            + 7));
+
+  }
+
+  //-- Paint Ellipse
+
+  // We want to paint ellipse from center
+  painter->translate(-this->transform().dx(), -this->transform().dy());
+
+  //-- Draw Ellipse
+  painter->setBrush(this->brush());
+  painter->setBackground(this->brush());
+  painter->setPen(this->pen());
+  painter->drawEllipse(QPoint(rect().width() / 2, rect().height() / 2),
+      (int) ((rect().width() / 2)), (int) ((rect().height() / 2)));
+
+  /*// Standard Style
+  //-------------------------------
+  if (!futureDisplay) {
+
+    //-- Paint ellipse
+    painter->setBrush(this->brush());
+    painter->setBackground(this->brush());
+    painter->setPen(this->pen());
+    painter->drawEllipse(QPoint(rect().width() / 2, rect().height() / 2),
+        (int) ((rect().width() / 2)), (int) ((rect().height() / 2)));
+
+  }
+  // Future Display Style
+  //---------------------------
+  else {
 
 
-	}*/
 
-	painter->restore();
-	// First let parent do paint;
-	//QGraphicsEllipseItem::paint(painter,option,widget);
+
+
+  }*/
+
+  painter->restore();
+  // First let parent do paint;
+  //QGraphicsEllipseItem::paint(painter,option,widget);
 }
 
 void StateItemEllipse::keyReleaseEvent(QKeyEvent * event) {
@@ -768,7 +769,7 @@ void StateItemEllipse::keyReleaseEvent(QKeyEvent * event) {
 
 QList<QUndoCommand*> StateItemEllipse::remove() {
 
-	return QList<QUndoCommand*>();
+  return QList<QUndoCommand*>();
 
 }
 
@@ -800,70 +801,70 @@ bool StateItemText::recordText() {
     dynamic_cast<Scene*>(this->scene())->getUndoStack()->push(changeName);
 
 
-	return true;
+  return true;
 }
 
 void StateItemText::paint(QPainter *painter,
-		const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    const QStyleOptionGraphicsItem *option, QWidget *widget) {
 
     painter->save();
 
-	// Antialiasing
-	painter->setRenderHint(QPainter::Antialiasing);
+  // Antialiasing
+  painter->setRenderHint(QPainter::Antialiasing);
 
-	// Apply opacity
-	painter->setOpacity(this->effectiveOpacity());
+  // Apply opacity
+  painter->setOpacity(this->effectiveOpacity());
 
-	// Draw text background
-	//---------------------
+  // Draw text background
+  //---------------------
 
-	// Translate to middle of bounding rect
+  // Translate to middle of bounding rect
 
-	painter->setOpacity(0.5);
-	painter->translate(this->boundingRect().width() / 2,
-			this->boundingRect().height() / 2);
+  painter->setOpacity(0.5);
+  painter->translate(this->boundingRect().width() / 2,
+      this->boundingRect().height() / 2);
 
-	int aboveBorder = 20;
+  int aboveBorder = 20;
 
-	// Background to text depending on text size
-	// Estimate text size
-	QFontMetrics fontMetrics = painter->fontMetrics();
-	int textWidth = fontMetrics.width(this->toPlainText());
-	textWidth += 10;
-	int textHeight = fontMetrics.height();
-	textHeight += 5;
+  // Background to text depending on text size
+  // Estimate text size
+  QFontMetrics fontMetrics = painter->fontMetrics();
+  int textWidth = fontMetrics.width(this->toPlainText());
+  textWidth += 10;
+  int textHeight = fontMetrics.height();
+  textHeight += 5;
 
-	// Draw Rect
-	QColor settingsTextColor = GuiSettings::value(SETTINGS_STATE_TEXT_BG,
-			QVariant(SETTINGS_STATE_TEXT_BG_DEFAULT)).value<QColor> ();
-	if (settingsTextColor != painter->brush().color())
-		painter->setBrush(QBrush(settingsTextColor));
+  // Draw Rect
+  QColor settingsTextColor = GuiSettings::value(SETTINGS_STATE_TEXT_BG,
+      QVariant(SETTINGS_STATE_TEXT_BG_DEFAULT)).value<QColor> ();
+  if (settingsTextColor != painter->brush().color())
+    painter->setBrush(QBrush(settingsTextColor));
 
-	//		painter->setPen(QPen(Qt::DotLine));
-	painter->drawRoundRect(QRect(-textWidth / 2, -textHeight / 2, textWidth,
-			textHeight), 10, 10);
+  //    painter->setPen(QPen(Qt::DotLine));
+  painter->drawRoundRect(QRect(-textWidth / 2, -textHeight / 2, textWidth,
+      textHeight), 10, 10);
 
-	// Points pattern
-	painter->setBrush(QBrush(Qt::lightGray, Qt::Dense4Pattern));
-	painter->drawRoundRect(QRect(-textWidth / 2, -textHeight / 2, textWidth,
-			textHeight), 10, 10);
-
-
-	painter->restore();
+  // Points pattern
+  painter->setBrush(QBrush(Qt::lightGray, Qt::Dense4Pattern));
+  painter->drawRoundRect(QRect(-textWidth / 2, -textHeight / 2, textWidth,
+      textHeight), 10, 10);
 
 
-	// Replace the text if necessary
-	//-----------
-	int middlex = 50 / 2;
-	int middley = 50 / 2;
-	QPointF correctPosition(middlex - textWidth / 2, middley - textHeight / 2);
-	if (this->pos().x() != correctPosition.x() || this->pos().y() != correctPosition.y() ) {
-		this->setPos(correctPosition);
-	}
+  painter->restore();
 
 
-	// Delegate Text painting to parent
-	FSMGraphicsTextItem::paint(painter, option, widget);
+  // Replace the text if necessary
+  //-----------
+  int middlex = 50 / 2;
+  int middley = 50 / 2;
+  QPointF correctPosition(middlex - textWidth / 2, middley - textHeight / 2);
+  if (this->pos().x() != correctPosition.x() || this->pos().y() != correctPosition.y() ) {
+    this->setPos(correctPosition);
+  }
+
+
+  // Delegate Text painting to parent
+  FSMGraphicsTextItem::paint(painter, option, widget);
 
 }
 
@@ -906,71 +907,71 @@ void StateItemText::startEditing() {
 
 bool StateItemText::sceneEventFilter ( QGraphicsItem * watched, QEvent * event ) {
 
-	//event->setAccepted(true);
+  //event->setAccepted(true);
 
-	//this->sceneEvent(event);
-	event->accept();
+  //this->sceneEvent(event);
+  event->accept();
 
-	return true;
+  return true;
 }
 
 bool StateItemText::sceneEvent(QEvent * event) {
 
-	bool res = FSMGraphicsTextItem::sceneEvent(event);
+  bool res = FSMGraphicsTextItem::sceneEvent(event);
 
 
-	 if (this->textInteractionFlags() & Qt::TextEditorInteraction) {
+   if (this->textInteractionFlags() & Qt::TextEditorInteraction) {
 
 
-		// If we are editing, we can only act on the text field for mouse and keyboard
-		// So we have to propagate events
-		switch (event->type()) {
+    // If we are editing, we can only act on the text field for mouse and keyboard
+    // So we have to propagate events
+    switch (event->type()) {
 
 
-		case QEvent::GraphicsSceneMouseMove:
-			((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->pos()));
-						((QGraphicsSceneMouseEvent*) event)->setLastPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->lastPos()));
-			this->mouseMoveEvent((QGraphicsSceneMouseEvent*) event);
-			event->accept();
-			return true;
-			break;
+    case QEvent::GraphicsSceneMouseMove:
+      ((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->pos()));
+            ((QGraphicsSceneMouseEvent*) event)->setLastPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->lastPos()));
+      this->mouseMoveEvent((QGraphicsSceneMouseEvent*) event);
+      event->accept();
+      return true;
+      break;
 
-		case QEvent::GraphicsSceneMousePress:
+    case QEvent::GraphicsSceneMousePress:
 
-			((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->pos()));
-			((QGraphicsSceneMouseEvent*) event)->setLastPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->lastPos()));
-			event->accept();
-			this->mousePressEvent((QGraphicsSceneMouseEvent*) event);
-			return true;
-			break;
+      ((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->pos()));
+      ((QGraphicsSceneMouseEvent*) event)->setLastPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->lastPos()));
+      event->accept();
+      this->mousePressEvent((QGraphicsSceneMouseEvent*) event);
+      return true;
+      break;
 
-		case QEvent::GraphicsSceneMouseRelease:
-			((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->pos()));
-						((QGraphicsSceneMouseEvent*) event)->setLastPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->lastPos()));
-			this->mouseReleaseEvent((QGraphicsSceneMouseEvent*) event);
-			event->accept();
-			return true;
-			break;
+    case QEvent::GraphicsSceneMouseRelease:
+      ((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->pos()));
+            ((QGraphicsSceneMouseEvent*) event)->setLastPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->lastPos()));
+      this->mouseReleaseEvent((QGraphicsSceneMouseEvent*) event);
+      event->accept();
+      return true;
+      break;
 
-		case QEvent::KeyPress:
-			this->keyPressEvent((QKeyEvent*) event);
-			event->setAccepted(true);
-			event->accept();
-			return true;
-			break;
-		case QEvent::KeyRelease:
-			QGraphicsItem::keyReleaseEvent((QKeyEvent*) event);
-			event->accept();
-			return true;
-			break;
+    case QEvent::KeyPress:
+      this->keyPressEvent((QKeyEvent*) event);
+      event->setAccepted(true);
+      event->accept();
+      return true;
+      break;
+    case QEvent::KeyRelease:
+      QGraphicsItem::keyReleaseEvent((QKeyEvent*) event);
+      event->accept();
+      return true;
+      break;
 
-		default:
-			break;
-		}
-	}
+    default:
+      break;
+    }
+  }
 
-	//  Let parent do
-	return res;
+  //  Let parent do
+  return res;
 
 }
 

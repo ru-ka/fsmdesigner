@@ -45,6 +45,11 @@ class Scene: public QGraphicsScene, public VerificationListener {
         /// The designed FSM
         Fsm * fsm;
 
+        //REMOVE?
+        bool    selectionChanged;
+        QPointF oldPos;
+        //ENDREMOVE
+
 
         /** \defgroup FSM Items Placement*/
         /**@{*/
