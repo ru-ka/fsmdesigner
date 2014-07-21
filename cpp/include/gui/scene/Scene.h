@@ -49,6 +49,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
         QPointF oldPos;
 
         void moveItem(); // Move the selected item.
+        void moveItem(QGraphicsItem * item);
 
 
         /** \defgroup FSM Items Placement*/

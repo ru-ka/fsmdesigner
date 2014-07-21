@@ -26,6 +26,7 @@ AddStateCommand::AddStateCommand( Scene * _relatedScene,
   //-- Place centered on mouse
   state->setPosition(pair<double,double>(mouseEvent->scenePos().x(),mouseEvent->scenePos().y()));
   stateItem->setPos(mouseEvent->scenePos().x(),mouseEvent->scenePos().y());
+  qDebug() << "stateItem->pos() = " << stateItem->pos();
 }
 
 

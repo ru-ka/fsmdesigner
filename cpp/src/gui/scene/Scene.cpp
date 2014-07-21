@@ -33,6 +33,7 @@ using namespace std;
 #include <gui/commands/MoveStateCommand.h>
 #include <gui/commands/CreateItemGroupCommand.h>
 #include <gui/commands/DeleteItemGroupCommand.h>
+#include <gui/commands/MoveItemGroupCommand.h>
 
 
 //-- Others
@@ -1334,13 +1335,33 @@ void Scene::receivedSelectionChanged() {
 
 
 void Scene::moveItem() {
+  qDebug() << "moveItem() ";
   Q_ASSERT( this->selectedItems().size() == 1 );
   QGraphicsItem * currentItem = this->selectedItems().first();
   switch( currentItem->type() ) {
+    case ( QGraphicsItemGroup::Type ) : {
+      MoveItemGroupCommand * moveCommand =
+        new MoveItemGroupCommand( this,
+            dynamic_cast<QGraphicsItemGroup*>(currentItem),
+            oldPos, currentItem->pos() );
+      undoStack.push( moveCommand );
+      break;
+    }
+    default: {
+      qDebug() << "moveItem() default case";
+      this->moveItem(currentItem);
+    }
+  }
+}
+
+
+void Scene::moveItem(QGraphicsItem * item) {
+  qDebug() << "moveItem(QGraphicsItem * item) ";
+  switch( item->type() ) {
     case ( FSMGraphicsItem<>::STATEITEM ) : {
       qDebug() << "moveItem() STATEITEM case";
       MoveStateCommand * moveCommand =
-        new MoveStateCommand( this, dynamic_cast<StateItem *>(currentItem) );
+        new MoveStateCommand( this, dynamic_cast<StateItem *>(item));
       undoStack.push( moveCommand );
       break;
     }
