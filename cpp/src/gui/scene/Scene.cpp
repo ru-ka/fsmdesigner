@@ -357,10 +357,11 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 }
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
-  // QUICKHACK
   if ( this->selectedItems().size() == 1 &&
       oldPos != this->selectedItems().first()->pos() ) {
     qDebug() << "Move detected.";
+    this->moveItem();
+    e->setAccepted(true);
   }
 
   // Destroy an itemgroup.
@@ -372,13 +373,14 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
       DeleteItemGroupCommand * groupCommand =
         new DeleteItemGroupCommand( this, currentItem );
       undoStack.push( groupCommand );
+      e->setAccepted(true);
     }
-  } else if (this->selectedItems().size() > 1) {
+  } else if (this->selectedItems().size() > 1) { // Create an itemGroup
     CreateItemGroupCommand * groupCommand =
       new CreateItemGroupCommand( this, this->selectedItems() );
     undoStack.push(groupCommand);
+    e->setAccepted(true);
   }
-  // ENDTODO
 
 
   // Placing if not in choose mode
@@ -1328,4 +1330,21 @@ QList<LinkDeparture*> Scene::findLinkDepartures(Link * link) {
 void Scene::receivedSelectionChanged() {
   qDebug() << "received SelectionChanged()";
   selectionChanged = true;
+}
+
+
+void Scene::moveItem() {
+  Q_ASSERT( this->selectedItems().size() == 1 );
+  QGraphicsItem * currentItem = this->selectedItems().first();
+  switch( currentItem->type() ) {
+    case ( FSMGraphicsItem<>::STATEITEM ) : {
+      qDebug() << "moveItem() STATEITEM case";
+      MoveStateCommand * moveCommand =
+        new MoveStateCommand( this, dynamic_cast<StateItem *>(currentItem) );
+      undoStack.push( moveCommand );
+      break;
+    }
+    default:
+      qDebug() << "moveItem() default case";
+  }
 }
