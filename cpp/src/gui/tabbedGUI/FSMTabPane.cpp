@@ -119,32 +119,32 @@ void FSMTabPane::zoomOut() {
 
 void FSMTabPane::placeSetChoose() {
   if (this->currentIndex()>0)
-    emit modeChanged(FSMDesigner::CHOOSE);
+    emit setPlaceModeSig(FSMDesigner::CHOOSE);
 }
 
 void FSMTabPane::placeSetState() {
   if (this->currentIndex()>0)
-    emit modeChanged(FSMDesigner::STATE);
+    emit setPlaceModeSig(FSMDesigner::STATE);
 }
 
 void FSMTabPane::placeSetTransition(){
   if (this->currentIndex()>0)
-    emit modeChanged(FSMDesigner::TRANS);
+    emit setPlaceModeSig(FSMDesigner::TRANS);
 }
 
 void FSMTabPane::placeSetHyperTransition(){
   if (this->currentIndex()>0)
-    emit modeChanged(FSMDesigner::HYPERTRANS);
+    emit setPlaceModeSig(FSMDesigner::HYPERTRANS);
 }
 
 void FSMTabPane::placeSetLink(){
   if (this->currentIndex()>0)
-    emit modeChanged(FSMDesigner::LINKDEPARTURE);
+    emit setPlaceModeSig(FSMDesigner::LINKDEPARTURE);
 }
 
 void FSMTabPane::placeSetJoin(){
   if (this->currentIndex()>0)
-    emit modeChanged(FSMDesigner::JOIN);
+    emit setPlaceModeSig(FSMDesigner::JOIN);
 }
 
 void FSMTabPane::generateVerilog() {
@@ -297,7 +297,7 @@ void FSMTabPane::tabSelectionChanged(int index) {
   connect( this->selectedScene, SIGNAL(modeChanged() ),
            this               , SLOT  (modeChanged()));
 
-  connect( this               , SIGNAL(modeChanged(FSMDesigner::Item) ),
+  connect( this               , SIGNAL(setPlaceModeSig (FSMDesigner::Item) ),
            this->selectedScene, SLOT  (setPlaceModeSlot(FSMDesigner::Item) ) );
 }
 
@@ -305,6 +305,7 @@ void FSMTabPane::markModeActions() {
   if (selectedScene == NULL)
     return;
   FSMDesigner::Item currentMode = dynamic_cast<Scene*>(selectedScene)->getPlaceMode();
+  qDebug() << "FSMTabPane:: current mode =  " << currentMode;
   emit chooseModeChanged(FSMDesigner::CHOOSE        == currentMode);
   emit stateModeChanged (FSMDesigner::STATE         == currentMode);
   emit transModeChanged (FSMDesigner::TRANS         == currentMode);
@@ -314,5 +315,6 @@ void FSMTabPane::markModeActions() {
 }
 
 void FSMTabPane::modeChanged() {
+  qDebug() << "FSMTabPane:: mode changed! ";
   this->markModeActions();
 }

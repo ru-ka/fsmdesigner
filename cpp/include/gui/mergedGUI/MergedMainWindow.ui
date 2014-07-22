@@ -103,6 +103,7 @@
     </property>
     <addaction name="separator"/>
     <addaction name="separator"/>
+    <addaction name="action_Choose"/>
     <addaction name="action_State"/>
     <addaction name="action_Transition"/>
     <addaction name="action_Hypertrans"/>
@@ -500,6 +501,9 @@
    </property>
   </action>
   <action name="action_State">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../src/gui/resources/resources.qrc">
      <normaloff>:/icons/state.png</normaloff>:/icons/state.png</iconset>
@@ -515,6 +519,9 @@
    </property>
   </action>
   <action name="action_Transition">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../src/gui/resources/resources.qrc">
      <normaloff>:/icons/trans.png</normaloff>:/icons/trans.png</iconset>
@@ -530,6 +537,9 @@
    </property>
   </action>
   <action name="action_Hypertrans">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -548,6 +558,9 @@
    </property>
   </action>
   <action name="action_Link">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -566,6 +579,9 @@
    </property>
   </action>
   <action name="action_Join">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../src/gui/resources/resources.qrc">
      <normaloff>:/icons/join.png</normaloff>:/icons/join.png</iconset>
@@ -776,6 +792,9 @@
    </property>
    <property name="whatsThis">
     <string>&quot;Choose-mode&quot; button.</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
  </widget>

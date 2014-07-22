@@ -1386,6 +1386,7 @@ void Scene::setPlaceModeSlot(FSMDesigner::Item mode) {
   qDebug() << "-----------------";
   qDebug() << "setPlaceMode slot";
   qDebug() << "-----------------";
+
   // Undo unused CreateItemGroupCommands.
   if (bLastCommand) {
     undoStack.undo();
