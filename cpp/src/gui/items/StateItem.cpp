@@ -488,14 +488,15 @@ bool StateItem::recordPosition() {
 }
 
 QList<QUndoCommand*> StateItem::remove(QUndoCommand * parentCommand) {
+  qDebug() << "StateItem::remove to be deleted.";
 
   //-- Prepare Undo list
   QList<QUndoCommand*> undoCommands;
 
   // Remove itself
   //----------------------------
-  DeleteStateAction * deleteThis = new DeleteStateAction(this);
-  undoCommands.append(deleteThis);
+  //DeleteStateAction * deleteThis = new DeleteStateAction(this);
+  //undoCommands.append(deleteThis);
 
   // Remove transitions
   //-------------------------

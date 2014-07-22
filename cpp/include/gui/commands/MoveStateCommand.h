@@ -36,6 +36,8 @@ class MoveStateCommand : public QUndoCommand {
     QPointF     oldPos      ;
     QPointF     newPos      ;
 
+    bool        bLastCommand; // CreateItemGroupCommand?
+
 
   public:
     enum { Id = FSMDesigner::MOVESTATECOMMAND };

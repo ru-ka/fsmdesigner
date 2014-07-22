@@ -7,7 +7,8 @@ AddStateCommand::AddStateCommand( Scene * _relatedScene,
                                   QUndoCommand(_parentCommand), 
                                   relatedScene(_relatedScene),
                                   mouseEvent(_e),
-                                  fsm( _relatedScene->getFsm() )
+                                  fsm( _relatedScene->getFsm() ),
+                                  bLastCommand( _relatedScene->bLastCommand )
 {
   //-- Add new GUI item to the Scene
   stateItem = new StateItem();
@@ -26,7 +27,6 @@ AddStateCommand::AddStateCommand( Scene * _relatedScene,
   //-- Place centered on mouse
   state->setPosition(pair<double,double>(mouseEvent->scenePos().x(),mouseEvent->scenePos().y()));
   stateItem->setPos(mouseEvent->scenePos().x(),mouseEvent->scenePos().y());
-  qDebug() << "stateItem->pos() = " << stateItem->pos();
 }
 
 
@@ -40,18 +40,26 @@ AddStateCommand::~AddStateCommand() {
 
 
 void  AddStateCommand::redo(){
+  qDebug() << "-------------------------";
+  qDebug() << "Add state item    redo() ";
+  qDebug() << "-------------------------";
   // Pass the ownership of the state objects to the scene and the model.
   relatedScene->addItem( stateItem ); 
   fsm->addState( state );
 
   relatedScene->update();
+  relatedScene->bLastCommand = false;
 }
 
 
 void  AddStateCommand::undo(){
+  qDebug() << "-------------------------";
+  qDebug() << "Add state item    undo() ";
+  qDebug() << "-------------------------";
   // Get the ownership of the state objects.
   relatedScene->removeItem(   stateItem );
   fsm->deleteState( state );
 
   relatedScene->update();
+  relatedScene->bLastCommand = this->bLastCommand;
 }

@@ -78,6 +78,9 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
   this->placeLinkEndState = NULL;
   this->placeLinkStartState = NULL;
 
+  this->bLastCommand = false;
+  this->activeGroup  = NULL ;
+
   // Verification
   //---------------
   this->setFSMVerificator(new FSMVerificator(this));
@@ -91,12 +94,6 @@ void Scene::initializeScene() {
   //----------
   this->clearSelection();
   this->clear();
-  //  QList <QGraphicsItem *> cil = this->items()  ;
-  //  while (!cil.isEmpty()) {
-  //    QGraphicsItem* i = cil.takeFirst();
-  //    this->removeItem(i);
-  //    delete i;
-  //  }
 
 
   // Draw FSM
@@ -283,7 +280,6 @@ void Scene::addToToPlaceStack(QGraphicsItem * item) {
   this->addItem(item);
   item->setVisible(false);
   item->setEnabled(false);
-  //item->setSelected(true);
 
 
   //-- Add to stack
@@ -358,24 +354,28 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 }
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
-  if ( this->selectedItems().size() == 1 &&
+  qDebug() << "-----------------";
+  qDebug() << "mouseReleaseEvent";
+  qDebug() << "-----------------";
+
+  // Handle item groups
+  if ( this->selectedItems().size() == 0 && bLastCommand ) {
+    undoStack.undo();
+    e->setAccepted(true);
+  } else if ( this->selectedItems().size() == 0 && activeGroup &&
+      !e->isAccepted() ) {
+    DeleteItemGroupCommand * groupCommand =
+      new DeleteItemGroupCommand( this, activeGroup );
+    undoStack.push( groupCommand );
+    e->setAccepted(true);
+  } else if ( this->selectedItems().size() == 1 &&
       oldPos != this->selectedItems().first()->pos() ) {
     qDebug() << "Move detected.";
     this->moveItem();
     e->setAccepted(true);
-  }
-
-  // Destroy an itemgroup.
-  if(e->modifiers() == Qt::ControlModifier && this->selectedItems().size() == 1) {
-    if( this->selectedItems().first()->type() == QGraphicsItemGroup::Type ) {
-      qDebug() << "Item group" << endl;
-      QGraphicsItemGroup * currentItem =
-        dynamic_cast<QGraphicsItemGroup *>(this->selectedItems().first() );
-      DeleteItemGroupCommand * groupCommand =
-        new DeleteItemGroupCommand( this, currentItem );
-      undoStack.push( groupCommand );
-      e->setAccepted(true);
-    }
+  } else if ( this->selectedItems().size() ==1 && bLastCommand &&
+      this->selectedItems().first()->type() != QGraphicsItemGroup::Type ) {
+    undoStack.undo();
   } else if (this->selectedItems().size() > 1) { // Create an itemGroup
     CreateItemGroupCommand * groupCommand =
       new CreateItemGroupCommand( this, this->selectedItems() );
@@ -893,16 +893,17 @@ void Scene::placeUnderMouse(QGraphicsItem * item, QPointF mousePosition) {
 
 
 void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
+  qDebug() << "-----------------";
+  qDebug() << "keyReleaseEvent";
+  qDebug() << "-----------------";
   // TODO: (QUICKHACK) move to the right place, 
   if(keyEvent->key() == Qt::Key_Escape) {
-    QList<QGraphicsItem *> selectedItems = this->selectedItems();
-    qDebug() << "selectedItems.size() = " << selectedItems.size();
-    QList<QGraphicsItem *>::iterator it;
-    for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
-      if( (*it)->type() == QGraphicsItemGroup::Type ) {
-        qDebug() << "Item group" << endl;
-        this->destroyItemGroup( dynamic_cast<QGraphicsItemGroup*>(*it) );
-      }
+    if (bLastCommand) {
+      undoStack.undo();
+    } else if (activeGroup ) {
+      DeleteItemGroupCommand * groupCommand =
+        new DeleteItemGroupCommand( this, activeGroup );
+      undoStack.push( groupCommand );
     }
   }
   // ENDTODO
@@ -936,9 +937,6 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
       if ((*it)->scene() == NULL) {
         continue;
       }
-
-      //-- remove / delete from scene
-      //this->removeItem(*it);
 
       if ( (*it)->type() == StateItem::Type ) {
         DeleteStateCommand *stateCommand = new DeleteStateCommand( this,
@@ -1009,6 +1007,19 @@ void Scene::setFsm(Fsm * fsm) {
        delete list.takeFirst();
 
 void Scene::setPlaceMode(FSMDesigner::Item mode) {
+  qDebug() << "-----------------";
+  qDebug() << "setPlaceMode";
+  qDebug() << "-----------------";
+  // Undo unused CreateItemGroupCommands.
+  /*
+  if (bLastCommand) {
+    undoStack.undo();
+  } else if (activeGroup) {
+    DeleteItemGroupCommand * groupCommand =
+      new DeleteItemGroupCommand( this, activeGroup );
+    undoStack.push( groupCommand );
+  }
+  */
 
 
   //-- If back to choose requested, then perform cleaning and such
@@ -1368,4 +1379,20 @@ void Scene::moveItem(QGraphicsItem * item) {
     default:
       qDebug() << "moveItem() default case";
   }
+}
+
+
+void Scene::setPlaceModeSlot(FSMDesigner::Item mode) {
+  qDebug() << "-----------------";
+  qDebug() << "setPlaceMode slot";
+  qDebug() << "-----------------";
+  // Undo unused CreateItemGroupCommands.
+  if (bLastCommand) {
+    undoStack.undo();
+  } else if (activeGroup) {
+    DeleteItemGroupCommand * groupCommand =
+      new DeleteItemGroupCommand( this, activeGroup );
+    undoStack.push( groupCommand );
+  }
+  this->setPlaceMode( mode );
 }

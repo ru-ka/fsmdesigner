@@ -118,40 +118,33 @@ void FSMTabPane::zoomOut() {
 }
 
 void FSMTabPane::placeSetChoose() {
-
-    if (this->currentIndex()>0)
-        dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::CHOOSE);
+  if (this->currentIndex()>0)
+    emit modeChanged(FSMDesigner::CHOOSE);
 }
 
 void FSMTabPane::placeSetState() {
-
-    if (this->currentIndex()>0)
-        dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::STATE);
+  if (this->currentIndex()>0)
+    emit modeChanged(FSMDesigner::STATE);
 }
 
 void FSMTabPane::placeSetTransition(){
-
-    if (this->currentIndex()>0)
-        dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::TRANS);
+  if (this->currentIndex()>0)
+    emit modeChanged(FSMDesigner::TRANS);
 }
 
 void FSMTabPane::placeSetHyperTransition(){
-
-    if (this->currentIndex()>0)
-        dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::HYPERTRANS);
+  if (this->currentIndex()>0)
+    emit modeChanged(FSMDesigner::HYPERTRANS);
 }
 
 void FSMTabPane::placeSetLink(){
-
-    if (this->currentIndex()>0)
-        dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::LINKDEPARTURE);
+  if (this->currentIndex()>0)
+    emit modeChanged(FSMDesigner::LINKDEPARTURE);
 }
 
 void FSMTabPane::placeSetJoin(){
-
-    if (this->currentIndex()>0)
-        dynamic_cast<FSMSceneView*>(this->currentWidget())->placeSetMode(FSMDesigner::JOIN);
-
+  if (this->currentIndex()>0)
+    emit modeChanged(FSMDesigner::JOIN);
 }
 
 void FSMTabPane::generateVerilog() {
@@ -303,15 +296,15 @@ void FSMTabPane::tabSelectionChanged(int index) {
 
   connect( this->selectedScene, SIGNAL(modeChanged() ),
            this               , SLOT  (modeChanged()));
+
+  connect( this               , SIGNAL(modeChanged(FSMDesigner::Item) ),
+           this->selectedScene, SLOT  (setPlaceModeSlot(FSMDesigner::Item) ) );
 }
 
-// TODO: Since there are more states than actions, double check the correctness
-// of method.
 void FSMTabPane::markModeActions() {
   if (selectedScene == NULL)
     return;
   FSMDesigner::Item currentMode = dynamic_cast<Scene*>(selectedScene)->getPlaceMode();
-  qDebug() << "currentMode = " << currentMode;
   emit chooseModeChanged(FSMDesigner::CHOOSE        == currentMode);
   emit stateModeChanged (FSMDesigner::STATE         == currentMode);
   emit transModeChanged (FSMDesigner::TRANS         == currentMode);

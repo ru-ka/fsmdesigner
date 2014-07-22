@@ -9,7 +9,8 @@ MoveStateCommand::MoveStateCommand( Scene * _relatedScene,
                                     stateItem(_stateItem),
                                     state( _stateItem->getModel() ),
                                     fsm( _relatedScene->getFsm() ),
-                                    newPos( _stateItem->scenePos() )
+                                    newPos( _stateItem->scenePos() ),
+                                    bLastCommand( _relatedScene->bLastCommand )
 {
   stateItem->setTransform(QTransform::fromTranslate( 0, 0));
   oldPos.setX( stateItem->getModel()->getPosition().first  );
@@ -29,6 +30,7 @@ void  MoveStateCommand::redo(){
   state->setPosition(std::make_pair(newPos.x(), newPos.y()));
 
   relatedScene->update();
+  relatedScene->bLastCommand = false;
 }
 
 
@@ -40,6 +42,7 @@ void  MoveStateCommand::undo(){
   state->setPosition(std::make_pair(oldPos.x(), oldPos.y()));
 
   relatedScene->update();
+  relatedScene->bLastCommand = this->bLastCommand;
 }
 
 

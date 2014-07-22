@@ -26,6 +26,8 @@ class DeleteItemGroupCommand : public QUndoCommand {
     QList<QGraphicsItem *>  selectedItems;
     QGraphicsItemGroup  *   itemGroup    ;
 
+    bool bLastCommand; // CreateItemGroupCommand?
+
 
   public:
     /**

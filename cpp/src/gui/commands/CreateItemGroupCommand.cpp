@@ -8,48 +8,66 @@ CreateItemGroupCommand::CreateItemGroupCommand( Scene * _relatedScene,
                                                 relatedScene(_relatedScene),
                                                 selectedItems(_selectedItems)
 {
-  itemGroup = NULL;
+  itemGroup = relatedScene->createItemGroup( selectedItems );
+  Q_ASSERT( itemGroup != NULL );
+
+  // Remove the items from the item group, in oder to add them through the redo-method
+  // consistently.
+  QList<QGraphicsItem *>::iterator child_it;;
+  for (child_it = selectedItems.begin(); child_it != selectedItems.end(); ++child_it) {
+    itemGroup->removeFromGroup( *child_it );
+  }
 }
 
 
 CreateItemGroupCommand::~CreateItemGroupCommand() {
+  relatedScene->destroyItemGroup( itemGroup );
 }
 
 
 void  CreateItemGroupCommand::redo() {
-  Q_ASSERT( itemGroup == NULL );
-  itemGroup = relatedScene->createItemGroup( selectedItems );
-  Q_ASSERT( itemGroup != NULL );
+  qDebug() << "-------------------------";
+  qDebug() << "Create item group redo() ";
+  qDebug() << "-------------------------";
+  QList<QGraphicsItem *>::Iterator it;
+  for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
+    (*it)->setSelected(false);
+    (*it)->clearFocus();
+    itemGroup->addToGroup( *it );
+  }
   itemGroup->setFlags(   QGraphicsItem::ItemIsSelectable
                        | QGraphicsItem::ItemIsMovable
                        | QGraphicsItem::ItemIsFocusable
                      );
+  // Just select the itemGroup and deselect its children
+
   itemGroup->setFocus();
   itemGroup->setSelected(true);
-  // Just select the itemGroup and deselect its children
-  QList<QGraphicsItem *>::Iterator it;
-  for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
-    (*it)->setSelected(false);
-  }
 
   relatedScene->update();
+  relatedScene->bLastCommand = true;
+  relatedScene->activeGroup = itemGroup;
 }
 
 
 void  CreateItemGroupCommand::undo() {
-  relatedScene->destroyItemGroup( itemGroup );
-  itemGroup = NULL;
+  qDebug() << "-------------------------";
+  qDebug() << "Create item group undo() ";
+  qDebug() << "-------------------------";
   // The child items could be queried by itemGroup->childItems(),
   // but since the command is responsible for generating the itemGroup,
   // its item-set MUST contain the same items as the itemGroup->childItems()
   // set.
   QList<QGraphicsItem *>::iterator child_it;;
   for (child_it = selectedItems.begin(); child_it != selectedItems.end(); ++child_it) {
+    itemGroup->removeFromGroup( *child_it );
     (*child_it)->setSelected(false);
     (*child_it)->clearFocus();
   }
 
   relatedScene->update();
+  relatedScene->bLastCommand = false;
+  relatedScene->activeGroup = NULL;
 }
 
 
@@ -71,10 +89,8 @@ bool  CreateItemGroupCommand::mergeWith(const QUndoCommand * command) {
   // Append all recently selected graphic items.
   selectedItems.append( groupCommand->getSelectedItems() );
   // Remove the destroyed groupItem.
-  Q_ASSERT( itemGroup != NULL );
   selectedItems.removeAt( selectedItems.indexOf( itemGroup ) );
 
-  const_cast<CreateItemGroupCommand *>(groupCommand)->undo(); //Hackish
   this->undo();
 
   // Create the flattened itemGroup.

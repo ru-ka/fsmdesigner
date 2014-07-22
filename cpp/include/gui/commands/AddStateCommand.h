@@ -32,6 +32,7 @@ class AddStateCommand : public QUndoCommand {
     StateItem * stateItem   ; // Related GUI object.
     State     * state       ; // Related fsm object.
     Fsm       * fsm         ;
+    bool        bLastCommand; // CreateItemGroupCommand?
 
     QGraphicsSceneMouseEvent * mouseEvent;
 
