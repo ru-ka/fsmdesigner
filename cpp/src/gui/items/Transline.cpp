@@ -712,6 +712,15 @@ void Transline::mouseMoveEvent(QGraphicsSceneMouseEvent * event) {
 	}
 
 	return;
+
+	//-- Set Selected item as the trackpoint
+	//addedTrackpoint->scene()->clearSelection();
+	//addedTrackpoint->setSelected(true);
+
+	//-- This transline simply dissapears if the start item is not a trackpoint
+//	if (!FSMGraphicsItem<>::isTrackPoint(this->getStartItem()))
+//		delete this;
+
 }
 
 QList<QUndoCommand*> Transline::remove(QUndoCommand * parentComand) {
