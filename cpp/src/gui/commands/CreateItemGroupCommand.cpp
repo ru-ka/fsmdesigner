@@ -8,15 +8,10 @@ CreateItemGroupCommand::CreateItemGroupCommand( Scene * _relatedScene,
                                                 relatedScene(_relatedScene),
                                                 selectedItems(_selectedItems)
 {
-  itemGroup = relatedScene->createItemGroup( selectedItems );
+  // Create an empty itemGroup.
+  QList<QGraphicsItem *> emptyItems;
+  itemGroup = relatedScene->createItemGroup( emptyItems );
   Q_ASSERT( itemGroup != NULL );
-
-  // Remove the items from the item group, in oder to add them through the redo-method
-  // consistently.
-  QList<QGraphicsItem *>::iterator child_it;;
-  for (child_it = selectedItems.begin(); child_it != selectedItems.end(); ++child_it) {
-    itemGroup->removeFromGroup( *child_it );
-  }
 }
 
 
@@ -77,10 +72,6 @@ int   CreateItemGroupCommand::id() const {
 
 
 /*
- *  This is a hackish approach.
- *  The reason for this is, the redo()-method of each pushed command is
- *  executed by the undoStack.
- *
  *  DoubleCheck if merging is desirable.
  */
 bool  CreateItemGroupCommand::mergeWith(const QUndoCommand * command) {
@@ -88,7 +79,7 @@ bool  CreateItemGroupCommand::mergeWith(const QUndoCommand * command) {
     static_cast<const CreateItemGroupCommand*>(command);
   // Append all recently selected graphic items.
   selectedItems.append( groupCommand->getSelectedItems() );
-  // Remove the destroyed groupItem.
+  // Remove the own itemGroup from the selectedItems list.
   selectedItems.removeAt( selectedItems.indexOf( itemGroup ) );
 
   this->undo();
