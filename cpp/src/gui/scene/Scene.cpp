@@ -425,8 +425,8 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 
       // Place trackpoint (not for hypertransition!)
       //---------------
-      if (itemUnder == NULL && this->placeTransitionStack.size() > 0
-                            && this->placeTransitionStack.back()->type()!=FSMGraphicsItem<>::HYPERTRANS ) {
+      if ( itemUnder == NULL && this->placeTransitionStack.size() > 0 
+           && this->placeTransitionStack.back()->type()!=FSMGraphicsItem<>::HYPERTRANS ) {
 
         //-- Nothing under, add a trackpoint between last item on stack, and nothing
         TrackpointItem * item = new TrackpointItem(new Trackpoint(e->scenePos().x(), e->scenePos().y(), 0),

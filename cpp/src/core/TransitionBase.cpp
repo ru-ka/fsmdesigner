@@ -201,8 +201,7 @@ Trackpoint * TransitionBase::deleteTrackpoint(Trackpoint * trackpoint) {
 
     //-- look for trackpoint
     vector<Trackpoint*>::iterator ti;
-    unsigned count = 0;
-    for (ti = trackpoints.begin(); ti != trackpoints.end(); ti++) {
+    for (ti = trackpoints.begin(); ti != trackpoints.end(); ++ti) {
 
         Trackpoint * tp = *(ti.base());
         if (tp == trackpoint) {
@@ -210,7 +209,6 @@ Trackpoint * TransitionBase::deleteTrackpoint(Trackpoint * trackpoint) {
             return trackpoint;
 
         }
-        count++;
     }
 
     return NULL;

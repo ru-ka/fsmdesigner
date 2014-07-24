@@ -45,6 +45,7 @@ using namespace std;
 
 StateItem::StateItem(State * model, QGraphicsItem * parent) :
   QGraphicsItemGroup(parent) {
+  // TODO: how to place the items around the center point (0,0) correctly?
 
   // TODO: Set state size parameterizable through preferences
 
@@ -58,18 +59,29 @@ StateItem::StateItem(State * model, QGraphicsItem * parent) :
   // Create Representation
   //-------------------------------
 
+  qDebug() << "this->boundingRect() = " << this->boundingRect();
+
+  //qDebug() << "this->boundingRect().center() " << this->boundingRect().center();
+  // Create Ellipse
+  this->stateEllipse = new StateItemEllipse(QRectF(0, 0, 50, 50));
+  this->stateEllipse->setPos(-25,-25);
+  this->stateEllipse->setVisible(true);
+  this->stateEllipse->setZValue(1);
+  this->addToGroup(this->stateEllipse);
+
+  qDebug() << "this->boundingRect() = " << this->boundingRect();
+
   // Create TextItem
   this->stateText = new StateItemText();
   this->stateText->setVisible(true);
   this->stateText->setFlag(ItemIsSelectable, false);
   this->stateText->setZValue(2);
+  this->stateText->setPos(-26,0);
   this->addToGroup(this->stateText);
 
-  // Create Ellipse
-  this->stateEllipse = new StateItemEllipse(QRectF(0, 0, 50, 50));
-  this->stateEllipse->setVisible(true);
-  this->stateEllipse->setZValue(1);
-  this->addToGroup(this->stateEllipse);
+  qDebug() << "this->boundingRect() = " << this->boundingRect();
+  qDebug() << "this->stateText->boundingRect() = " << this->stateText->boundingRect();
+  
 
   // Set movable and selectable
   this->setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges | ItemIsFocusable);
@@ -77,7 +89,7 @@ StateItem::StateItem(State * model, QGraphicsItem * parent) :
   this->setVisible(true);
 
   // Translate to have upper-left corner not be 0,0 but 0,0 be in the middle of the bounding area rect
-  this->setTransform(QTransform::fromTranslate(-25, -25));
+  //this->setTransform(QTransform::fromTranslate(-25, -25));
 
 
   // Parameters from model
@@ -424,17 +436,6 @@ void StateItem::keyReleaseEvent(QKeyEvent * event) {
       this->stateText->startEditing();
   }
 
-  /*if (event->isAccepted())
-    return;
-
-  if (this->stateText->hasFocus()) {
-    // Don't do anything if text is active
-  } else {
-    FSMGraphicsItem<State>::keyRelease(event);
-  }
-*/
-
-
 }
 
 void StateItem::keyPressEvent ( QKeyEvent * event ) {
@@ -727,7 +728,7 @@ void StateItemEllipse::paint(QPainter *painter,
   //-- Paint Ellipse
 
   // We want to paint ellipse from center
-  painter->translate(-this->transform().dx(), -this->transform().dy());
+  //painter->translate(-this->transform().dx(), -this->transform().dy());
 
   //-- Draw Ellipse
   painter->setBrush(this->brush());
@@ -776,13 +777,12 @@ QList<QUndoCommand*> StateItemEllipse::remove() {
 
 StateItemText::StateItemText(QGraphicsItem* parent) : FSMGraphicsTextItem(*(new QString("String")),parent) {
 
-    this->setFlag(QGraphicsItem::ItemSendsGeometryChanges,true);
-    this->setFlag(QGraphicsItem::ItemIsFocusable,true);
+  this->setFlag(QGraphicsItem::ItemSendsGeometryChanges,true);
+  this->setFlag(QGraphicsItem::ItemIsFocusable,true);
 
-     QFont font = this->font();
-     font.setBold(true);
-     this->setFont(font);
-
+  QFont font = this->font();
+  font.setBold(true);
+  this->setFont(font);
 
 }
 
@@ -807,8 +807,9 @@ bool StateItemText::recordText() {
 
 void StateItemText::paint(QPainter *painter,
     const QStyleOptionGraphicsItem *option, QWidget *widget) {
+  qDebug() << "StateItemText : paint()";
 
-    painter->save();
+  painter->save();
 
   // Antialiasing
   painter->setRenderHint(QPainter::Antialiasing);
@@ -819,21 +820,22 @@ void StateItemText::paint(QPainter *painter,
   // Draw text background
   //---------------------
 
-  // Translate to middle of bounding rect
-
   painter->setOpacity(0.5);
-  painter->translate(this->boundingRect().width() / 2,
-      this->boundingRect().height() / 2);
-
-  int aboveBorder = 20;
+  //this->setPos(this->boundingRect().width() / 2,
+  //    this->boundingRect().height() / 2);
 
   // Background to text depending on text size
   // Estimate text size
+  /*
   QFontMetrics fontMetrics = painter->fontMetrics();
   int textWidth = fontMetrics.width(this->toPlainText());
   textWidth += 10;
   int textHeight = fontMetrics.height();
   textHeight += 5;
+  */
+  int textWidth = boundingRect().size().width();
+  int textHeight = boundingRect().size().height();
+
 
   // Draw Rect
   QColor settingsTextColor = GuiSettings::value(SETTINGS_STATE_TEXT_BG,
@@ -842,26 +844,19 @@ void StateItemText::paint(QPainter *painter,
     painter->setBrush(QBrush(settingsTextColor));
 
   //    painter->setPen(QPen(Qt::DotLine));
-  painter->drawRoundRect(QRect(-textWidth / 2, -textHeight / 2, textWidth,
+  painter->drawRoundRect(QRect( 0 , 0 , textWidth,
       textHeight), 10, 10);
 
   // Points pattern
   painter->setBrush(QBrush(Qt::lightGray, Qt::Dense4Pattern));
-  painter->drawRoundRect(QRect(-textWidth / 2, -textHeight / 2, textWidth,
+  painter->drawRoundRect(QRect( 0, 0, textWidth,
       textHeight), 10, 10);
 
 
   painter->restore();
 
-
-  // Replace the text if necessary
-  //-----------
-  int middlex = 50 / 2;
-  int middley = 50 / 2;
-  QPointF correctPosition(middlex - textWidth / 2, middley - textHeight / 2);
-  if (this->pos().x() != correctPosition.x() || this->pos().y() != correctPosition.y() ) {
-    this->setPos(correctPosition);
-  }
+  this->setPos(QPointF( -(textWidth/2), -(textHeight/2) ) );
+  qDebug() << "this->pos() = " << this->pos();
 
 
   // Delegate Text painting to parent

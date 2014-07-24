@@ -35,6 +35,8 @@ public:
 	/// Does nothing per default
 	virtual bool recordPosition();
 
+  virtual QRectF  boundingRect () const;
+
 public Q_SLOTS:
 
 	/**
@@ -54,7 +56,6 @@ protected:
     QDateTime * editorStartTime;
 
 
-    virtual QRectF  boundingRect () const;
 
 	/// Overriden to detect selection changes and thus painting parameters
 	virtual QVariant itemChange ( GraphicsItemChange change, const QVariant & value );

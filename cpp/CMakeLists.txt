@@ -142,8 +142,10 @@ endforeach(package)
 ## Core library QT QXML
 #####################
 message(STATUS "QT Libraries")
-add_library(core_qxml_lib SHARED ${core_src} ${core-qxml_src})
-target_link_libraries(core_qxml_lib ${QT_LIBRARIES})
+add_library(core_lib SHARED ${core_src})
+target_link_libraries(core_lib ${QT_LIBRARIES})
+add_library(core_qxml_lib SHARED ${core-qxml_src})
+target_link_libraries(core_qxml_lib core_lib ${QT_LIBRARIES})
 
 ## Verification  library
 ###########################
@@ -189,7 +191,7 @@ add_custom_target(gui_generated SOURCES ${gui_ui_src} ${gui_ui_resources} ${gui_
 
 #### Create and link library
 add_library(gui_lib SHARED ${gui_src} ${gui_ui_src} ${gui_ui_resources} ${gui_moced_src})
-target_link_libraries(gui_lib genverilog_lib core_qxml_lib verification_lib ${QT_LIBRARIES})
+target_link_libraries(gui_lib genverilog_lib core_lib core_qxml_lib verification_lib ${QT_LIBRARIES})
 
 ##########################################
 # Gui Executable

@@ -1,5 +1,7 @@
 #include "gui/commands/MoveStateCommand.h"
 
+//TODO: How to deal with state items? Should the origin be in the middle,
+//      should it be to the left upper corner?
 
 MoveStateCommand::MoveStateCommand( Scene * _relatedScene,
                                     StateItem * _stateItem,

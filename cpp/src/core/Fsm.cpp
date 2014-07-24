@@ -58,15 +58,10 @@ Fsm::Fsm(int f) {
     resetstate = 0;
     globals.first = "clk";
     globals.second = "res_n";
-
-    //-- Init
-    //this->statesMap.clear();
-    this->joinsMap.clear();
-
 }
 
 Fsm::~Fsm() {
-
+  //TODO: delete the objects owned by this class.
 }
 
 void Fsm::setId(int id) {
@@ -918,31 +913,3 @@ Join * Fsm::getJoin(unsigned int id) {
             return NULL;
     return this->joinsMap[id];
 }
-/*
-/// Path to last generated verilog source
-void Fsm::setLastGeneratedVerilogFile(string path) {
-
-    //-- Get User ID
-    string userID = User::getUserID();
-
-    //-- Put into map
-    this->lastGeneratedVerilogFile[userID] = path;
-}
-
-string Fsm::getLastGeneratedVerilogFile() {
-
-    //-- Get User ID
-    string userID = User::getUserID();
-
-    //-- Return
-    return this->lastGeneratedVerilogFile[userID];
-}
-
-map<string, string> Fsm::getLastGeneratedVerilogFileMap() {
-    return this->lastGeneratedVerilogFile;
-}
-
-void Fsm::addLastGeneratedVerilogFile(string user, string path) {
-
-    this->lastGeneratedVerilogFile[user] = path;
-}*/

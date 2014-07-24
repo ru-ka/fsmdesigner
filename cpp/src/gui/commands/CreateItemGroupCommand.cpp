@@ -77,15 +77,19 @@ int   CreateItemGroupCommand::id() const {
 bool  CreateItemGroupCommand::mergeWith(const QUndoCommand * command) {
   const CreateItemGroupCommand *groupCommand =
     static_cast<const CreateItemGroupCommand*>(command);
-  // Append all recently selected graphic items.
-  selectedItems.append( groupCommand->getSelectedItems() );
+  // Additional items
+  QList<QGraphicsItem *> addedItems = groupCommand->getSelectedItems();
   // Remove the own itemGroup from the selectedItems list.
-  selectedItems.removeAt( selectedItems.indexOf( itemGroup ) );
-
-  this->undo();
-
-  // Create the flattened itemGroup.
-  this->redo();
+  addedItems.removeAt( selectedItems.indexOf( itemGroup ) );
+  // Add items to itemGroup
+  QList<QGraphicsItem *>::Iterator it;
+  for (it = addedItems.begin(); it != addedItems.end(); ++it) {
+    (*it)->setSelected(false);
+    (*it)->clearFocus();
+    itemGroup->addToGroup( *it );
+  }
+  // Append all recently added graphic items. (Merging).
+  selectedItems.append( addedItems );
 
   return true;
 }

@@ -13,8 +13,8 @@ AddStateCommand::AddStateCommand( Scene * _relatedScene,
   //-- Add new GUI item to the Scene
   stateItem = new StateItem();
   // Set GUI properties.
-  stateItem->setVisible( true      );
-  stateItem->setEnabled( true      );
+  stateItem->setVisible( true );
+  stateItem->setEnabled( true );
 
   //-- Create a new state to the underlying model and refer to it in the GUI item
   state = fsm->addState();
@@ -26,7 +26,7 @@ AddStateCommand::AddStateCommand( Scene * _relatedScene,
 
   //-- Place centered on mouse
   state->setPosition(pair<double,double>(mouseEvent->scenePos().x(),mouseEvent->scenePos().y()));
-  stateItem->setPos(mouseEvent->scenePos().x(),mouseEvent->scenePos().y());
+  stateItem->setPos(mouseEvent->scenePos());
 }
 
 
