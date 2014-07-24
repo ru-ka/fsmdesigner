@@ -48,6 +48,7 @@ StateItem::StateItem(State * model, QGraphicsItem * parent) :
   // TODO: how to place the items around the center point (0,0) correctly?
 
   // TODO: Set state size parameterizable through preferences
+  //
 
   this->setZValue(200000);
 
@@ -59,7 +60,6 @@ StateItem::StateItem(State * model, QGraphicsItem * parent) :
   // Create Representation
   //-------------------------------
 
-  qDebug() << "this->boundingRect() = " << this->boundingRect();
 
   //qDebug() << "this->boundingRect().center() " << this->boundingRect().center();
   // Create Ellipse
@@ -69,8 +69,6 @@ StateItem::StateItem(State * model, QGraphicsItem * parent) :
   this->stateEllipse->setZValue(1);
   this->addToGroup(this->stateEllipse);
 
-  qDebug() << "this->boundingRect() = " << this->boundingRect();
-
   // Create TextItem
   this->stateText = new StateItemText();
   this->stateText->setVisible(true);
@@ -79,18 +77,11 @@ StateItem::StateItem(State * model, QGraphicsItem * parent) :
   this->stateText->setPos(-26,0);
   this->addToGroup(this->stateText);
 
-  qDebug() << "this->boundingRect() = " << this->boundingRect();
-  qDebug() << "this->stateText->boundingRect() = " << this->stateText->boundingRect();
-  
-
   // Set movable and selectable
-  this->setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges | ItemIsFocusable);
+  this->setFlags(ItemIsMovable | ItemIsSelectable | ItemIsFocusable);
+//      ItemSendsGeometryChanges | ItemIsFocusable);
   this->show();
   this->setVisible(true);
-
-  // Translate to have upper-left corner not be 0,0 but 0,0 be in the middle of the bounding area rect
-  //this->setTransform(QTransform::fromTranslate(-25, -25));
-
 
   // Parameters from model
   //------------
@@ -107,7 +98,7 @@ StateItem::~StateItem() {
 
 void StateItem::modelChanged() {
 
-    FSMGraphicsItem<State>::modelChanged();
+  FSMGraphicsItem<State>::modelChanged();
 
   //-- Propagate to ellipse
   this->stateEllipse->setModel(this->getModel());
@@ -206,6 +197,8 @@ void StateItem::setText(QString s) {
 }
 
 void StateItem::setStateItemColor(QColor color) {
+  if (this->model == NULL)
+    return;
   // Set Color
   this->model->setColor((unsigned int) color.value());
   this->stateEllipse->setColor(color);
@@ -777,8 +770,8 @@ QList<QUndoCommand*> StateItemEllipse::remove() {
 
 StateItemText::StateItemText(QGraphicsItem* parent) : FSMGraphicsTextItem(*(new QString("String")),parent) {
 
-  this->setFlag(QGraphicsItem::ItemSendsGeometryChanges,true);
-  this->setFlag(QGraphicsItem::ItemIsFocusable,true);
+//  this->setFlag(QGraphicsItem::ItemSendsGeometryChanges,true);
+//  this->setFlag(QGraphicsItem::ItemIsFocusable,true);
 
   QFont font = this->font();
   font.setBold(true);
