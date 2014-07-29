@@ -78,8 +78,7 @@ StateItem::StateItem(State * model, QGraphicsItem * parent) :
   this->addToGroup(this->stateText);
 
   // Set movable and selectable
-  this->setFlags(ItemIsMovable | ItemIsSelectable | ItemIsFocusable);
-//      ItemSendsGeometryChanges | ItemIsFocusable);
+  this->setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges | ItemIsFocusable);
   this->show();
   this->setVisible(true);
 
@@ -800,7 +799,6 @@ bool StateItemText::recordText() {
 
 void StateItemText::paint(QPainter *painter,
     const QStyleOptionGraphicsItem *option, QWidget *widget) {
-  qDebug() << "StateItemText : paint()";
 
   painter->save();
 
@@ -849,8 +847,6 @@ void StateItemText::paint(QPainter *painter,
   painter->restore();
 
   this->setPos(QPointF( -(textWidth/2), -(textHeight/2) ) );
-  qDebug() << "this->pos() = " << this->pos();
-
 
   // Delegate Text painting to parent
   FSMGraphicsTextItem::paint(painter, option, widget);

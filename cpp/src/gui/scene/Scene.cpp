@@ -28,13 +28,18 @@ using namespace std;
 #include <gui/actions/DeleteHyperTransitionAction.h>
 
 //-- Commands
+//-- State
 #include <gui/commands/AddStateCommand.h>
 #include <gui/commands/DeleteStateCommand.h>
 #include <gui/commands/MoveStateCommand.h>
+//-- ItemGroup
 #include <gui/commands/CreateItemGroupCommand.h>
 #include <gui/commands/DeleteItemGroupCommand.h>
 #include <gui/commands/MoveItemGroupCommand.h>
-
+//-- Trans
+#include <gui/commands/AddTransCommand.h>
+//-- HyperTrans
+#include <gui/commands/AddHyperTransCommand.h>
 
 //-- Others
 #include <gui/common/GUIUtils.h>
@@ -59,7 +64,12 @@ using namespace FSMDesigner;
 
 #include "Scene.h"
 Scene::Scene(Fsm * fsm, QObject *parent) :
-  QGraphicsScene(-5000,-5000,10000,10000,parent) {
+  QGraphicsScene(-5000,-5000,10000,10000,parent),
+  bLastCommand( false ),
+  activeGroup( NULL ),
+  activeTransCommand( NULL ),
+  activeHyperTransCommand( NULL )
+{
 
   this->setBackgroundBrush(Qt::white);
   //this->setBackgroundBrush(QPixmap());
@@ -75,11 +85,8 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
 
   // Variables
   //------------------
-  this->placeLinkEndState = NULL;
+  this->placeLinkEndState   = NULL;
   this->placeLinkStartState = NULL;
-
-  this->bLastCommand = false;
-  this->activeGroup  = NULL ;
 
   // Verification
   //---------------
@@ -102,7 +109,7 @@ void Scene::initializeScene() {
   //-- Get current FSM to draw
   Fsm * currentFSM =this->fsm;
 
-  // Prepare some datas
+  // Prepare some data
   //------------------------------
 
   //-- Created items map (id<->object), and Join map
@@ -288,15 +295,7 @@ void Scene::addToToPlaceStack(QGraphicsItem * item) {
 
 void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 
-
   QGraphicsScene::mousePressEvent(e);
-
-  if (this->selectedItems().size() == 1) {
-    oldPos = this->selectedItems().first()->pos();
-    qDebug() << "ItemPos = oldPos = " << this->selectedItems().first()->pos();
-  }
-
-
 
   //-- First element has to be placed, removed from stack and reenabled
   if (this->toPlaceStack.size() > 0) {
@@ -312,16 +311,7 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 
       QGraphicsItem * tr = this->toPlaceStack.takeFirst();
 
-      /*
-      //-- Delete only if the transline is not from a trackpoint
-      if (!FSMGraphicsItem<>::isTrackPoint(
-          FSMGraphicsItem<>::toTransline(tr)->getStartItem())) {
-        this->removeItem(tr);
-        delete tr;
-      }*/
-
       //this->toPlaceStack.first()->setVisible(false);
-
 
       //-- only ensure the line is enabled
       tr->setEnabled(true);
@@ -331,10 +321,7 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
       if (FSMGraphicsItem<>::toTransline(tr)->getEndItem()==NULL &&
           !FSMGraphicsItem<>::isTrackPoint(FSMGraphicsItem<>::toTransline(tr)->getStartItem() )) {
         delete tr;
-
       }
-
-
     } else {
 
       // Get and remove
@@ -345,12 +332,8 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 
       // Position
       this->placeUnderMouse(first, e->scenePos());
-
     }
-
   }
-
-
 }
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
@@ -358,29 +341,52 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
   qDebug() << "mouseReleaseEvent";
   qDebug() << "-----------------";
 
-  // Handle item groups
-  if ( this->selectedItems().size() == 0 && bLastCommand ) {
-    undoStack.undo();
-    e->setAccepted(true);
-  } else if ( this->selectedItems().size() == 0 && activeGroup &&
-      !e->isAccepted() ) {
-    DeleteItemGroupCommand * groupCommand =
-      new DeleteItemGroupCommand( this, activeGroup );
-    undoStack.push( groupCommand );
-    e->setAccepted(true);
-  } else if ( this->selectedItems().size() == 1 &&
-      oldPos != this->selectedItems().first()->pos() ) {
-    qDebug() << "Move detected.";
-    this->moveItem();
-    e->setAccepted(true);
-  } else if ( this->selectedItems().size() ==1 && bLastCommand &&
-      this->selectedItems().first()->type() != QGraphicsItemGroup::Type ) {
-    undoStack.undo();
-  } else if (this->selectedItems().size() > 1) { // Create an itemGroup
-    CreateItemGroupCommand * groupCommand =
-      new CreateItemGroupCommand( this, this->selectedItems() );
-    undoStack.push(groupCommand);
-    e->setAccepted(true);
+  if ( this->placeMode == CHOOSE ) {
+    // Handle item groups
+    if ( this->selectedItems().size() == 0 && bLastCommand ) {
+      undoStack.undo();
+      e->setAccepted(true);
+    } else if ( this->selectedItems().size() == 0 && activeGroup &&
+        !e->isAccepted() ) {
+      DeleteItemGroupCommand * groupCommand =
+        new DeleteItemGroupCommand( this, activeGroup );
+      undoStack.push( groupCommand );
+      e->setAccepted(true);
+    } else if ( this->selectedItems().size() == 1 &&
+        oldPos != this->selectedItems().first()->pos() ) {
+      qDebug() << "Move detected.";
+      this->moveItem();
+      e->setAccepted(true);
+    } else if ( this->selectedItems().size() ==1 && bLastCommand &&
+        this->selectedItems().first()->type() != QGraphicsItemGroup::Type ) {
+      undoStack.undo();
+    } else if (this->selectedItems().size() > 1) { // Create an itemGroup
+      // TODO: Do not split up translines in several items. This requires an
+      // major update of the internal data structures. But for now,
+      // create an item group, if there are other items than trackpoints or
+      // translines in the eslection.
+      bool bCreateGroup = false;
+      QList<QGraphicsItem *>::iterator it;
+      QList<QGraphicsItem *> currentItems = this->selectedItems();
+      cout << endl;
+      for ( it = currentItems.begin(); it != currentItems.end(); ++it) {
+        qDebug() << "&(*it) = " << &(*it);
+        qDebug() << "*it = " << (*it);
+        if ( (*it)->type() != FSMGraphicsItem<>::TRANSLINE &&
+             (*it)->type() != FSMGraphicsItem<>::TRANSLINETEXT &&
+             (*it)->type() != FSMGraphicsItem<>::TRACKPOINT ) {
+          bCreateGroup = true;
+          break;
+        }
+      }
+      if ( bCreateGroup ) {
+        CreateItemGroupCommand * groupCommand =
+          new CreateItemGroupCommand( this, this->selectedItems() );
+        undoStack.push(groupCommand);
+        e->setAccepted(true);
+      }
+      // ENDTODO
+    }
   }
 
 
@@ -405,11 +411,17 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
       }
       break;
       //-- END OF State -------//
-
+      
       // Transition
       //--------------------------
     case TRANS: {
+      qDebug() << "placeTransitionStack.size() = " << placeTransitionStack.size();
+      if ( activeTransCommand == NULL )
+        activeTransCommand = new AddTransCommand( this );
 
+      // NOTE: moved to AddTransCommand.
+      /*
+      */
       //-- Get Item under
       QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
           Qt::IntersectsItemShape, Qt::AscendingOrder);
@@ -429,16 +441,15 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
            && this->placeTransitionStack.back()->type()!=FSMGraphicsItem<>::HYPERTRANS ) {
 
         //-- Nothing under, add a trackpoint between last item on stack, and nothing
-        TrackpointItem * item = new TrackpointItem(new Trackpoint(e->scenePos().x(), e->scenePos().y(), 0),
+        TrackpointItem * item =
+          new TrackpointItem(new Trackpoint(e->scenePos().x(), e->scenePos().y(), 0),
             this->placeTransitionStack.first(), NULL);
         item->setPos(e->scenePos());
-        this->addItem(item);
+        this->addItem( item );
+        activeTransCommand->addTrackPoint( item );
 
         //-- Trackpoint is last element on the transition stack
         this->placeTransitionStack.push_front(item);
-
-        //-- We want to place its next line (to have the mouse follow the next line)
-        //this->addToToPlaceStack(item->getNextTransline());
       }
       // Use Item under (Ok if Join or State)
       //---------------
@@ -451,9 +462,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
                 this->placeTransitionStack.first())) {
           dynamic_cast<TrackpointItem*> (this->placeTransitionStack[0])->setEndItem(
               itemUnder);
-        } else {
-
-        }
+        } 
         this->placeTransitionStack.push_front(itemUnder);
 
       }
@@ -463,7 +472,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
         break;
 
       // Check that if we should end the transition
-      // The objects are commited to model
+      // The objects are committed to model
       //-----------------------------------------------
 
       // If we have found that we can end the transition
@@ -579,6 +588,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
           lastTransline = new Transline(transition,
               this->placeTransitionStack.back(), this->placeTransitionStack.front());
           this->addItem(lastTransline);
+          activeTransCommand->addTransLine( lastTransline );
         }
 
         //-- Mark end of transition
@@ -590,8 +600,10 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
         if (stateToState || stateToJoin) {
           TranslineText * translineText = new TranslineText(QString(
                   transition->getName().c_str()),(Trans*)lastTransline->getModel());
+          activeTransCommand->addTransText( translineText );
 
 
+          // Moved to Command.
           //-- Place in between the two state
           lastTransline->setEnabled(true);
           qreal textx = this->placeTransitionStack.back()->x() -(this->placeTransitionStack.back()->x() - this->placeTransitionStack.front()->x())/2;
@@ -607,28 +619,12 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
         this->setPlaceMode(CHOOSE);
 
       } // End State to State finish--/
-      // hypertransition to State
-      //--------------------
-      else if (hypertransitionToState) {
 
-          //-- Update Hypertransition model to target the state
-                State * targetState = FSMGraphicsItem<>::toStateItem(this->placeTransitionStack.front())->getModel();
-                FSMGraphicsItem<>::toHyperTransition(this->placeTransitionStack.back())->getModel()->setTargetState(targetState);
 
-                //-- Add Transline
-                Transline * transline = new Transline(NULL,
-                                            this->placeTransitionStack.back(), this->placeTransitionStack.front());
-                this->addItem(transline);
 
-                //-- Clean
-                // All items to be placed have been placed
-                this->placeTransitionStack.clear();
-                this->setPlaceMode(CHOOSE);
 
-                //-- Mark end of transition
-                endOfTransition = true;
 
-      }
+
 
       // End of transition or add a new Transition that follow the mouse
       //------------------------------------------------------
@@ -651,6 +647,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
           //-- Prepare transline
           Transline * transition = new Transline(NULL,
               this->placeTransitionStack.first(), NULL);
+          activeTransCommand->addTransLine( transition );
 
           //-- Add to transition stack
           //this->placeTransitionStack.push_front(transition);
@@ -662,6 +659,89 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
       break;
     }
         //-- END OF Transition -------//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // Link
         //------------------------------
@@ -801,41 +881,20 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     // Place an HyperTransition
     //---------------------------------
     case HYPERTRANS: {
-
-        //-- Get Hypertransition item (under the mouse because just released)
-            HyperTransition * hypertransition = FSMGraphicsItem<>::toHyperTransition(this->items(e->scenePos(),
-                    Qt::IntersectsItemShape, Qt::AscendingOrder).front());
-
-
-            //-- Add To FSM
-            Hypertrans * hypertransitionModel = this->getFsm()->addHypertrans();
-            hypertransition->setModel(hypertransitionModel);
-            this->getFsm()->addHypertrans(hypertransition->getModel());
-
-            //-- Place centered on mouse
-            hypertransitionModel->setPosition(pair<double,double>(e->scenePos().x(),e->scenePos().y()));
-            hypertransition->setPos(e->scenePos().x(),e->scenePos().y());
-
-            // Ask user to target a state
-            //----------------------------------------
-
-            // Start Transline Placement
-            //--------------------
-
-            //-- Stakc hypertransition on transitin placement stack
-            this->placeTransitionStack.push_front(hypertransition);
-
-            //-- Add a transline to position, and start transition placement modus
-            Transline * beginTransline = new Transline(NULL,hypertransition,NULL);
-            this->addToToPlaceStack(beginTransline);
-
-            //-- Set to transition modus
-            this->setPlaceMode(TRANS);
-
-            break;
-
+      if ( activeHyperTransCommand == NULL ) {
+        activeHyperTransCommand = new AddHyperTransCommand( this );
+        activeHyperTransCommand->handleMouseReleaseEvent(e);
+      } else {
+        activeHyperTransCommand->handleMouseReleaseEvent(e);
+        if ( activeHyperTransCommand->commandReady() ) {
+          undoStack.push( activeHyperTransCommand );
+          activeHyperTransCommand =  NULL;
+          if ( placeLock == FSMDesigner::UNLOCKED )
+            setPlaceMode( FSMDesigner::CHOOSE );
+        }
+      }
+      break;
     }
-
 
     }
 
@@ -857,7 +916,8 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 }
 
 void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
-
+  if ( activeHyperTransCommand )
+    activeHyperTransCommand->handleMouseMoveEvent(e);
   //----------------- Mouse Following stacks --------------//
 
   // Mouse following
@@ -922,6 +982,7 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
   // ESC sets place mode to choose
   //---------------
   if (keyEvent->key() == Qt::Key_Escape && this->getPlaceMode() != CHOOSE) {
+    // TODO: free activeCommands.
     this->setPlaceMode(CHOOSE);
   }
   // Super deletes items
@@ -939,6 +1000,7 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
       }
 
       if ( (*it)->type() == StateItem::Type ) {
+        // TODO: delete associated translines.
         DeleteStateCommand *stateCommand = new DeleteStateCommand( this,
             dynamic_cast<StateItem*>(*it) );
         undoStack.push(stateCommand);
@@ -1010,16 +1072,13 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
   qDebug() << "-----------------";
   qDebug() << "setPlaceMode";
   qDebug() << "-----------------";
-  // Undo unused CreateItemGroupCommands.
-  /*
-  if (bLastCommand) {
-    undoStack.undo();
-  } else if (activeGroup) {
-    DeleteItemGroupCommand * groupCommand =
-      new DeleteItemGroupCommand( this, activeGroup );
-    undoStack.push( groupCommand );
+
+  // -- Quick hack.
+  if (activeTransCommand != NULL) {
+    undoStack.push(activeTransCommand);
+    activeTransCommand = NULL;
   }
-  */
+  // END - quick hack.
 
 
   //-- If back to choose requested, then perform cleaning and such
@@ -1027,7 +1086,7 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
   if (mode==FSMDesigner::CHOOSE) {
 
     //-- Restore any cursor change
-    QApplication::restoreOverrideCursor();
+//    QApplication::restoreOverrideCursor();
 
     //-- Clear selected elements
     this->clearSelection();
@@ -1060,8 +1119,12 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
       //-- Transline that belong to a trackpoint are removed by trackpoint
       if (FSMGraphicsItem<>::isTrackPoint(firstItem)) {
         this->removeItem(firstItem);
-        delete firstItem;
+        //delete firstItem;
       }
+    }
+    if ( activeTransCommand != NULL ) {
+      delete activeTransCommand;
+      activeTransCommand = NULL;
     }
 
     // Reset variables
@@ -1083,7 +1146,7 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
 
     case LINKDEPARTURE: {
         //-- Change cursor
-        QApplication::setOverrideCursor(Qt::CrossCursor);
+//        QApplication::setOverrideCursor(Qt::CrossCursor);
 
         //-- Highligh all the states that don't already have a link
         this->clearSelection();

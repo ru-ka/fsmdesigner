@@ -114,9 +114,11 @@ QVariant HyperTransition::itemChange(GraphicsItemChange change,
 	} else if (change ==QGraphicsItem::ItemSceneHasChanged && this->scene()==NULL) {
 
 	    //-- Removed from scene, remove transline too
+      /*
 	    if (this->outgoingTransition != NULL) {
 	        delete this->outgoingTransition;
 	    }
+      */
 
 	} else if (change ==QGraphicsItem::ItemSceneHasChanged && this->scene()!=NULL) {
 

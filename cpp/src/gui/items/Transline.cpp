@@ -68,7 +68,7 @@ Transline::Transline(TransitionBase * model, QGraphicsItem * startItem,
 	this->endItem = NULL;
 	if (startItem!=NULL) {
 		this->setStartItem(startItem);
-		this->endPoint = startItem->pos();
+		this->endPoint = startItem->scenePos();
 	}
 
 	if (startItem!=endItem)
@@ -76,14 +76,11 @@ Transline::Transline(TransitionBase * model, QGraphicsItem * startItem,
 	else
 	    this->endItem = endItem;
 
-	//this->endPoint.setX(startItem!=NULL?startItem->x():0);
-	//this->endPoint.setY(startItem!=NULL?startItem->y():0);
-
-
 
 	// Ui Flags
 	//--------------
-	this->setFlag(ItemIsSelectable,this->getModel()!=NULL);
+	//this->setFlag(ItemIsSelectable,this->getModel()!=NULL);
+	this->setFlag( ItemIsSelectable, true );
 	QGraphicsDropShadowEffect * dse  = new QGraphicsDropShadowEffect();
 	dse->setColor(Qt::lightGray);
 	dse->setOffset(5,5);
@@ -91,6 +88,7 @@ Transline::Transline(TransitionBase * model, QGraphicsItem * startItem,
 }
 
 Transline::~Transline() {
+  qDebug() << "Deleting transline.";
 
 	//-- Ensure we can't be on the scene, so that all events are sent
 	if (this->scene()!=NULL)
@@ -99,6 +97,7 @@ Transline::~Transline() {
 }
 
 void Transline::preparePath(bool propagate) {
+  //prepareGeometryChange();
 
 	// End Item
 	//---------------
@@ -134,9 +133,9 @@ void Transline::preparePath(bool propagate) {
 	// (stick to start/end shapes)
 	//---------
 	QLineF lineToPaint;
-	lineToPaint.setP1(this->startItem->pos());
+	lineToPaint.setP1(this->startItem->scenePos());
 	if (this->endItem != NULL && (this->startItem!=this->endItem)) {
-		lineToPaint.setP2(this->endItem->pos());
+		lineToPaint.setP2(this->endItem->scenePos());
 	} else
 		lineToPaint.setP2(this->endPoint);
 
@@ -244,8 +243,6 @@ void Transline::preparePath(bool propagate) {
 
 	    qDebug() << "Looping";
 
-	    qDebug() << "Looping";
-
 	    QPainterPath loop;
 	    linePath = loop;
 	    //loop.moveTo(this->startItem->pos());
@@ -271,10 +268,10 @@ void Transline::preparePath(bool propagate) {
 	    //loop.moveTo(this->startItem->pos().x()+100,this->startItem->pos().y()+100);
 	    //loop.quadTo(this->startItem->pos().x()+20,this->startItem->pos().y()+20,this->startItem->pos().x(),this->startItem->pos().y());
 
-	    loop.moveTo(this->startItem->pos().x(),this->startItem->pos().y()-20);
-	    loop.cubicTo(this->startItem->pos().x(),this->startItem->pos().y(),
-	                  this->startItem->pos().x()+200,this->startItem->pos().y(),
-	                  this->startItem->pos().x(),this->startItem->pos().y()+20);
+	    loop.moveTo(this->startItem->scenePos().x(),this->startItem->scenePos().y()-20);
+	    loop.cubicTo(this->startItem->scenePos().x(),this->startItem->scenePos().y(),
+	                  this->startItem->scenePos().x()+200,this->startItem->scenePos().y(),
+	                  this->startItem->scenePos().x(),this->startItem->scenePos().y()+20);
 	    loop.closeSubpath();
 
 	    linePath = loop;
@@ -418,6 +415,7 @@ QGraphicsItem * Transline::getEndItem() {
 }
 
 void Transline::setEndPoint(QPointF point) {
+//  prepareGeometryChange();
 	this->endPoint = point;
 	this->preparePath();
 }
@@ -453,6 +451,7 @@ void Transline::modelChanged() {
 
 	// Not selectable without model
     //-------------
+  //TODO: what is the intention of this code?
 	if (this->getModel()==NULL) {
 		this->setFlag(ItemIsSelectable,false);
 	} else {
@@ -471,9 +470,6 @@ void Transline::modelChanged() {
         }
 
 	}
-
-
-
 }
 
 QVariant Transline::itemChange(GraphicsItemChange change,
@@ -646,8 +642,8 @@ void Transline::mouseMoveEvent(QGraphicsSceneMouseEvent * event) {
 	// The Mouse move must be large enough, to improve usability
 	//-------------------------------------------
 	unsigned int requiredMoveAmplitude = 2; // x pixels
-	unsigned int xAmplitude = abs(event->pos().x() - this->pressLocation.x());
-	unsigned int yAmplitude = abs(event->pos().y() - this->pressLocation.y());
+	unsigned int xAmplitude = abs(event->scenePos().x() - this->pressLocation.x());
+	unsigned int yAmplitude = abs(event->scenePos().y() - this->pressLocation.y());
 
 
     //qDebug() << "[Transline move] detected movement amplitude : " << xAmplitude << "in x and " << yAmplitude << "in y" ;

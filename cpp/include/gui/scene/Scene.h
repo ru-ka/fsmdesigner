@@ -35,6 +35,8 @@ class VerificatorRule;
 #include <QtCore>
 
 class StateItem;
+class AddTransCommand;
+class AddHyperTransCommand;
 
 class Scene: public QGraphicsScene, public VerificationListener {
 
@@ -42,16 +44,17 @@ class Scene: public QGraphicsScene, public VerificationListener {
 
   public:
     bool                  bLastCommand; // Get rid of unused CreateItemGroupCommands.
-    QGraphicsItemGroup *  activeGroup ;
-    // Destroy active groups at the end of an interaction.
+    QGraphicsItemGroup *  activeGroup ; // Destroy active groups at the end of an interaction.
+
   private:
 
     /// The designed FSM
     Fsm * fsm;
 
     bool    selectionChanged;
-    QPointF oldPos;
-    // Remember old position in order to move itemGroups.
+    QPointF oldPos; // Remember old position in order to move itemGroups.
+    AddTransCommand * activeTransCommand;
+    AddHyperTransCommand * activeHyperTransCommand;
 
     void moveItem(); // Move the selected item.
     void moveItem(QGraphicsItem * item);

@@ -158,10 +158,6 @@ void LinkDeparture::preparePath() {
 
 	//-- Set new path
 	this->setPath(shapePath);
-
-
-
-
 }
 
 
