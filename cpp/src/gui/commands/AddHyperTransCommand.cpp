@@ -8,6 +8,7 @@ AddHyperTransCommand::AddHyperTransCommand( Scene * _relatedScene,
                                   fsm( _relatedScene->getFsm() ),
                                   bLastCommand( _relatedScene->bLastCommand ),
                                   hypertransition( NULL ),
+                                  hypertransModel( NULL ),
                                   transline( NULL ),
                                   targetState( NULL )
 {
@@ -24,9 +25,11 @@ AddHyperTransCommand::~AddHyperTransCommand() {
 
 
 void  AddHyperTransCommand::redo(){
-  qDebug() << "Adding &hypertransModel = " << &hypertransModel;
+  qDebug() << "Adding hypertransModel = " << hypertransModel;
   // add items to model
+  qDebug() << "Before fsm->addHypertrans(..): hypertransModel->getId() = " << hypertransModel->getId();
   fsm->addHypertrans( hypertransModel );
+  qDebug() << "After fsm->addHypertrans(..): hypertransModel->getId() = " << hypertransModel->getId();
 
   // add items to scene
   qDebug() << "Adding &hypertransition = " << &hypertransition;
@@ -35,8 +38,6 @@ void  AddHyperTransCommand::redo(){
   qDebug() << "Adding transline = " << transline;
   relatedScene->addItem( transline );
   
-  // TODO: add transline
-
   relatedScene->update();
   relatedScene->bLastCommand = false;
 }
@@ -51,7 +52,6 @@ void  AddHyperTransCommand::undo(){
 
   // remove items from model
   fsm->deleteHypertrans( hypertransModel );
-  // TODO: remove transline
 
   relatedScene->update();
   relatedScene->bLastCommand = this->bLastCommand;
@@ -100,6 +100,7 @@ bool AddHyperTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e)
     if ( getIntersectingItem(e)->type() == FSMGraphicsItem<>::STATEITEM ) {
       targetState = dynamic_cast<StateItem *>( getIntersectingItem(e) );
       transline->setEndItem( targetState );
+      hypertransModel->setTargetState( targetState->getModel() );
       return true;
     } else {
       return false;
