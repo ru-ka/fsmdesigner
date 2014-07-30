@@ -16,26 +16,23 @@ AddHyperTransCommand::AddHyperTransCommand( Scene * _relatedScene,
 
 
 AddHyperTransCommand::~AddHyperTransCommand() {
-  delete hypertransition;
-  delete hypertransModel;
-  delete transline      ;
+  if (hypertransition)
+    delete hypertransition;
+  if (hypertransModel)
+    delete hypertransModel;
+  if (transline)
+    delete transline      ;
   // Do not delete the target state, since the command does not have the
   // ownership of that object.
 }
 
 
 void  AddHyperTransCommand::redo(){
-  qDebug() << "Adding hypertransModel = " << hypertransModel;
   // add items to model
-  qDebug() << "Before fsm->addHypertrans(..): hypertransModel->getId() = " << hypertransModel->getId();
   fsm->addHypertrans( hypertransModel );
-  qDebug() << "After fsm->addHypertrans(..): hypertransModel->getId() = " << hypertransModel->getId();
 
   // add items to scene
-  qDebug() << "Adding &hypertransition = " << &hypertransition;
   relatedScene->addItem( hypertransition );
-  qDebug() << "Adding &transline = " << &transline;
-  qDebug() << "Adding transline = " << transline;
   relatedScene->addItem( transline );
   
   relatedScene->update();
@@ -45,9 +42,7 @@ void  AddHyperTransCommand::redo(){
 
 void  AddHyperTransCommand::undo(){
   // remove items from scene
-  qDebug() << "Before removing transline = " << transline;
   relatedScene->removeItem( transline );
-  qDebug() << "After removing transline = " << transline;
   relatedScene->removeItem( hypertransition );
 
   // remove items from model
@@ -85,6 +80,10 @@ bool AddHyperTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e)
     hypertransModel = new Hypertrans();
     hypertransModel->setPosition(
       pair<double,double>(e->scenePos().x(), e->scenePos().y() ) );
+    //-- It is cleaner to modify the model at the redo command. On the
+    //other hand, the current fsm-api throws an exception, if the command is
+    //undone and deleted without calling redo() before.
+    //fsm->addHypertrans( hypertransModel );
     // Create a new hyper transition item.
     hypertransition = new HyperTransition( hypertransModel );
     hypertransition->setPos( e->scenePos() );
@@ -118,6 +117,6 @@ bool AddHyperTransCommand::handleMouseMoveEvent(QGraphicsSceneMouseEvent * e) {
 }
 
 
-bool AddHyperTransCommand::commandReady() {
+bool AddHyperTransCommand::commandReady() const {
   return (targetState != NULL);
 }

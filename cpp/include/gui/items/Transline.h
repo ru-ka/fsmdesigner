@@ -72,6 +72,14 @@ class Transline: public QGraphicsPathItem, public FSMGraphicsItem<TransitionBase
 
         }
 
+        void setDrawArrow(bool arrow) {
+          this->drawArrow = arrow;
+        }
+
+        bool getDrawArrow() const {
+          return this->drawArrow;
+        }
+
         /// Propagate removal of transline and remove itself
         virtual QList<QUndoCommand*> remove(QUndoCommand * parentComand = NULL);
 

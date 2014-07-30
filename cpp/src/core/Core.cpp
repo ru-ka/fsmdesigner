@@ -70,7 +70,7 @@ void Core::reset() {
     //-- Remove Project
     if (this->getProject() != NULL) {
         delete this->getProject();
-        this->project == NULL;
+        this->project = NULL;
     }
 
     //-- Add a new default project

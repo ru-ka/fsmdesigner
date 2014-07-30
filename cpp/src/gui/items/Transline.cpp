@@ -47,6 +47,7 @@ using namespace std;
 Transline::Transline(TransitionBase * model, QGraphicsItem * startItem,
 		QGraphicsItem * endItem) :
 	QGraphicsPathItem() {
+    qDebug() << "Constructing transline = " << this;
 
 	// Variable inits
 	//------------------
@@ -88,7 +89,7 @@ Transline::Transline(TransitionBase * model, QGraphicsItem * startItem,
 }
 
 Transline::~Transline() {
-  qDebug() << "Deleting transline.";
+  qDebug() << "Deleting transline = " << this;
 
 	//-- Ensure we can't be on the scene, so that all events are sent
 	if (this->scene()!=NULL)
@@ -426,21 +427,6 @@ QPointF Transline::getEndPoint() {
 
 void Transline::paint(QPainter *painter,
 		const QStyleOptionGraphicsItem *option, QWidget *widget) {
-
-   /* painter->save();
-	painter->setRenderHint(QPainter::Antialiasing);
-	painter->setOpacity(this->effectiveOpacity());
-
-
-	painter->setPen(this->pen());
-	painter->setBrush(this->brush());
-
-	painter->drawPath(this->path());
-
-	if (this->startItem!=this->endItem)
-	    painter->fillPath(this->path(),this->brush());
-
-	painter->restore();*/
 
     QGraphicsPathItem::paint(painter,option,widget);
 

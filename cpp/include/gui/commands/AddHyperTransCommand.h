@@ -51,7 +51,8 @@ class AddHyperTransCommand : public QUndoCommand {
     // Returns, whether the event changed the command or not.
     bool handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e);
     bool handleMouseMoveEvent(QGraphicsSceneMouseEvent * e);
-    bool commandReady();
+
+    bool commandReady() const;
 
 };
 
