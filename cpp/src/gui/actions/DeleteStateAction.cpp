@@ -48,7 +48,7 @@ DeleteStateAction::DeleteStateAction(StateItem * item,QUndoCommand * parentComma
 
     //-- Outgoing
     while (!this->item->getOutgoingTransitions().isEmpty()) {
-        this->item->getOutgoingTransitions().takeFirst()->remove(this);
+//        this->item->getOutgoingTransitions().takeFirst()->remove(this);
     }
 
     //-- Incoming
@@ -71,11 +71,11 @@ DeleteStateAction::DeleteStateAction(StateItem * item,QUndoCommand * parentComma
 
         }
         //-- If Incoming if also outgoing (loopback), then do not double remove
-        else if (t->getModel()!=NULL && ((Trans*)t->getModel())->getStartState() != ((Trans*)t->getModel())->getEndState())
-            t->remove(this);
+        else if (t->getModel()!=NULL && ((Trans*)t->getModel())->getStartState() != ((Trans*)t->getModel())->getEndState()) {
+            //t->remove(this);
 
         //-- if Coming from join, delete join
-        else if (t->getStartItem()->type()==JoinItem::Type) {
+        } else if (t->getStartItem()->type()==JoinItem::Type) {
             FSMGraphicsItem<>::toJoinItem(t->getStartItem())->remove(this);
         }
 

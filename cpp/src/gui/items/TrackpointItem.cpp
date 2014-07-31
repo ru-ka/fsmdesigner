@@ -127,7 +127,7 @@ QVariant TrackpointItem::itemChange(GraphicsItemChange change,
 		this->recordPosition();
 
 	} else if (change == QGraphicsItem::ItemSceneHasChanged) {
-
+    /*
 
 		//-- If there is no scene, we are going to be removed
 		if (this->scene() == NULL) {
@@ -201,12 +201,8 @@ QVariant TrackpointItem::itemChange(GraphicsItemChange change,
                 dynamic_cast<Scene *>(this->scene())->getUndoStack()->push(delAction);
 			}
 
-
-
-
-
-
 		}
+    */
 
 	} else if (change == QGraphicsItem::ItemEnabledHasChanged) {
 

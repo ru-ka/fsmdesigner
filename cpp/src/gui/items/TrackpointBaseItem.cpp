@@ -69,11 +69,12 @@ Transline * TrackpointBaseItem::getNextTransline(){
 
 void TrackpointBaseItem::setStartItem(QGraphicsItem * item) {
 
-
+  // TODO: simplify the functions.
 
 	// Create a transline between this trackpoint and the Start Item
 	// If the start is a trackpointm there is no need, because the previous will care about that
 	//----------------
+  /*
 	if (FSMGraphicsItem<>::isTrackPoint(item)) {
 
 		//-- Our start is a trackpoint, if it was not one previously, we can remove our previous
@@ -100,6 +101,7 @@ void TrackpointBaseItem::setStartItem(QGraphicsItem * item) {
 				this->getScene()->addItem(this->getPreviousTransline());
 			}
 	}
+  */
 
 
 
@@ -119,6 +121,8 @@ void TrackpointBaseItem::setEndItem(QGraphicsItem * item) {
 	this->endItem = item;
 
 
+  // TODO: simplify the functions.
+  /*
 	// Create a transline between this trackpoint and the End Item
 	//----------------
 
@@ -138,6 +142,7 @@ void TrackpointBaseItem::setEndItem(QGraphicsItem * item) {
 	if (this->getScene()!=NULL  && this->getNextTransline()->scene()==NULL) {
 			this->getScene()->addItem(this->getNextTransline());
 	}
+  */
 
 
 

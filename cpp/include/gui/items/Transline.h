@@ -81,7 +81,7 @@ class Transline: public QGraphicsPathItem, public FSMGraphicsItem<TransitionBase
         }
 
         /// Propagate removal of transline and remove itself
-        virtual QList<QUndoCommand*> remove(QUndoCommand * parentComand = NULL);
+        //virtual QList<QUndoCommand*> remove(QUndoCommand * parentComand = NULL);
 
         /**
          * Reconstruct the path based on start/end items positions/types

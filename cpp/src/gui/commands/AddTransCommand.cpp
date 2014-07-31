@@ -40,8 +40,6 @@ void  AddTransCommand::redo(){
   }
   qDebug() << "Adding text"; 
   if ( text != NULL ) {
-    // TODO: find a good position for the text item.
-    text->setPos( transList.first()->scenePos() );
     relatedScene->addItem( text );
   }
   qDebug() << "Adding trackpoint items"; 
@@ -56,14 +54,18 @@ void  AddTransCommand::redo(){
 
 
 void  AddTransCommand::undo(){
+  qDebug() << "Before removing translineItems.";
   QList<Transline *>::iterator it;
   for (it = transList.begin(); it != transList.end(); ++it) {
     relatedScene->removeItem( *it );
   }
-  relatedScene->removeItem( text );
+  qDebug() << "Before removing text.";
+  if ( text )
+    relatedScene->removeItem( text );
   QList<TrackpointItem *>::iterator track_it;
+  qDebug() << "Before removing trackpoints.";
   for (track_it = trackList.begin(); track_it != trackList.end(); ++track_it) {
-    relatedScene->removeItem( *it );
+    relatedScene->removeItem( *track_it );
   }
 
   relatedScene->update();
@@ -111,6 +113,7 @@ bool AddTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
       startItem = getIntersectingItem(e);
       Transline * transition = new Transline( NULL, startItem, NULL );
       transition->setEndPoint( e->scenePos() );
+      qDebug() << "transition->boundingRect() = " << transition->boundingRect();
       relatedScene->addItem( transition );
       transList.append( transition );
       return true;
@@ -140,8 +143,10 @@ bool AddTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
     // Take care of the translines.
     transList.last()->setDrawArrow(false);
     transList.last()->setEndItem( item );
+    qDebug() << "transList.last()->boundingRect() = " << transList.last()->boundingRect();
     Transline * transition = new Transline( NULL, item, NULL );
     transition->setEndPoint( e->scenePos() );
+    qDebug() << "transition->boundingRect() = " << transition->boundingRect();
     relatedScene->addItem( transition );
     transList.append( transition );
     return true;
@@ -187,7 +192,10 @@ bool AddTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
     }
     // TODO: implement
     Q_ASSERT( false );
+  } else {
+    return false;
   }
+  return true;
 }
 
 
@@ -201,8 +209,12 @@ void AddTransCommand::addTrackPointsToModel( Trans * trans ) {
 
 
 void AddTransCommand::createText( Trans * trans ) {
+  // TODO: where to place the Transline text?
   text = new TranslineText( QString( trans->getName().c_str() ), trans );
-  text->setPos( transList.first()->scenePos() );
+  QPointF textPos = transList.first()->boundingRect().center();
+  textPos.setX( textPos.x() - text->boundingRect().width()/2 );
+  textPos.setY( textPos.y() - text->boundingRect().height()/2 );
+  text->setPos( textPos );
 }
 
 

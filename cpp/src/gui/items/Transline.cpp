@@ -347,6 +347,7 @@ void Transline::preparePath(bool propagate) {
 
 	// Set Line path to path to be painted
 	this->setPath(linePath);
+  prepareGeometryChange();
 
 }
 
@@ -419,6 +420,7 @@ void Transline::setEndPoint(QPointF point) {
 //  prepareGeometryChange();
 	this->endPoint = point;
 	this->preparePath();
+  prepareGeometryChange();
 }
 
 QPointF Transline::getEndPoint() {
@@ -501,6 +503,7 @@ QVariant Transline::itemChange(GraphicsItemChange change,
 		}
 
 	} else if (change== QGraphicsItem::ItemSceneHasChanged && this->scene()==NULL ) {
+    /*
 
 		//-- If removed from scene
 		//-- Ensure the Previous Item forget about us
@@ -525,6 +528,7 @@ QVariant Transline::itemChange(GraphicsItemChange change,
 		    //this->getEndItem()->scene()->removeItem(this->getEndItem());
 			//SGC::getInstance()->requestDelete(this->getEndItem());
 		}
+    */
 
 	}
 
@@ -560,8 +564,6 @@ void Transline::mouseReleaseEvent(QGraphicsSceneMouseEvent * event) {
 	//---------
 	if (this->addedTrackpoint != NULL) {
 		this->scene()->sendEvent(this->addedTrackpoint, event);
-
-
 	}
 
 
@@ -705,6 +707,7 @@ void Transline::mouseMoveEvent(QGraphicsSceneMouseEvent * event) {
 
 }
 
+/*
 QList<QUndoCommand*> Transline::remove(QUndoCommand * parentComand) {
 
 
@@ -727,3 +730,4 @@ QList<QUndoCommand*> Transline::remove(QUndoCommand * parentComand) {
 	return undoCommands;
 
 }
+*/

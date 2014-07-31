@@ -46,7 +46,7 @@ DeleteJoinAction::DeleteJoinAction(JoinItem * item,QUndoCommand * parentCommand)
 
     while (!this->item->getIncomingTransitions().isEmpty()) {
         qDebug() << "Removing incoming line";
-        this->item->getIncomingTransitions().takeFirst()->remove(this);
+//        this->item->getIncomingTransitions().takeFirst()->remove(this);
     }
 
 }
