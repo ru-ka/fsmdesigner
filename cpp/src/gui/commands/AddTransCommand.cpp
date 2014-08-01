@@ -141,13 +141,14 @@ bool AddTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
     relatedScene->addItem( item );
     trackList.append( item );
     // Take care of the translines.
-    transList.last()->setDrawArrow(false);
     transList.last()->setEndItem( item );
-    qDebug() << "transList.last()->boundingRect() = " << transList.last()->boundingRect();
     Transline * transition = new Transline( NULL, item, NULL );
     transition->setEndPoint( e->scenePos() );
-    qDebug() << "transition->boundingRect() = " << transition->boundingRect();
     relatedScene->addItem( transition );
+    // Connect the translines properly.
+    item->setPreviousTransline( transList.last() );
+    item->setNextTransline( transition );
+    // Finally, append transition to transList.
     transList.append( transition );
     return true;
   }

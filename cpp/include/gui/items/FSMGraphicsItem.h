@@ -109,7 +109,7 @@ public:
 
 	/// Setter for internal model
 	void setModel(T * newModel) {
-		void * pastModel = this->model;
+		//void * pastModel = this->model;
 		this->model = newModel;
 		//if (this->model != pastModel)
 			this->modelChanged();
