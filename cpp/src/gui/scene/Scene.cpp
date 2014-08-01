@@ -30,7 +30,7 @@ using namespace std;
 //-- Commands
 //-- State
 #include <gui/commands/NewStateCommand.h>
-#include <gui/commands/DeleteStateCommand.h>
+#include <gui/commands/RemoveStateCommand.h>
 #include <gui/commands/MoveStateCommand.h>
 //-- ItemGroup
 #include <gui/commands/CreateItemGroupCommand.h>
@@ -701,7 +701,7 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
 
       if ( (*it)->type() == StateItem::Type ) {
         // TODO: delete associated translines.
-        DeleteStateCommand *stateCommand = new DeleteStateCommand( this,
+        RemoveStateCommand *stateCommand = new RemoveStateCommand( this,
             dynamic_cast<StateItem*>(*it) );
         undoStack.push(stateCommand);
       }
