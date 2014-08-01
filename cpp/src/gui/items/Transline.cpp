@@ -68,11 +68,11 @@ Transline::Transline(TransitionBase * model, QGraphicsItem * startItem,
 	this->startItem = NULL;
 	this->endItem = NULL;
 	if (startItem!=NULL) {
-		this->setStartItem(startItem);
 		this->endPoint = startItem->scenePos();
+		this->setStartItem(startItem);
 	}
 
-	if (startItem!=endItem)
+	if (endItem!=NULL && startItem!=endItem)
 		this->setEndItem(endItem);
 	else
 	    this->endItem = endItem;
@@ -121,6 +121,7 @@ void Transline::preparePath(bool propagate) {
 	QPainterPath linePath;
 
 	if (this->startItem==NULL) {
+    qDebug() << "Returning empty line path.";
 		this->setPath(linePath);
 		return;
 		//return linePath;
@@ -135,10 +136,14 @@ void Transline::preparePath(bool propagate) {
 	//---------
 	QLineF lineToPaint;
 	lineToPaint.setP1(this->startItem->scenePos());
+  qDebug() << "lineToPaint.setP1(this->startItem->scenePos()) = " << startItem->scenePos();
 	if (this->endItem != NULL && (this->startItem!=this->endItem)) {
 		lineToPaint.setP2(this->endItem->scenePos());
-	} else
+    qDebug() << "if p2 = " << this->endItem->scenePos();
+	} else {
 		lineToPaint.setP2(this->endPoint);
+    qDebug() << "else p2 = " << this->endPoint;
+  }
 
 	//-- Check start item
 	if (this->startItem->type() == StateItem::Type  ||
@@ -146,26 +151,29 @@ void Transline::preparePath(bool propagate) {
 		this->startItem->type() == LinkArrival::Type ||
 		this->startItem->type() == HyperTransition::Type) {
 
-		int reduce = this->startItem->boundingRect().width() / 2;
-		reduce += 3;
+    if (lineToPaint.length() > 0) {
 
-		//-- Reduce Length to stay on edge of start element
-		QLineF workLine = lineToPaint;
+      int reduce = this->startItem->boundingRect().width() / 2;
+      reduce += 3;
 
-		// Target length = length - reduce
-		qreal targetLength = lineToPaint.length() - reduce;
+      //-- Reduce Length to stay on edge of start element
+      QLineF workLine = lineToPaint;
 
-		// Turn that to a 0:1 proportion of original line
-		qreal lengthFraction = targetLength / lineToPaint.length();
+      // Target length = length - reduce
+      qreal targetLength = lineToPaint.length() - reduce;
 
-		// The new p1 is at (1-fraction)
-		QPointF newP1 = workLine.pointAt(1 - lengthFraction);
+      // Turn that to a 0:1 proportion of original line
+      qreal lengthFraction = targetLength / lineToPaint.length();
 
-		// Move P1
-		workLine.setP1(newP1);
+      // The new p1 is at (1-fraction)
+      QPointF newP1 = workLine.pointAt(1 - lengthFraction);
 
-		lineToPaint = workLine;
-		//this->setLine(workLine);
+      // Move P1
+      workLine.setP1(newP1);
+
+      lineToPaint = workLine;
+      //this->setLine(workLine);
+    }
 	}
 
 	//-- Check end item
@@ -207,7 +215,7 @@ void Transline::preparePath(bool propagate) {
 		}
 
 		//-- Determine intersection of bounding rects
-		QRectF inter = this->endItem->boundingRect().intersected(this->boundingRect());
+		//QRectF inter = this->endItem->boundingRect().intersected(this->boundingRect());
 
 		//qDebug() << "Transline joining join from " << dir;
 
@@ -650,7 +658,6 @@ void Transline::mouseMoveEvent(QGraphicsSceneMouseEvent * event) {
 	//qDebug() << "[Transline move] Add new trackpoint: " << foundItems.size() ;
 
 	//-- Trackpoint position
-	bool after = true;
 	if (this->getStartItem()->type() == StateItem::Type) {
 		// After the start item (add First
 		newTrackpointModel = this->getModel()->addFirstTrackpoint(event->scenePos().x(), event->scenePos().y());
