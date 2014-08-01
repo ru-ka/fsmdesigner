@@ -29,7 +29,7 @@ using namespace std;
 
 //-- Commands
 //-- State
-#include <gui/commands/AddStateCommand.h>
+#include <gui/commands/NewStateCommand.h>
 #include <gui/commands/DeleteStateCommand.h>
 #include <gui/commands/MoveStateCommand.h>
 //-- ItemGroup
@@ -404,7 +404,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     case STATE:
       {
         // Generate the appropriate command and pass it to the undostack. 
-        AddStateCommand *stateCommand = new AddStateCommand( this, e );
+        NewStateCommand *stateCommand = new NewStateCommand( this, e );
         undoStack.push( stateCommand );
         // Close interaction
         this->setPlaceMode( CHOOSE );

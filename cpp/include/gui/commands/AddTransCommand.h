@@ -42,7 +42,8 @@ class AddTransCommand : public QUndoCommand {
 
 
     QGraphicsItem * getIntersectingItem(QGraphicsSceneMouseEvent * e) const;
-    void addTrackPointsToModel( Trans * trans );
+    void addTrackPointsToTransModel( Trans * trans );
+    void addModelToTranslines( Trans * trans );
     void createText( Trans * trans );
 
 

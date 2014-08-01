@@ -164,7 +164,8 @@ bool AddTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
       Trans * transition = fsm->addTrans(
           dynamic_cast<StateItem*>( startItem )->getModel(),
           dynamic_cast<StateItem*>( endItem   )->getModel() );
-      this->addTrackPointsToModel( transition );
+      this->addTrackPointsToTransModel( transition );
+      this->addModelToTranslines( transition );
       this->createText( transition );
     }
     // joinToState
@@ -200,11 +201,18 @@ bool AddTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
 }
 
 
-void AddTransCommand::addTrackPointsToModel( Trans * trans ) {
+void AddTransCommand::addTrackPointsToTransModel( Trans * trans ) {
   QList<TrackpointItem *>::iterator it;
   for (it = trackList.begin(); it != trackList.end(); ++it) {
     trans->appendTrackpoint( (*it)->getModel() );
     (*it)->modelChanged();
+  }
+}
+
+void AddTransCommand::addModelToTranslines( Trans * trans ) {
+  QList<Transline *>::iterator it;
+  for (it = transList.begin(); it != transList.end(); ++it) {
+   (*it)->setModel( trans );
   }
 }
 
