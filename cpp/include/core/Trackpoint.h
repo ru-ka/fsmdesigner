@@ -111,6 +111,8 @@ class Trackpoint {
          */
         bool isLink();
 
+        bool isJoin() const;
+
         /**
          *
          * @param joinId The ID of the targeted join, 0 means not targeting a join

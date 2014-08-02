@@ -222,60 +222,148 @@ void Scene::initializeScene() {
 
   // TODO: Implement a function? or a command? for this task?
   // Iterate over the transitions and create the required gui-items.
+  // TODO: Since the underlying data structures are not carefully chosen, it is
+  // hard to control the translation from the gui structure to the backend
+  // structure. Simplify the data structures and improve the maintainability.
   auto transitions = fsm->getTransitions();
   for ( auto trans : transitions ) {
-    // Get the start/end items.
+    qDebug() << "Constructing transition.";
+    // Since the underlying data structure is a mess, implement all cases
+    // seperatly.
+    // TODO: Redesign the data structure or live with its negative impacts!
     auto startStateId = trans.second->getStartState()->getId();
-    QGraphicsItem * startItem = NULL;
-    if ( itemsMap.find(startStateId) != itemsMap.end() ) {
-      startItem = itemsMap[startStateId];
-    }
-    // TODO: Figure out, how joins work. Is this correct?
-    else if ( joinsMap.find(startStateId) != joinsMap.end() ) {
-      startItem = joinsMap[startStateId];
-    }
-    // ENDTODO
+    Q_ASSERT( itemsMap.find(startStateId) != itemsMap.end() );
+    QGraphicsItem * startItem = itemsMap[startStateId];
     auto endStateId   = trans.second->getEndState()->getId();
-    QGraphicsItem * endItem = NULL;
-    if ( itemsMap.find(endStateId) != itemsMap.end() ) {
-      endItem = itemsMap[endStateId];
-    }
-    //TODO
-    else if (joinsMap.find(endStateId) != joinsMap.end() ) {
-      endItem = joinsMap[endStateId];
-    }
-    //ENDTODO
+    Q_ASSERT ( itemsMap.find(endStateId) != itemsMap.end() );
+    QGraphicsItem * endItem = itemsMap[endStateId];
 
+    // ---------------------------------
+    // CASE 1: STATE to STATE transition
+    // ---------------------------------
+    // Get the start/end items.
     auto trackpoints  = trans.second->getTrackpoints();
-    QList<Transline      *> transList;
-    Transline * currentTransItem = new Transline( trans.second, startItem, NULL );
-    transList.append( currentTransItem );
-    QList<TrackpointItem *> trackList;
-    for ( auto currentPoint : trackpoints ) {
-      // 1) Create TrackpointItems, if any trackpoints are available.
-      TrackpointItem * item = new TrackpointItem( currentPoint );
-      trackList.append( item );
-      item->setPreviousTransline( currentTransItem );
-      // TODO: is it important to set start/end items of trackpoints?
-      // 2) Update current TransItem and create additional TranslineItems.
-      currentTransItem->setEndItem( item );
-      currentTransItem = new Transline( trans.second, item, NULL );
+    if ( !trackpoints.front()->isJoin() && !trackpoints.front()->isLink()
+        && !trackpoints.back()->isJoin() && !trackpoints.back()->isJoin() ) {
+      QList<Transline      *> transList;
+      Transline * currentTransItem = NULL;
+      currentTransItem = new Transline( trans.second, startItem, NULL );
       transList.append( currentTransItem );
-      item->setNextTransline( currentTransItem );
+      QList<TrackpointItem *> trackList;
+      for ( auto currentPoint : trackpoints ) {
+        TrackpointItem * item = new TrackpointItem( currentPoint );
+        trackList.append( item );
+        item->setPreviousTransline( currentTransItem );
+        // TODO: is it important to set start/end items of trackpoints?
+        // 2) Update current TransItem and create additional TranslineItems.
+        currentTransItem->setEndItem( item );
+        currentTransItem = new Transline( trans.second, item, NULL );
+        transList.append( currentTransItem );
+        item->setNextTransline( currentTransItem );
+      }
+      currentTransItem->setEndItem( endItem );
+      // 3) Create transition text.
+      TranslineText * text = new TranslineText( trans.second->getName().c_str(), trans.second );
+      text->setPos( trans.second->getTextPosition().first,
+                    trans.second->getTextPosition().second );
+      // 4) Add items to scene.
+      this->addItem( text );
+      for ( auto item : trackList ) {
+        this->addItem( item );
+      }
+      for ( auto item : transList ) {
+        this->addItem( item );
+      }
     }
-    currentTransItem->setEndItem( endItem );
-    // 3) Create transition text.
-    TranslineText * text = new TranslineText( trans.second->getName().c_str(), trans.second );
-    text->setPos( trans.second->getTextPosition().first,
-                  trans.second->getTextPosition().second );
-    // 4) Add items to scene.
-    this->addItem( text );
-    for ( auto item : trackList ) {
-      this->addItem( item );
+    // -------------------------------------
+    // END CASE 1: STATE to STATE transition
+    // -------------------------------------
+
+
+
+    // ----------------------------------------
+    // CASE 2: STATE to JOIN or LINK transition
+    // ----------------------------------------
+    else if ( !trackpoints.front()->isJoin() && !trackpoints.front()->isLink()
+       && ( trackpoints.back()->isJoin() || trackpoints.back()->isLink() ) ) {
+      qDebug() << "State to join or link transition";
+      QList<Transline      *> transList;
+      Transline * currentTransItem = NULL;
+      currentTransItem = new Transline( trans.second, startItem, NULL );
+      transList.append( currentTransItem );
+      QList<TrackpointItem *> trackList;
+      for ( auto currentPoint : trackpoints ) {
+        if ( currentPoint->isJoin() || currentPoint->isLink() )
+          break;
+        TrackpointItem * item = new TrackpointItem( currentPoint );
+        trackList.append( item );
+        item->setPreviousTransline( currentTransItem );
+        // TODO: is it important to set start/end items of trackpoints?
+        // 2) Update current TransItem and create additional TranslineItems.
+        currentTransItem->setEndItem( item );
+        currentTransItem = new Transline( trans.second, item, NULL );
+        transList.append( currentTransItem );
+        item->setNextTransline( currentTransItem );
+      }
+      // Adjust enditem in the local scope.
+      QGraphicsItem * enditem = NULL;
+      if ( trackpoints.back()->isJoin() )
+        endItem = joinsMap[trackpoints.back()->getJoin()->getId()];
+      else {
+        endItem = new LinkDeparture( trackpoints.back() );
+        this->addItem( endItem );
+        qDebug() << "LinkDeparture = " << endItem;
+      }
+
+      currentTransItem->setEndItem( endItem );
+      // 3) Create transition text.
+      TranslineText * text = new TranslineText( trans.second->getName().c_str(), trans.second );
+      text->setPos( trans.second->getTextPosition().first,
+                    trans.second->getTextPosition().second );
+      // 4) Add items to scene.
+      this->addItem( text );
+      for ( auto item : trackList ) {
+        this->addItem( item );
+      }
+      for ( auto item : transList ) {
+        this->addItem( item );
+      }
     }
-    for ( auto item : transList ) {
-      this->addItem( item );
+    // --------------------------------------------
+    // END CASE 2: STATE to JOIN or JOIN transition
+    // --------------------------------------------
+    
+
+
+
+
+    // ----------------------------------------
+    // CASE 3: JOIN or LINK to STATE transition
+    // ----------------------------------------
+    else if ( ( trackpoints.front()->isJoin() || trackpoints.front()->isLink() )
+        && !trackpoints.back()->isJoin() && !trackpoints.back()->isLink() ) {
+      qDebug() << "join or link to state transition";
     }
+    // --------------------------------------------
+    // END CASE 3: JOIN or LINK to STATE transition
+    // --------------------------------------------
+
+
+
+    // -----------------------------------------------
+    // CASE 4: JOIN or LINK to JOIN or LINK transition
+    // -----------------------------------------------
+    else if ( ( trackpoints.front()->isJoin() || trackpoints.front()->isLink() )
+       && ( trackpoints.back()->isJoin() || trackpoints.back()->isLink() ) ) {
+      qDebug() << "join or link to join or link transition";
+    }
+    // ---------------------------------------------------
+    // END CASE 4: JOIN or LINK to JOIN or LINK transition
+    // ---------------------------------------------------
+    //
+    
+    
+    
   }
   // End Transitions.
 

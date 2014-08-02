@@ -88,6 +88,10 @@ bool Trackpoint::isLink() {
     return this->targetLink==NULL ? false : true;
 }
 
+bool Trackpoint::isJoin() const {
+    return (this->join != NULL);
+}
+
 void Trackpoint::setJoin(Join* join) {
     this->join = join;
 }

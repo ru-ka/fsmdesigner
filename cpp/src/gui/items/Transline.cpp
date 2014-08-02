@@ -47,7 +47,7 @@ using namespace std;
 Transline::Transline(TransitionBase * model, QGraphicsItem * startItem,
 		QGraphicsItem * endItem) :
 	QGraphicsPathItem() {
-    qDebug() << "Constructing transline = " << this;
+    //qDebug() << "Constructing transline = " << this;
 
 	// Variable inits
 	//------------------
@@ -136,13 +136,13 @@ void Transline::preparePath(bool propagate) {
 	//---------
 	QLineF lineToPaint;
 	lineToPaint.setP1(this->startItem->scenePos());
-  qDebug() << "lineToPaint.setP1(this->startItem->scenePos()) = " << startItem->scenePos();
+  //qDebug() << "lineToPaint.setP1(this->startItem->scenePos()) = " << startItem->scenePos();
 	if (this->endItem != NULL && (this->startItem!=this->endItem)) {
 		lineToPaint.setP2(this->endItem->scenePos());
-    qDebug() << "if p2 = " << this->endItem->scenePos();
+    //qDebug() << "if p2 = " << this->endItem->scenePos();
 	} else {
 		lineToPaint.setP2(this->endPoint);
-    qDebug() << "else p2 = " << this->endPoint;
+    //qDebug() << "else p2 = " << this->endPoint;
   }
 
 	//-- Check start item
