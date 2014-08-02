@@ -1,7 +1,7 @@
-#include "gui/commands/AddTransCommand.h"
+#include "gui/commands/NewTransCommand.h"
 
 
-AddTransCommand::AddTransCommand( Scene * _relatedScene,
+NewTransCommand::NewTransCommand( Scene * _relatedScene,
                                   QUndoCommand * _parentCommand) :
                                   QUndoCommand(_parentCommand), 
                                   relatedScene(_relatedScene),
@@ -14,13 +14,9 @@ AddTransCommand::AddTransCommand( Scene * _relatedScene,
 }
 
 
-AddTransCommand::~AddTransCommand() {
-  // TODO: is the model updated correctly by the existing code base?
-  QList<Transline *>::iterator it;
-  // TODO: Most likely, merely the first transline should be deleted, since
-  // the other translines are freed by their owners namely the trackpoint items?
-  // Answer: Nope, currently not. Nice pointer mess so far ;).
-  for (it = transList.begin(); it != transList.end(); ++it) {
+NewTransCommand::~NewTransCommand() {
+  //QList<Transline *>::iterator it;
+  for (auto it = transList.begin(); it != transList.end(); ++it) {
     delete *it;
   }
   if (text)
@@ -32,7 +28,7 @@ AddTransCommand::~AddTransCommand() {
 }
 
 
-void  AddTransCommand::redo(){
+void  NewTransCommand::redo(){
   qDebug() << "Adding transline items. Transline items.size() = " << transList.size();
   QList<Transline *>::iterator it;
   for (it = transList.begin(); it != transList.end(); ++it) {
@@ -53,7 +49,7 @@ void  AddTransCommand::redo(){
 }
 
 
-void  AddTransCommand::undo(){
+void  NewTransCommand::undo(){
   qDebug() << "Before removing translineItems.";
   QList<Transline *>::iterator it;
   for (it = transList.begin(); it != transList.end(); ++it) {
@@ -73,7 +69,7 @@ void  AddTransCommand::undo(){
 }
 
 
-QGraphicsItem * AddTransCommand::getIntersectingItem(QGraphicsSceneMouseEvent * e) const {
+QGraphicsItem * NewTransCommand::getIntersectingItem(QGraphicsSceneMouseEvent * e) const {
   // NOTE: Copied from scene.cpp. TODO: Make function nice. What to do, if
   // several stateItems are under the cursor? Pop up a selection dialog?
   //-- Get Item under
@@ -94,7 +90,7 @@ QGraphicsItem * AddTransCommand::getIntersectingItem(QGraphicsSceneMouseEvent * 
 }
 
 
-bool AddTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
+bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
   // TODO: is the case JOIN to JOIN legal?
   // In the old FSMDesigner, this case is not described, but could occur.
   
@@ -201,7 +197,7 @@ bool AddTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
 }
 
 
-void AddTransCommand::addTrackPointsToTransModel( Trans * trans ) {
+void NewTransCommand::addTrackPointsToTransModel( Trans * trans ) {
   QList<TrackpointItem *>::iterator it;
   for (it = trackList.begin(); it != trackList.end(); ++it) {
     trans->appendTrackpoint( (*it)->getModel() );
@@ -209,7 +205,7 @@ void AddTransCommand::addTrackPointsToTransModel( Trans * trans ) {
   }
 }
 
-void AddTransCommand::addModelToTranslines( Trans * trans ) {
+void NewTransCommand::addModelToTranslines( Trans * trans ) {
   QList<Transline *>::iterator it;
   for (it = transList.begin(); it != transList.end(); ++it) {
    (*it)->setModel( trans );
@@ -217,7 +213,7 @@ void AddTransCommand::addModelToTranslines( Trans * trans ) {
 }
 
 
-void AddTransCommand::createText( Trans * trans ) {
+void NewTransCommand::createText( Trans * trans ) {
   // TODO: where to place the Transline text?
   text = new TranslineText( QString( trans->getName().c_str() ), trans );
   QPointF textPos = transList.first()->boundingRect().center();
@@ -227,7 +223,7 @@ void AddTransCommand::createText( Trans * trans ) {
 }
 
 
-bool AddTransCommand::handleMouseMoveEvent(QGraphicsSceneMouseEvent * e) {
+bool NewTransCommand::handleMouseMoveEvent(QGraphicsSceneMouseEvent * e) {
   if ( transList.empty() )
     return false;
   transList.last()->setEndPoint( e->scenePos() );
@@ -235,7 +231,7 @@ bool AddTransCommand::handleMouseMoveEvent(QGraphicsSceneMouseEvent * e) {
 }
 
 
-bool AddTransCommand::commandReady() const {
+bool NewTransCommand::commandReady() const {
   return ( endItem != NULL );
 }
 
@@ -257,22 +253,6 @@ bool AddTransCommand::commandReady() const {
 
 
 /*
- //-- Transition from state to state
-      //-----------------
-      if (stateToState || joinToState || stateToJoin) {
-
-          //-- Keep added/referenced transition
-          Trans * transition= NULL;
-
-        //---- Add to model depending on type
-        //---------------------
-        if (stateToState) {
-
-          //-- Add Transition
-            transition = this->fsm->addTrans(
-              dynamic_cast<StateItem*> (this->placeTransitionStack.back())->getModel(),
-              dynamic_cast<StateItem*> (this->placeTransitionStack.front())->getModel());
-
         } else if (joinToState) {
 
           //-- Update join model to target the state
@@ -285,7 +265,12 @@ bool AddTransCommand::commandReady() const {
             ((Trans *)(*it)->getModel())->setEndState(FSMGraphicsItem<>::toStateItem(this->placeTransitionStack.front())->getModel());
           }
 
-        } else if (stateToJoin) {
+        }
+        */
+
+
+/*
+else if (stateToJoin) {
 
           //-- Target is target of the joint
           State * targetState = FSMGraphicsItem<>::toJoinItem(this->placeTransitionStack.front())->getModel()->getTargetState();
@@ -303,8 +288,17 @@ bool AddTransCommand::commandReady() const {
           qDebug() << "Join target: " << targetState->getId() << " is id: " << joinTrackpoint->getModel()->getJoin()->getId();
 
         }
+        */
 
 
+
+
+
+
+
+
+
+/*
         //---- Trackpoints (Go from end to start because of stacking)
         //-------------------
         Transline* lastTransline = NULL;

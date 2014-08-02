@@ -37,7 +37,7 @@ using namespace std;
 #include <gui/commands/DeleteItemGroupCommand.h>
 #include <gui/commands/MoveItemGroupCommand.h>
 //-- Trans
-#include <gui/commands/AddTransCommand.h>
+#include <gui/commands/NewTransCommand.h>
 //-- HyperTrans
 #include <gui/commands/AddHyperTransCommand.h>
 
@@ -471,7 +471,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
       {
         qDebug() << "placeTransitionStack.size() = " << placeTransitionStack.size();
         if ( activeTransCommand == NULL ) {
-          activeTransCommand = new AddTransCommand( this );
+          activeTransCommand = new NewTransCommand( this );
           activeTransCommand->handleMouseReleaseEvent(e);
         } else {
           activeTransCommand->handleMouseReleaseEvent(e);

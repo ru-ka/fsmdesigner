@@ -1,10 +1,10 @@
 /**
- * \file AddTransCommand.h
+ * \file NewTransCommand.h
  *
  */
 
-#ifndef __ADDTRANSCOMMAND_H__
-#define __ADDTRANSCOMMAND_H__
+#ifndef __NEWTRANSCOMMAND_H__
+#define __NEWTRANSCOMMAND_H__
 
 // Includes
 //--------------------
@@ -27,7 +27,7 @@
 //-- Core
 #include "core/Fsm.h"
 
-class AddTransCommand : public QUndoCommand {
+class NewTransCommand : public QUndoCommand {
   private:
     // Related objects
     Scene * relatedScene;
@@ -49,10 +49,10 @@ class AddTransCommand : public QUndoCommand {
 
 
   public:
-    AddTransCommand( Scene          * _relatedScene,
+    NewTransCommand( Scene          * _relatedScene,
                      QUndoCommand   * _parentCommand = NULL);
 
-    virtual ~AddTransCommand();
+    virtual ~NewTransCommand();
 
     virtual void    redo();
     virtual void    undo();
@@ -64,4 +64,4 @@ class AddTransCommand : public QUndoCommand {
 
 };
 
-#endif // __ADDTRANSCOMMAND_H__
+#endif // __NEWTRANSCOMMAND_H__
