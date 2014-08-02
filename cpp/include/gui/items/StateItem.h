@@ -159,7 +159,7 @@ public:
   enum { Type = FSMGraphicsItem<>::STATEITEM };
 
   /// Constructor using a State Model
-  StateItem(State * model = NULL,QGraphicsItem * parent = 0);
+  StateItem(State * model = NULL, QGraphicsItem * parent = NULL);
 
   virtual ~StateItem();
 

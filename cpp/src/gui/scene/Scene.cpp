@@ -107,30 +107,28 @@ void Scene::initializeScene() {
   //------------------
 
   //-- Get current FSM to draw
-  Fsm * currentFSM =this->fsm;
+  Fsm * currentFSM = this->fsm;
 
   // Prepare some data
   //------------------------------
 
   //-- Created items map (id<->object), and Join map
-  map<int, StateItem*> itemsMap;
-  map<int, JoinItem* > joinsMap;
-
-
+  map<unsigned int, StateItem*> itemsMap;
+  map<unsigned int, JoinItem* > joinsMap;
 
   // Place Joins
   //--------------------
   FOREACH_JOIN(this->fsm)
-
-
-
     //-- Prepare Item
     JoinItem * joinItem = new JoinItem((*it).second);
     joinsMap[(*it).first] = joinItem;
 
     //-- Use Undo to place on the scene
+    // TODO: get rid of the the DeleteJoinAction;
     DeleteJoinAction * undoJoin = new DeleteJoinAction(joinItem, NULL);
 
+    // TODO: place transitions.
+    /*
     //-- If target state is defined, set transition and trackpoints to it
     //----------------------------
     if (joinItem->getModel()->getTargetState()!=NULL) {
@@ -150,6 +148,7 @@ void Scene::initializeScene() {
     } else {
         qDebug() << "No target state onto join";
     }
+    */
 
     //-- place
     undoJoin->setRelatedScene(this);
@@ -163,8 +162,10 @@ void Scene::initializeScene() {
 
     // Get Current State
     State * currentState = state;
-    if (currentState == NULL)
+    if (currentState == NULL) {
+      qDebug() << "currentState == NULL. Should never occur, if the fsm is correct.";
       continue;
+    }
 
     //-- Create a GUI state if necessary
     StateItem * stateItem = itemsMap.find(currentState->getId())!=itemsMap.end() ? itemsMap[currentState->getId()] : NULL;
@@ -176,6 +177,7 @@ void Scene::initializeScene() {
 
     // Create transitions from this item
     //-----------
+    /*
     Transline * lastTransitionLine = NULL;
     list<Trans*> stateStartingTransitions =
         currentState->getStartingTransitions();
@@ -187,16 +189,10 @@ void Scene::initializeScene() {
       Trans * transition = *i;
       lastTransitionLine = NULL;
 
-      //-- Calculate the start and end as a trackpoints
-
-      // Start
-      Trackpoint * start = new Trackpoint(currentState->getPosition().first,
-          currentState->getPosition().second, 0);
-
       // End
-      /*currentFSM->getStatebyID(transition->end);
-      State * endState = currentFSM->getCurrentState();
-      currentFSM->getStatebyID(currentState->sid);*/
+      //currentFSM->getStatebyID(transition->end);
+      //State * endState = currentFSM->getCurrentState();
+      //currentFSM->getStatebyID(currentState->sid);
       State * endState = transition->getEndState();
 
       //-- Find/create end Gui item
@@ -218,10 +214,70 @@ void Scene::initializeScene() {
       delete lineToAdd;
 
     } // ENd OF transitions loop
+    */
 
 
   END_FOREACH_STATE
   //-- END LOOP OVER STATES
+
+  // TODO: Implement a function? or a command? for this task?
+  // Iterate over the transitions and create the required gui-items.
+  auto transitions = fsm->getTransitions();
+  for ( auto trans : transitions ) {
+    // Get the start/end items.
+    auto startStateId = trans.second->getStartState()->getId();
+    QGraphicsItem * startItem = NULL;
+    if ( itemsMap.find(startStateId) != itemsMap.end() ) {
+      startItem = itemsMap[startStateId];
+    }
+    // TODO: Figure out, how joins work. Is this correct?
+    else if ( joinsMap.find(startStateId) != joinsMap.end() ) {
+      startItem = joinsMap[startStateId];
+    }
+    // ENDTODO
+    auto endStateId   = trans.second->getEndState()->getId();
+    QGraphicsItem * endItem = NULL;
+    if ( itemsMap.find(endStateId) != itemsMap.end() ) {
+      endItem = itemsMap[endStateId];
+    }
+    //TODO
+    else if (joinsMap.find(endStateId) != joinsMap.end() ) {
+      endItem = joinsMap[endStateId];
+    }
+    //ENDTODO
+
+    auto trackpoints  = trans.second->getTrackpoints();
+    QList<Transline      *> transList;
+    Transline * currentTransItem = new Transline( trans.second, startItem, NULL );
+    transList.append( currentTransItem );
+    QList<TrackpointItem *> trackList;
+    for ( auto currentPoint : trackpoints ) {
+      // 1) Create TrackpointItems, if any trackpoints are available.
+      TrackpointItem * item = new TrackpointItem( currentPoint );
+      trackList.append( item );
+      item->setPreviousTransline( currentTransItem );
+      // TODO: is it important to set start/end items of trackpoints?
+      // 2) Update current TransItem and create additional TranslineItems.
+      currentTransItem->setEndItem( item );
+      currentTransItem = new Transline( trans.second, item, NULL );
+      transList.append( currentTransItem );
+      item->setNextTransline( currentTransItem );
+    }
+    currentTransItem->setEndItem( endItem );
+    // 3) Create transition text.
+    TranslineText * text = new TranslineText( trans.second->getName().c_str(), trans.second );
+    text->setPos( trans.second->getTextPosition().first,
+                  trans.second->getTextPosition().second );
+    // 4) Add items to scene.
+    this->addItem( text );
+    for ( auto item : trackList ) {
+      this->addItem( item );
+    }
+    for ( auto item : transList ) {
+      this->addItem( item );
+    }
+  }
+  // End Transitions.
 
   // Loop over links entrances
   //----------------------------

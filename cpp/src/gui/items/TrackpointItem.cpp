@@ -35,6 +35,11 @@ TrackpointItem::TrackpointItem(Trackpoint * model,QGraphicsItem * startItem,
 		QGraphicsItem * endItem) :
 	TrackpointBaseItem(model,startItem,endItem) {
 
+  if( model != NULL ) {
+    QPointF position( model->getPosition().first, model->getPosition().second );
+    this->setPos( position );
+  }
+
 	setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges | ItemIsFocusable);
 	setToolTip("TrackpointItem");
 	this->setBrush(Qt::black);
@@ -46,8 +51,6 @@ TrackpointItem::TrackpointItem(Trackpoint * model,QGraphicsItem * startItem,
 	QPainterPath rectPath;
 	rectPath.addRect(-3,-3,6,6);
 	this->setPath(rectPath);
-
-
 
 }
 
