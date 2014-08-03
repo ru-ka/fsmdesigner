@@ -40,6 +40,8 @@ using namespace std;
 #include <gui/commands/NewTransCommand.h>
 //-- HyperTrans
 #include <gui/commands/NewHyperTransCommand.h>
+//-- Join
+#include <gui/commands/NewJoinCommand.h>
 
 //-- Others
 #include <gui/common/GUIUtils.h>
@@ -68,7 +70,8 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
   bLastCommand( false ),
   activeGroup( NULL ),
   activeTransCommand( NULL ),
-  activeHyperTransCommand( NULL )
+  activeHyperTransCommand( NULL ),
+  activeJoinCommand( NULL )
 {
 
   this->setBackgroundBrush(Qt::white);
@@ -891,36 +894,19 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     // Place a JointPoint
     //--------------------------
     case JOIN: {
-
-      //-- Get Item under
-      QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
-          Qt::IntersectsItemShape, Qt::AscendingOrder);
-      QGraphicsItem* itemUnder =
-          itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
-
-      JoinItem * JoinItem = FSMGraphicsItem<>::toJoinItem(itemUnder);
-
-      //-- Add to FSM
-      this->getFsm()->addJoin(JoinItem->getModel());
-
-      // Ask user to target a state
-            //----------------------------------------
-
-            // Start Transline Placement
-            //--------------------
-
-            //-- Stakc hypertransition on transitin placement stack
-            this->placeTransitionStack.push_front(JoinItem);
-
-            //-- Add a transline to position, and start transition placement modus
-            Transline * beginTransline = new Transline(NULL,JoinItem,NULL);
-            this->addToToPlaceStack(beginTransline);
-
-            //-- Set to transition modus
-            this->setPlaceMode(TRANS);
-
-
-
+      {
+        if ( activeJoinCommand == NULL ) {
+          activeJoinCommand = new NewJoinCommand( this );
+          activeJoinCommand->handleMouseReleaseEvent(e);
+        } else {
+          activeJoinCommand->handleMouseReleaseEvent(e);
+          if ( activeJoinCommand->commandReady() ) {
+            undoStack.push( activeJoinCommand );
+            activeJoinCommand = NULL;
+            this->setPlaceMode( CHOOSE );
+          }
+        }
+      }
       break;
     }
     //-- EOF JoinItem
@@ -969,6 +955,8 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
     activeHyperTransCommand->handleMouseMoveEvent(e);
   if ( activeTransCommand )
     activeTransCommand->handleMouseMoveEvent(e);
+  if ( activeJoinCommand )
+    activeJoinCommand->handleMouseMoveEvent(e);
   //----------------- Mouse Following stacks --------------//
 
   // Mouse following
@@ -1036,10 +1024,20 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
     this->setPlaceMode(CHOOSE);
 
     // TODO: free activeCommands.
+    if ( activeTransCommand ) {
+      activeTransCommand->undo();
+      delete activeTransCommand;
+      activeTransCommand = NULL;
+    }
     if ( activeHyperTransCommand ) {
       activeHyperTransCommand->undo();
       delete activeHyperTransCommand;
       activeHyperTransCommand = NULL;
+    }
+    if ( activeJoinCommand ) {
+      activeJoinCommand->undo();
+      delete activeJoinCommand;
+      activeJoinCommand = NULL;
     }
 
   }

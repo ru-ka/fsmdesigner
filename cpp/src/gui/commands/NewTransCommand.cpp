@@ -25,6 +25,7 @@ NewTransCommand::~NewTransCommand() {
   for (track_it = trackList.begin(); track_it != trackList.end(); ++track_it) {
     delete *track_it;
   }
+  delete trans;
 }
 
 
@@ -43,6 +44,7 @@ void  NewTransCommand::redo(){
   for (track_it = trackList.begin(); track_it != trackList.end(); ++track_it) {
     relatedScene->addItem( *track_it );
   }
+  this->fsm->addTrans( trans );
 
   relatedScene->update();
   relatedScene->bLastCommand = false;
@@ -63,6 +65,7 @@ void  NewTransCommand::undo(){
   for (track_it = trackList.begin(); track_it != trackList.end(); ++track_it) {
     relatedScene->removeItem( *track_it );
   }
+  this->fsm->deleteTrans( trans );
 
   relatedScene->update();
   relatedScene->bLastCommand = this->bLastCommand;
@@ -153,16 +156,17 @@ bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
   // Intent: Add end item. Finish the outstanding transline.
   else if ( getIntersectingItem(e)->type() == StateItem::Type ) {
     endItem = getIntersectingItem(e);
-    trackList.last()->setEndItem( endItem );
+    if ( !trackList.empty() )
+      trackList.last()->setEndItem( endItem );
     transList.last()->setEndItem( endItem );
     // stateToState
     if ( startItem->type() == StateItem::Type ) {
-      Trans * transition = fsm->addTrans(
+      trans = fsm->addTrans(
           dynamic_cast<StateItem*>( startItem )->getModel(),
           dynamic_cast<StateItem*>( endItem   )->getModel() );
-      this->addTrackPointsToTransModel( transition );
-      this->addModelToTranslines( transition );
-      this->createText( transition );
+      this->addTrackPointsToTransModel( );
+      this->addModelToTranslines( );
+      this->createText( );
     }
     // joinToState
     else if ( startItem->type() == JoinItem::Type ) {
@@ -175,7 +179,8 @@ bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
   // Intent: Add end item. Finish the outstanding transline.
   else if ( getIntersectingItem(e)->type() == JoinItem::Type ) {
     endItem = getIntersectingItem(e);
-    trackList.last()->setEndItem( endItem );
+    if ( !trackList.empty() )
+      trackList.last()->setEndItem( endItem );
     transList.last()->setEndItem( endItem );
     // stateToJoin
     if ( startItem->type() == StateItem::Type ) {
@@ -197,7 +202,7 @@ bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
 }
 
 
-void NewTransCommand::addTrackPointsToTransModel( Trans * trans ) {
+void NewTransCommand::addTrackPointsToTransModel( ) {
   QList<TrackpointItem *>::iterator it;
   for (it = trackList.begin(); it != trackList.end(); ++it) {
     trans->appendTrackpoint( (*it)->getModel() );
@@ -205,7 +210,7 @@ void NewTransCommand::addTrackPointsToTransModel( Trans * trans ) {
   }
 }
 
-void NewTransCommand::addModelToTranslines( Trans * trans ) {
+void NewTransCommand::addModelToTranslines( ) {
   QList<Transline *>::iterator it;
   for (it = transList.begin(); it != transList.end(); ++it) {
    (*it)->setModel( trans );
@@ -213,7 +218,7 @@ void NewTransCommand::addModelToTranslines( Trans * trans ) {
 }
 
 
-void NewTransCommand::createText( Trans * trans ) {
+void NewTransCommand::createText( ) {
   // TODO: where to place the Transline text?
   text = new TranslineText( QString( trans->getName().c_str() ), trans );
   QPointF textPos = transList.first()->boundingRect().center();

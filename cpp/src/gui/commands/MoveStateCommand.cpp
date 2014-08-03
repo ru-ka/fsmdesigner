@@ -21,9 +21,6 @@ MoveStateCommand::~MoveStateCommand() {
 
 
 void  MoveStateCommand::redo(){
-  qDebug() << "redo()";
-  qDebug() << "oldPos = " << oldPos;
-  qDebug() << "newPos = " << newPos;
   stateItem->setPos(newPos);
   state->setPosition(std::make_pair(newPos.x(), newPos.y()));
   stateItem->modelChanged();
@@ -34,9 +31,6 @@ void  MoveStateCommand::redo(){
 
 
 void  MoveStateCommand::undo(){
-  qDebug() << "undo()";
-  qDebug() << "oldPos = " << oldPos;
-  qDebug() << "newPos = " << newPos;
   stateItem->setPos(oldPos);
   state->setPosition(std::make_pair(oldPos.x(), oldPos.y()));
   stateItem->modelChanged();
@@ -52,7 +46,6 @@ int   MoveStateCommand::id() const {
 
 
 bool  MoveStateCommand::mergeWith(const QUndoCommand * command) {
-  qDebug() << "MoveStateCommand: mergeWith()";
   // Ensure, that merely MoveStateCommands of the same item are merged.
   const MoveStateCommand *moveCommand = static_cast<const MoveStateCommand *>(command);
   StateItem * nextItem = moveCommand->getItem();

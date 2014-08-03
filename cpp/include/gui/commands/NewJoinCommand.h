@@ -1,10 +1,10 @@
 /**
- * \file NewTransCommand.h
+ * \file NewJoinCommand.h
  *
  */
 
-#ifndef __NEWTRANSCOMMAND_H__
-#define __NEWTRANSCOMMAND_H__
+#ifndef __NEWJOINCOMMAND_H__
+#define __NEWJOINCOMMAND_H__
 
 // Includes
 //--------------------
@@ -26,8 +26,9 @@
 
 //-- Core
 #include "core/Fsm.h"
+#include "core/Join.h"
 
-class NewTransCommand : public QUndoCommand {
+class NewJoinCommand : public QUndoCommand {
   private:
     // Related objects
     Scene * relatedScene;
@@ -35,25 +36,21 @@ class NewTransCommand : public QUndoCommand {
     bool    bLastCommand; // CreateItemGroupCommand?
 
     QList<Transline       *> transList; // Related GUI object.
-    TranslineText         *  text     ; // Text.
     QList<TrackpointItem  *> trackList; // Trackpoints.
     QGraphicsItem         *  startItem;
     QGraphicsItem         *  endItem  ;
-    Trans                 *  trans    ;
+    Join                  *  join     ;
 
 
     QGraphicsItem * getIntersectingItem(QGraphicsSceneMouseEvent * e) const;
-    void addTrackPointsToTransModel( );
-    void addModelToTranslines( );
-    void createText( );
-
+    void addTrackPointsToJoinModel();
 
 
   public:
-    NewTransCommand( Scene          * _relatedScene,
+    NewJoinCommand( Scene          * _relatedScene,
                      QUndoCommand   * _parentCommand = NULL);
 
-    virtual ~NewTransCommand();
+    virtual ~NewJoinCommand();
 
     virtual void    redo();
     virtual void    undo();
@@ -65,4 +62,4 @@ class NewTransCommand : public QUndoCommand {
 
 };
 
-#endif // __NEWTRANSCOMMAND_H__
+#endif // __NEWJOINCOMMAND_H__
