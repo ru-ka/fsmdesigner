@@ -42,6 +42,8 @@ using namespace std;
 #include <gui/commands/NewHyperTransCommand.h>
 //-- Join
 #include <gui/commands/NewJoinCommand.h>
+//-- Link
+#include <gui/commands/NewLinkCommand.h>
 
 //-- Others
 #include <gui/common/GUIUtils.h>
@@ -71,7 +73,8 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
   activeGroup( NULL ),
   activeTransCommand( NULL ),
   activeHyperTransCommand( NULL ),
-  activeJoinCommand( NULL )
+  activeJoinCommand( NULL ),
+  activeLinkCommand( NULL )
 {
 
   this->setBackgroundBrush(Qt::white);
@@ -791,105 +794,23 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
       //-- END OF TRANS -------//
 
 
-
-
         // Link
         //------------------------------
     case LINKDEPARTURE: {
-
-      //-- Get Item under
-      QList<QGraphicsItem*> itemsUnder = this->items(e->scenePos(),
-          Qt::IntersectsItemShape, Qt::AscendingOrder);
-      QGraphicsItem* itemUnder =
-          itemsUnder.size() > 0 ? itemsUnder.front() : NULL;
-
-      //-- Action if clicked on a state
-      if (itemUnder == NULL || itemUnder->type() != StateItem::Type) {
-        break;
-      }
-      StateItem * clickedState = dynamic_cast<StateItem*> (itemUnder);
-
-      //-- First state To be clicked is the source
-      if (this->placeLinkStartState == NULL) {
-
-        //-- Record and unselect
-        this->placeLinkStartState = clickedState;
-        this->placeLinkStartState->setSelected(false);
-      }
-      //-- Second state to be clicked is the destination
-      else if (this->placeLinkEndState == NULL) {
-
-        //-- Record and unselect
-        this->placeLinkEndState = clickedState;
-        this->placeLinkEndState->setSelected(false);
-      }
-
-      //-- If both states are set, proceed
-      //-----------
-      if (this->placeLinkEndState != NULL && this->placeLinkStartState
-          != NULL) {
-
-        // Prepare Model
-        //------------------------
-
-          Link * link = this->getFsm()->getLinkbyGoal(this->placeLinkEndState->getModel());
-
-        //-- Add Link to destination if necessary
-        if (link==NULL) {
-            link = this->getFsm()->addLink(this->placeLinkEndState->getModel(),(double) e->scenePos().x(),
-              (double) e->scenePos().y());
+        if ( activeLinkCommand == NULL ) {
+          activeLinkCommand = new NewLinkCommand( this );
+          activeLinkCommand->handleMouseReleaseEvent(e);
+        } else {
+          activeLinkCommand->handleMouseReleaseEvent(e);
+          if ( activeLinkCommand->commandReady() ) {
+            undoStack.push( activeLinkCommand );
+            activeLinkCommand = NULL;
+            this->setPlaceMode( CHOOSE );
+          }
         }
-
-
-
-        //-- Add Link transition from start
-        Trans * linkToTransition = this->getFsm()->addTrans(
-            this->placeLinkStartState->getModel()->getId(),
-            this->placeLinkEndState->getModel()->getId());
-        Trackpoint * tp = linkToTransition->appendTrackpoint(
-            (double) e->scenePos().x(), (double) e->scenePos().y());
-
-        tp->setTargetLink(link);
-
-        // Add Items to GUI using toPlace stack
-        //-----------------
-
-        //-- Prepare destination
-        LinkArrival* linkToEndStateItem = this->placeLinkToState(
-                    this->placeLinkEndState, link);
-
-        //-- Prepare Start
-        LinkDeparture * linkFromStartItem = new LinkDeparture(tp,
-            this->placeLinkStartState);
-
-        //-- Sync colors
-        linkFromStartItem->setBrush(linkToEndStateItem->brush());
-
-
-        //-- End (At first because it cleans everything)
-        //-- && Place
-        this->setPlaceMode(CHOOSE);
-
-        //-- Place Link to State if necessary
-        if (linkToEndStateItem->scene() == NULL)
-          this->addToToPlaceStack(linkToEndStateItem);
-
-        //-- Place transition from start
-        this->addToToPlaceStack(linkFromStartItem);
-
-        // Clean
-        //--------------------
-        this->placeLinkStartState = NULL;
-        this->placeLinkEndState = NULL;
       }
-
       break;
       //-- END OF Link -------------//
-
-      /*default:
-       break;*/
-    }
-    //-- EOF Link --//
 
     // Place a JointPoint
     //--------------------------
@@ -957,6 +878,8 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
     activeTransCommand->handleMouseMoveEvent(e);
   if ( activeJoinCommand )
     activeJoinCommand->handleMouseMoveEvent(e);
+  if ( activeLinkCommand )
+    activeLinkCommand->handleMouseMoveEvent(e);
   //----------------- Mouse Following stacks --------------//
 
   // Mouse following

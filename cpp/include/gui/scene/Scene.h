@@ -38,6 +38,7 @@ class StateItem;
 class NewTransCommand;
 class NewHyperTransCommand;
 class NewJoinCommand;
+class NewLinkCommand;
 
 class Scene: public QGraphicsScene, public VerificationListener {
 
@@ -57,6 +58,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
     NewTransCommand      * activeTransCommand;
     NewHyperTransCommand * activeHyperTransCommand;
     NewJoinCommand       * activeJoinCommand;
+    NewLinkCommand       * activeLinkCommand;
 
     void moveItem(); // Move the selected item.
     void moveItem(QGraphicsItem * item);
