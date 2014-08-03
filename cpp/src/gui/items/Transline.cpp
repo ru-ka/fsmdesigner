@@ -38,10 +38,6 @@ using namespace std;
 
 #include <common/SGC.h>
 
-//-- Actions
-#include <gui/actions/DeleteTransitionAction.h>
-#include <gui/actions/DeleteTrackpointAction.h>
-
 #include "Transline.h"
 
 Transline::Transline(TransitionBase * model, QGraphicsItem * startItem,

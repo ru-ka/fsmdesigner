@@ -1,8 +1,5 @@
 #include "gui/commands/MoveStateCommand.h"
 
-//TODO: How to deal with state items? Should the origin be in the middle,
-//      should it be to the left upper corner?
-
 MoveStateCommand::MoveStateCommand( Scene * _relatedScene,
                                     StateItem * _stateItem,
                                     QUndoCommand * _parentCommand) :
@@ -14,7 +11,6 @@ MoveStateCommand::MoveStateCommand( Scene * _relatedScene,
                                     newPos( _stateItem->scenePos() ),
                                     bLastCommand( _relatedScene->bLastCommand )
 {
-  stateItem->setTransform(QTransform::fromTranslate( 0, 0));
   oldPos.setX( stateItem->getModel()->getPosition().first  );
   oldPos.setY( stateItem->getModel()->getPosition().second );
 }
@@ -30,6 +26,7 @@ void  MoveStateCommand::redo(){
   qDebug() << "newPos = " << newPos;
   stateItem->setPos(newPos);
   state->setPosition(std::make_pair(newPos.x(), newPos.y()));
+  stateItem->modelChanged();
 
   relatedScene->update();
   relatedScene->bLastCommand = false;
@@ -42,6 +39,7 @@ void  MoveStateCommand::undo(){
   qDebug() << "newPos = " << newPos;
   stateItem->setPos(oldPos);
   state->setPosition(std::make_pair(oldPos.x(), oldPos.y()));
+  stateItem->modelChanged();
 
   relatedScene->update();
   relatedScene->bLastCommand = this->bLastCommand;

@@ -34,7 +34,7 @@ using namespace std;
 //-- Actions
 #include <gui/actions/DeleteStateAction.h>
 #include <gui/actions/ChangeStateNameAction.h>
-#include <gui/actions/MoveStateAction.h>
+//#include <gui/actions/MoveStateAction.h>
 
 #include <common/SGC.h>
 
@@ -107,7 +107,7 @@ void StateItem::modelChanged() {
 
       //-- Position from model
         this->setPos(this->model->getPosition().first, this->model->getPosition().second);
-        this->itemChange(QGraphicsItem::ItemPositionChange,QVariant(QPointF(this->pos())));
+        this->itemChange(QGraphicsItem::ItemPositionChange,QVariant(QPointF(this->scenePos())));
 
     //-- Update reset states and so on
       this->stateText->setPlainText(QString::fromStdString(this->getModel()->getName()));
@@ -289,8 +289,8 @@ QVariant StateItem::itemChange(GraphicsItemChange change,
           continue;
 
         //-- Calculate Dx/Dy
-        qreal dx = newPosition.x() - this->pos().x();
-        qreal dy = newPosition.y() - this->pos().y();
+        qreal dx = newPosition.x() - this->scenePos().x();
+        qreal dy = newPosition.y() - this->scenePos().y();
 
         //-- Yes, go through connections to move items
         QGraphicsItem * currentItem = tr->getEndItem();
@@ -914,7 +914,7 @@ bool StateItemText::sceneEvent(QEvent * event) {
 
 
     case QEvent::GraphicsSceneMouseMove:
-      ((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->pos()));
+      ((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->scenePos()));
             ((QGraphicsSceneMouseEvent*) event)->setLastPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->lastPos()));
       this->mouseMoveEvent((QGraphicsSceneMouseEvent*) event);
       event->accept();
@@ -923,7 +923,7 @@ bool StateItemText::sceneEvent(QEvent * event) {
 
     case QEvent::GraphicsSceneMousePress:
 
-      ((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->pos()));
+      ((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->scenePos()));
       ((QGraphicsSceneMouseEvent*) event)->setLastPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->lastPos()));
       event->accept();
       this->mousePressEvent((QGraphicsSceneMouseEvent*) event);
@@ -931,7 +931,7 @@ bool StateItemText::sceneEvent(QEvent * event) {
       break;
 
     case QEvent::GraphicsSceneMouseRelease:
-      ((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->pos()));
+      ((QGraphicsSceneMouseEvent*) event)->setPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->scenePos()));
             ((QGraphicsSceneMouseEvent*) event)->setLastPos(this->mapFromItem(this->parentItem(),((QGraphicsSceneMouseEvent*) event)->lastPos()));
       this->mouseReleaseEvent((QGraphicsSceneMouseEvent*) event);
       event->accept();
