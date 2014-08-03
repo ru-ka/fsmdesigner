@@ -105,8 +105,8 @@ void Transline::preparePath(bool propagate) {
 
 	//-- End with an arrow ?
 	if (this->getEndItem() != NULL &&
-		 ( this->getEndItem()->type() == TrackpointItem::Type ||
-		  this->getEndItem()->type() == LinkDeparture::Type
+		 ( this->getEndItem()->type() == TrackpointItem::Type
+//       || this->getEndItem()->type() == LinkDeparture::Type
 		 )
 		)
 		this->drawArrow = false;
@@ -177,11 +177,8 @@ void Transline::preparePath(bool propagate) {
 	}
 
 	//-- Check end item
-	if (this->endItem != NULL &&
-			(this->endItem->type() == StateItem::Type ||
-			this->endItem->type()== TrackpointItem::Type ||
-			this->endItem->type()== LinkDeparture::Type)) {
-
+	if (this->endItem != NULL && ( this->endItem->type() == StateItem::Type 
+      || this->endItem->type() == TrackpointItem::Type ) ) {
 		int reduce = this->endItem->boundingRect().height() / 2;
 		reduce += 3;
 
@@ -189,16 +186,20 @@ void Transline::preparePath(bool propagate) {
 		QLineF workLine = lineToPaint;
 		workLine.setLength(lineToPaint.length() - reduce);
 
-		// Reduce additionaly from arrow lengt
+		// Reduce additionally from arrow length
 		if (this->drawArrow == true) {
 			workLine.setLength(workLine.length() - arrowSize);
 		}
 
 		lineToPaint = workLine;
 		//this->setLine(workLine);
-
+  } else if ( this->endItem != NULL && 
+    this->endItem->type() == LinkDeparture::Type ) {
+    lineToPaint.setLength( lineToPaint.length() - 12 );
 	} else if (this->endItem != NULL && this->endItem->type() == JoinItem::Type) {
+    lineToPaint.setLength( lineToPaint.length() - 20 );
 
+    /*
 		QLineF workLine = lineToPaint;
 
 		//-- Determine incoming direction using p1 and endItem position
@@ -241,6 +242,7 @@ void Transline::preparePath(bool propagate) {
 
 		//-- Set usage of workline
 		lineToPaint = workLine;
+    */
 
 	}
 
@@ -713,28 +715,3 @@ void Transline::mouseMoveEvent(QGraphicsSceneMouseEvent * event) {
 //		delete this;
 
 }
-
-/*
-QList<QUndoCommand*> Transline::remove(QUndoCommand * parentComand) {
-
-
-
-	//-- Prepare Undo
-	QList<QUndoCommand*> undoCommands;
-
-	//-- Don't remove if not on the scene
-	if (this->scene()==NULL)
-	    return undoCommands;
-
-
-	//-- FIXME If the far end is a LinkDeparture, uses a delete Link Item object not delete Transition
-
-	//-- Remove itself
-	DeleteTransitionAction * undoDeleteThis = new DeleteTransitionAction(this,parentComand);
-	undoCommands.append(undoDeleteThis);
-
-
-	return undoCommands;
-
-}
-*/
