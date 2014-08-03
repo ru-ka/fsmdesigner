@@ -1,7 +1,7 @@
-#include "gui/commands/DeleteItemGroupCommand.h"
+#include "gui/commands/RemoveItemGroupCommand.h"
 
 
-DeleteItemGroupCommand::DeleteItemGroupCommand( Scene * _relatedScene,
+RemoveItemGroupCommand::RemoveItemGroupCommand( Scene * _relatedScene,
                                                 QGraphicsItemGroup * _itemGroup,
                                                 QUndoCommand * _parentCommand) :
                                                 QUndoCommand(_parentCommand), 
@@ -13,11 +13,11 @@ DeleteItemGroupCommand::DeleteItemGroupCommand( Scene * _relatedScene,
 }
 
 
-DeleteItemGroupCommand::~DeleteItemGroupCommand() {
+RemoveItemGroupCommand::~RemoveItemGroupCommand() {
 }
 
 
-void  DeleteItemGroupCommand::redo() {
+void  RemoveItemGroupCommand::redo() {
   qDebug() << "-------------------------";
   qDebug() << "Delete item group redo() ";
   qDebug() << "-------------------------";
@@ -35,7 +35,7 @@ void  DeleteItemGroupCommand::redo() {
 }
 
 
-void  DeleteItemGroupCommand::undo() {
+void  RemoveItemGroupCommand::undo() {
   qDebug() << "-------------------------";
   qDebug() << "Delete item group undo() ";
   qDebug() << "-------------------------";

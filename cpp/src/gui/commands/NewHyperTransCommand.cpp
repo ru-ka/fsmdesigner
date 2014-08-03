@@ -1,7 +1,7 @@
-#include "gui/commands/AddHyperTransCommand.h"
+#include "gui/commands/NewHyperTransCommand.h"
 
 
-AddHyperTransCommand::AddHyperTransCommand( Scene * _relatedScene,
+NewHyperTransCommand::NewHyperTransCommand( Scene * _relatedScene,
                                   QUndoCommand * _parentCommand) :
                                   QUndoCommand( _parentCommand ), 
                                   relatedScene( _relatedScene ),
@@ -15,7 +15,7 @@ AddHyperTransCommand::AddHyperTransCommand( Scene * _relatedScene,
 }
 
 
-AddHyperTransCommand::~AddHyperTransCommand() {
+NewHyperTransCommand::~NewHyperTransCommand() {
   if (hypertransition)
     delete hypertransition;
   if (hypertransModel)
@@ -27,7 +27,7 @@ AddHyperTransCommand::~AddHyperTransCommand() {
 }
 
 
-void  AddHyperTransCommand::redo(){
+void  NewHyperTransCommand::redo(){
   // add items to model
   fsm->addHypertrans( hypertransModel );
 
@@ -40,7 +40,7 @@ void  AddHyperTransCommand::redo(){
 }
 
 
-void  AddHyperTransCommand::undo(){
+void  NewHyperTransCommand::undo(){
   // remove items from scene
   relatedScene->removeItem( transline );
   relatedScene->removeItem( hypertransition );
@@ -53,7 +53,7 @@ void  AddHyperTransCommand::undo(){
 }
 
 
-QGraphicsItem * AddHyperTransCommand::getIntersectingItem(QGraphicsSceneMouseEvent * e) const {
+QGraphicsItem * NewHyperTransCommand::getIntersectingItem(QGraphicsSceneMouseEvent * e) const {
   // NOTE: Copied from scene.cpp. TODO: Make function nice. What to do, if
   // several stateItems are under the cursor? Pop up a selection dialog?
   //-- Get Item under
@@ -74,7 +74,7 @@ QGraphicsItem * AddHyperTransCommand::getIntersectingItem(QGraphicsSceneMouseEve
 }
 
 
-bool AddHyperTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
+bool NewHyperTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
   if ( hypertransition == NULL ) {
     // Create new model. Do not attach the model to the fsm data structure yet.
     hypertransModel = new Hypertrans();
@@ -109,7 +109,7 @@ bool AddHyperTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e)
 }
 
 
-bool AddHyperTransCommand::handleMouseMoveEvent(QGraphicsSceneMouseEvent * e) {
+bool NewHyperTransCommand::handleMouseMoveEvent(QGraphicsSceneMouseEvent * e) {
   if ( transline == NULL )
     return false;
   transline->setEndPoint( e->scenePos() );
@@ -117,6 +117,6 @@ bool AddHyperTransCommand::handleMouseMoveEvent(QGraphicsSceneMouseEvent * e) {
 }
 
 
-bool AddHyperTransCommand::commandReady() const {
+bool NewHyperTransCommand::commandReady() const {
   return (targetState != NULL);
 }

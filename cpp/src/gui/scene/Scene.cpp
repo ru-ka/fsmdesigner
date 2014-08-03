@@ -34,12 +34,12 @@ using namespace std;
 #include <gui/commands/MoveStateCommand.h>
 //-- ItemGroup
 #include <gui/commands/CreateItemGroupCommand.h>
-#include <gui/commands/DeleteItemGroupCommand.h>
+#include <gui/commands/RemoveItemGroupCommand.h>
 #include <gui/commands/MoveItemGroupCommand.h>
 //-- Trans
 #include <gui/commands/NewTransCommand.h>
 //-- HyperTrans
-#include <gui/commands/AddHyperTransCommand.h>
+#include <gui/commands/NewHyperTransCommand.h>
 
 //-- Others
 #include <gui/common/GUIUtils.h>
@@ -708,8 +708,8 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
       e->setAccepted(true);
     } else if ( this->selectedItems().size() == 0 && activeGroup &&
         !e->isAccepted() ) {
-      DeleteItemGroupCommand * groupCommand =
-        new DeleteItemGroupCommand( this, activeGroup );
+      RemoveItemGroupCommand * groupCommand =
+        new RemoveItemGroupCommand( this, activeGroup );
       undoStack.push( groupCommand );
       e->setAccepted(true);
     } else if ( this->selectedItems().size() == 1 &&
@@ -929,7 +929,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     //---------------------------------
     case HYPERTRANS: {
       if ( activeHyperTransCommand == NULL ) {
-        activeHyperTransCommand = new AddHyperTransCommand( this );
+        activeHyperTransCommand = new NewHyperTransCommand( this );
         activeHyperTransCommand->handleMouseReleaseEvent(e);
       } else {
         activeHyperTransCommand->handleMouseReleaseEvent(e);
@@ -1012,8 +1012,8 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
     if (bLastCommand) {
       undoStack.undo();
     } else if (activeGroup ) {
-      DeleteItemGroupCommand * groupCommand =
-        new DeleteItemGroupCommand( this, activeGroup );
+      RemoveItemGroupCommand * groupCommand =
+        new RemoveItemGroupCommand( this, activeGroup );
       undoStack.push( groupCommand );
     }
   }
@@ -1513,8 +1513,8 @@ void Scene::setPlaceModeSlot(FSMDesigner::Item mode) {
   if (bLastCommand) {
     undoStack.undo();
   } else if (activeGroup) {
-    DeleteItemGroupCommand * groupCommand =
-      new DeleteItemGroupCommand( this, activeGroup );
+    RemoveItemGroupCommand * groupCommand =
+      new RemoveItemGroupCommand( this, activeGroup );
     undoStack.push( groupCommand );
   }
   this->setPlaceMode( mode );

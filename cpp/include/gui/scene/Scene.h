@@ -36,7 +36,7 @@ class VerificatorRule;
 
 class StateItem;
 class NewTransCommand;
-class AddHyperTransCommand;
+class NewHyperTransCommand;
 
 class Scene: public QGraphicsScene, public VerificationListener {
 
@@ -54,7 +54,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
     bool    selectionChanged;
     QPointF oldPos; // Remember old position in order to move itemGroups.
     NewTransCommand * activeTransCommand;
-    AddHyperTransCommand * activeHyperTransCommand;
+    NewHyperTransCommand * activeHyperTransCommand;
 
     void moveItem(); // Move the selected item.
     void moveItem(QGraphicsItem * item);

@@ -1,10 +1,10 @@
 /**
- * \file AddHyperTransCommand.h
+ * \file NewHyperTransCommand.h
  *
  */
 
-#ifndef __ADDHYPERTRANSCOMMAND_H__
-#define __ADDHYPERTRANSCOMMAND_H__
+#ifndef __NEWHYPERTRANSCOMMAND_H__
+#define __NEWHYPERTRANSCOMMAND_H__
 
 // Includes
 //--------------------
@@ -25,7 +25,7 @@
 //-- Core
 #include "core/Fsm.h"
 
-class AddHyperTransCommand : public QUndoCommand {
+class NewHyperTransCommand : public QUndoCommand {
   private:
     // Related objects
     Scene * relatedScene;
@@ -40,10 +40,10 @@ class AddHyperTransCommand : public QUndoCommand {
     QGraphicsItem * getIntersectingItem(QGraphicsSceneMouseEvent * e) const;
 
   public:
-    AddHyperTransCommand( Scene     * _relatedScene,
+    NewHyperTransCommand( Scene     * _relatedScene,
                      QUndoCommand   * _parentCommand = NULL);
 
-    virtual ~AddHyperTransCommand();
+    virtual ~NewHyperTransCommand();
 
     virtual void    redo();
     virtual void    undo();
@@ -56,4 +56,4 @@ class AddHyperTransCommand : public QUndoCommand {
 
 };
 
-#endif // __ADDHYPERTRANSCOMMAND_H__
+#endif // __NEWHYPERTRANSCOMMAND_H__

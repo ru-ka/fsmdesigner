@@ -1,10 +1,10 @@
 /**
- * \file DeleteItemGroupCommand.h
+ * \file RemoveItemGroupCommand.h
  *
  */
 
-#ifndef __DELETEITEMGROUPCOMMAND_H__
-#define __DELETEITEMGROUPCOMMAND_H__
+#ifndef __REMOVEITEMGROUPCOMMAND_H__
+#define __REMOVEITEMGROUPCOMMAND_H__
 
 // Includes
 //--------------------
@@ -19,7 +19,7 @@
 /**
  * \brief Delete an itemGroup with this command.
  */
-class DeleteItemGroupCommand : public QUndoCommand {
+class RemoveItemGroupCommand : public QUndoCommand {
   private:
     // Related objects
     Scene               *   relatedScene ;
@@ -33,14 +33,14 @@ class DeleteItemGroupCommand : public QUndoCommand {
     /**
      * Constructor.
      */
-    DeleteItemGroupCommand( Scene         * _relatedScene,
+    RemoveItemGroupCommand( Scene         * _relatedScene,
                             QGraphicsItemGroup * _itemGroup,
                             QUndoCommand  * _parentCommand = NULL);
 
     /**
      * Default Destructor
      */
-    virtual ~DeleteItemGroupCommand();
+    virtual ~RemoveItemGroupCommand();
 
     /** \defgroup UndoRedo Undo Redo Methods to be implemented */
     /** @{ */
@@ -50,4 +50,4 @@ class DeleteItemGroupCommand : public QUndoCommand {
     /** @} */
 };
 
-#endif /* __DELETEITEMGROUPCOMMAND_H__ */
+#endif /* __REMOVEITEMGROUPCOMMAND_H__ */
