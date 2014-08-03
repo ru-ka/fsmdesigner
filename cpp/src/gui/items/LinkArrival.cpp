@@ -210,9 +210,11 @@ QVariant LinkArrival::itemChange(GraphicsItemChange change,
 	} else if (change == QGraphicsItem::ItemSceneHasChanged && this->scene()==NULL) {
 
 		//-- Removed from scene, propagate to Transline
+    /*
 		if (this->getNextTransline()!=NULL) {
 			SGC::getInstance()->requestDelete(this->getNextTransline());
 		}
+    */
 
 	}
 

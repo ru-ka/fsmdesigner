@@ -44,10 +44,8 @@ NewLinkCommand::~NewLinkCommand() {
 
 
 void  NewLinkCommand::redo(){
-  relatedScene->addItem( startItem  );
   relatedScene->addItem( startTrans );
   relatedScene->addItem( linkDepart );
-  relatedScene->addItem( endItem    );
   relatedScene->addItem( endTrans   );
   relatedScene->addItem( linkArrival);
   this->fsm->addLink( link );
@@ -58,10 +56,8 @@ void  NewLinkCommand::redo(){
 
 
 void  NewLinkCommand::undo(){
-  relatedScene->removeItem( startItem  );
   relatedScene->removeItem( startTrans );
   relatedScene->removeItem( linkDepart );
-  relatedScene->removeItem( endItem    );
   relatedScene->removeItem( endTrans   );
   relatedScene->removeItem( linkArrival);
   this->fsm->deleteLink( link );
@@ -134,8 +130,9 @@ bool NewLinkCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
       linkDepart = new LinkDeparture( trackPoint, startItem );
       linkDepart->setPos( e->scenePos() );
       relatedScene->addItem( linkDepart );
-      startTrans = new Transline( transModel, endItem, linkDepart );
+      startTrans = new Transline( transModel, startItem, linkDepart );
       linkDepart->setPreviousTransline( startTrans );
+      relatedScene->addItem( startTrans );
       return true;
     } else {
       return false;
@@ -145,9 +142,10 @@ bool NewLinkCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
   else if ( !linkArrival ) {
     qDebug() << " Placing linkArrival.";
     linkArrival = new LinkArrival ( link, endItem );
-    endTrans    = new Transline   ( transModel, linkArrival, startItem );
+    endTrans    = new Transline   ( transModel, linkArrival, endItem );
     linkArrival->setNextTransline( endTrans );
     relatedScene->addItem( linkArrival );
+    relatedScene->addItem( endTrans );
   }
   // 4th case, place linkArrival.
   else if ( linkArrival && !finished ) {

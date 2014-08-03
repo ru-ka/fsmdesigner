@@ -227,6 +227,8 @@ QVariant LinkDeparture::itemChange(GraphicsItemChange change,
 
 		//-- Need a start item
 		if (this->startItem!=NULL && FSMGraphicsItem<>::isStateItem(this->startItem)) {
+      qDebug() << "this->startItem = "
+        << this->startItem;
 
 
 			// Tooltip (if we have a model)
