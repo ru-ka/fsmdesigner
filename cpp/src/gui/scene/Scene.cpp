@@ -113,7 +113,7 @@ void Scene::initializeScene() {
   //------------------------------
 
   //-- Created items map (id<->object), and Join map
-  map<unsigned int, StateItem*> itemsMap;
+  map<unsigned int, StateItem*> statesMap;
   map<unsigned int, JoinItem* > joinsMap;
 
   // Place Joins
@@ -122,38 +122,7 @@ void Scene::initializeScene() {
     //-- Prepare Item
     JoinItem * joinItem = new JoinItem((*it).second);
     joinsMap[(*it).first] = joinItem;
-
-    //-- Use Undo to place on the scene
-    // TODO: get rid of the the DeleteJoinAction;
-    DeleteJoinAction * undoJoin = new DeleteJoinAction(joinItem, NULL);
-
-    // TODO: place transitions.
-    /*
-    //-- If target state is defined, set transition and trackpoints to it
-    //----------------------------
-    if (joinItem->getModel()->getTargetState()!=NULL) {
-
-      //-- Target State
-      State * endState = joinItem->getModel()->getTargetState();
-      StateItem * endStateItem = itemsMap[endState->getId()];
-      if (endStateItem == NULL) {
-        endStateItem = new StateItem(endState);
-        itemsMap[endState->getId()] = endStateItem;
-        this->addItem(endStateItem);
-      }
-
-      //-- Use Undo to place on the scene
-      //undoJoin->setEndItem(endStateItem);
-
-    } else {
-        qDebug() << "No target state onto join";
-    }
-    */
-
-    //-- place
-    undoJoin->setRelatedScene(this);
-    undoJoin->undo();
-
+    this->addItem( joinItem );
   END_FOREACH_JOIN
 
   // Loop over states until no more
@@ -168,10 +137,10 @@ void Scene::initializeScene() {
     }
 
     //-- Create a GUI state if necessary
-    StateItem * stateItem = itemsMap.find(currentState->getId())!=itemsMap.end() ? itemsMap[currentState->getId()] : NULL;
+    StateItem * stateItem = statesMap.find(currentState->getId())!=statesMap.end() ? statesMap[currentState->getId()] : NULL;
     if (stateItem == NULL) {
       stateItem = new StateItem(currentState);
-      itemsMap[currentState->getId()] = stateItem;
+      statesMap[currentState->getId()] = stateItem;
       this->addItem(stateItem);
     }
 
@@ -196,10 +165,10 @@ void Scene::initializeScene() {
       State * endState = transition->getEndState();
 
       //-- Find/create end Gui item
-      StateItem * endStateItem = itemsMap.find(endState->getId())!=itemsMap.end() ? itemsMap[endState->getId()] : NULL;
+      StateItem * endStateItem = statesMap.find(endState->getId())!=statesMap.end() ? statesMap[endState->getId()] : NULL;
       if (endStateItem == NULL) {
         endStateItem = new StateItem(endState);
-        itemsMap[endState->getId()] = endStateItem;
+        statesMap[endState->getId()] = endStateItem;
         this->addItem(endStateItem);
       }
 
@@ -219,6 +188,83 @@ void Scene::initializeScene() {
 
   END_FOREACH_STATE
   //-- END LOOP OVER STATES
+  //
+  FOREACH_JOIN(this->fsm)
+    //-- Prepare Item
+    Q_ASSERT( joinsMap.find( (*it).first ) != joinsMap.end() );
+    JoinItem * startItem = joinsMap[(*it).first];
+    auto endStateId = join->getTargetState()->getId();
+    Q_ASSERT( statesMap.find( endStateId ) != statesMap.end() );
+    QGraphicsItem * endItem   = statesMap[ endStateId ];
+    auto trackpoints = join->getTrackpoints();
+    if ( trackpoints.size() == 0 ) {
+      Transline * currentTransItem = new Transline( NULL, startItem, endItem );
+      this->addItem( currentTransItem );
+    } else {
+      // ------------------------------
+      // CASE 1 : endItem == trackpoint
+      // ------------------------------
+      if ( !trackpoints.back()->isJoin() ) {
+        QList<Transline      *> transList;
+        Transline * currentTransItem = NULL;
+        currentTransItem = new Transline( NULL, startItem, NULL );
+        transList.append( currentTransItem );
+        QList<TrackpointItem *> trackList;
+        for ( auto currentPoint : trackpoints ) {
+          TrackpointItem * item = new TrackpointItem( currentPoint );
+          trackList.append( item );
+          item->setPreviousTransline( currentTransItem );
+          // 2) Update current TransItem and create additional TranslineItems.
+          currentTransItem->setEndItem( item );
+          currentTransItem = new Transline( NULL, item, NULL );
+          transList.append( currentTransItem );
+          item->setNextTransline( currentTransItem );
+        }
+        currentTransItem->setEndItem( endItem );
+        // 4) Add items to scene.
+        for ( auto item : trackList ) {
+          this->addItem( item );
+        }
+        for ( auto item : transList ) {
+          this->addItem( item );
+        }
+      }
+      // ------------------------------
+      // CASE 2 : endItem == join
+      // ------------------------------
+      else {
+        Q_ASSERT( trackpoints.back()->isJoin() );
+        auto endJoinId = trackpoints.back()->getJoin()->getId();
+        Q_ASSERT( joinsMap.find( endJoinId ) != joinsMap.end() );
+        endItem = joinsMap[endJoinId];
+        QList<Transline      *> transList;
+        Transline * currentTransItem = NULL;
+        currentTransItem = new Transline( NULL, startItem, NULL );
+        transList.append( currentTransItem );
+        QList<TrackpointItem *> trackList;
+        for ( auto currentPoint : trackpoints ) {
+          if ( !currentPoint->isJoin() ) {
+            TrackpointItem * item = new TrackpointItem( currentPoint );
+            trackList.append( item );
+            item->setPreviousTransline( currentTransItem );
+            // 2) Update current TransItem and create additional TranslineItems.
+            currentTransItem->setEndItem( item );
+            currentTransItem = new Transline( NULL, item, NULL );
+            transList.append( currentTransItem );
+            item->setNextTransline( currentTransItem );
+          }
+        }
+        currentTransItem->setEndItem( endItem );
+        // 4) Add items to scene.
+        for ( auto item : trackList ) {
+          this->addItem( item );
+        }
+        for ( auto item : transList ) {
+          this->addItem( item );
+        }
+      }
+    }
+  END_FOREACH_JOIN
 
   // TODO: Implement a function? or a command? for this task?
   // Iterate over the transitions and create the required gui-items.
@@ -241,11 +287,11 @@ void Scene::initializeScene() {
     // seperatly.
     // TODO: Redesign the data structure or live with its negative impacts!
     auto startStateId = trans.second->getStartState()->getId();
-    Q_ASSERT( itemsMap.find(startStateId) != itemsMap.end() );
-    QGraphicsItem * startItem = itemsMap[startStateId];
+    Q_ASSERT( statesMap.find(startStateId) != statesMap.end() );
+    QGraphicsItem * startItem = statesMap[startStateId];
     auto endStateId   = trans.second->getEndState()->getId();
-    Q_ASSERT ( itemsMap.find(endStateId) != itemsMap.end() );
-    QGraphicsItem * endItem = itemsMap[endStateId];
+    Q_ASSERT ( statesMap.find(endStateId) != statesMap.end() );
+    QGraphicsItem * endItem = statesMap[endStateId];
 
     // Get the start/end items.
     auto trackpoints  = trans.second->getTrackpoints();
@@ -402,7 +448,7 @@ void Scene::initializeScene() {
           item->setNextTransline( currentTransItem );
         }
         // Adjust enditem in the local scope.
-        QGraphicsItem * enditem = NULL;
+        QGraphicsItem * endItem = NULL;
         if ( trackpoints.back()->isJoin() )
           endItem = joinsMap[trackpoints.back()->getJoin()->getId()];
         else {
@@ -431,32 +477,106 @@ void Scene::initializeScene() {
       
 
 
-
-
-      // ----------------------------------------
-      // CASE 3: JOIN or LINK to STATE transition
-      // ----------------------------------------
-      else if ( ( trackpoints.front()->isJoin() || trackpoints.front()->isLink() )
+      // --------------------------------
+      // CASE 3: JOIN to STATE transition
+      // --------------------------------
+      else if ( trackpoints.front()->isJoin()
           && !trackpoints.back()->isJoin() && !trackpoints.back()->isLink() ) {
         qDebug() << "join or link to state transition";
+        QList<Transline      *> transList;
+        Transline * currentTransItem = NULL;
+        QList<TrackpointItem *> trackList;
+        for ( auto currentPoint : trackpoints ) {
+          if ( currentPoint->isJoin() ) {
+            auto joinId = currentPoint->getJoin()->getId();
+            Q_ASSERT( joinsMap.find( joinId ) != joinsMap.end() );
+            startItem = joinsMap[joinId];
+            currentTransItem = new Transline( trans.second, startItem, NULL );
+            transList.append( currentTransItem );
+          } else {
+            TrackpointItem * item = new TrackpointItem( currentPoint );
+            trackList.append( item );
+            item->setPreviousTransline( currentTransItem );
+            // 2) Update current TransItem and create additional TranslineItems.
+            currentTransItem->setEndItem( item );
+            currentTransItem = new Transline( trans.second, item, NULL );
+            transList.append( currentTransItem );
+            item->setNextTransline( currentTransItem );
+          }
+        }
+        currentTransItem->setEndItem( endItem );
+        // 3) Create transition text.
+        TranslineText * text = new TranslineText( trans.second->getName().c_str(), trans.second );
+        text->setPos( trans.second->getTextPosition().first,
+                      trans.second->getTextPosition().second );
+        // 4) Add items to scene.
+        this->addItem( text );
+        for ( auto item : trackList ) {
+          this->addItem( item );
+        }
+        for ( auto item : transList ) {
+          this->addItem( item );
+        }
       }
-      // --------------------------------------------
-      // END CASE 3: JOIN or LINK to STATE transition
-      // --------------------------------------------
+      // ------------------------------------
+      // END CASE 3: JOIN to STATE transition
+      // ------------------------------------
 
 
 
-      // -----------------------------------------------
-      // CASE 4: JOIN or LINK to JOIN or LINK transition
-      // -----------------------------------------------
-      else if ( ( trackpoints.front()->isJoin() || trackpoints.front()->isLink() )
-         && ( trackpoints.back()->isJoin() || trackpoints.back()->isLink() ) ) {
+      // -------------------------------
+      // CASE 4: JOIN to JOIN transition
+      // -------------------------------
+      else if ( trackpoints.front()->isJoin() && trackpoints.back()->isJoin() ) {
         qDebug() << "join or link to join or link transition";
+        auto joinStartID = trackpoints.front()->getJoin()->getId();
+        auto joinEndId   = trackpoints.back() ->getJoin()->getId();
+        Q_ASSERT( joinsMap.find( joinStartID ) != joinsMap.end() );
+        Q_ASSERT( joinsMap.find( joinEndId   ) != joinsMap.end() );
+        startItem = joinsMap[ joinStartID ];
+        endItem   = joinsMap[ joinEndId   ];
+
+        Transline * currentTransItem = NULL;
+        currentTransItem = new Transline( trans.second, startItem, NULL );
+
+        QList<Transline      *> transList;
+        transList.append( currentTransItem );
+        QList<TrackpointItem *> trackList;
+        for ( auto currentPoint : trackpoints ) {
+          if ( !currentPoint->isJoin() ) {
+            TrackpointItem * item = new TrackpointItem( currentPoint );
+            trackList.append( item );
+            item->setPreviousTransline( currentTransItem );
+            // TODO: is it important to set start/end items of trackpoints?
+            // 2) Update current TransItem and create additional TranslineItems.
+            currentTransItem->setEndItem( item );
+            currentTransItem = new Transline( trans.second, item, NULL );
+            transList.append( currentTransItem );
+            item->setNextTransline( currentTransItem );
+          }
+        }
+        currentTransItem->setEndItem( endItem );
+        // 3) Create transition text.
+        //TranslineText * text = new TranslineText( trans.second->getName().c_str(), trans.second );
+        //text->setPos( trans.second->getTextPosition().first,
+        //              trans.second->getTextPosition().second );
+        // 4) Add items to scene.
+        //this->addItem( text );
+        for ( auto item : trackList ) {
+          this->addItem( item );
+        }
+        for ( auto item : transList ) {
+          this->addItem( item );
+        }
       }
-      // ---------------------------------------------------
-      // END CASE 4: JOIN or LINK to JOIN or LINK transition
-      // ---------------------------------------------------
+      // -------------------------------------------
+      // END CASE 4: JOIN or LINK to JOIN transition
+      // -------------------------------------------
       //
+      else {
+        qDebug() << "Not implemented yet. Most likely invalid state.";
+        Q_ASSERT( false );
+      }
     }
   }
   // End Transitions.
@@ -466,7 +586,7 @@ void Scene::initializeScene() {
   FOREACH_LINKS(currentFSM)
 
         //-- Use Undo Class to place
-        LinkArrival * linkArrival = new LinkArrival(link,itemsMap[link->getTargetState()->getId()]);
+        LinkArrival * linkArrival = new LinkArrival(link,statesMap[link->getTargetState()->getId()]);
         DeleteLinkArrivalAction * undoLinkArrival = new DeleteLinkArrivalAction(linkArrival);
         undoLinkArrival->setRelatedScene(this);
         undoLinkArrival->undo();
