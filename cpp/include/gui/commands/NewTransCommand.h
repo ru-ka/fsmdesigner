@@ -26,6 +26,7 @@
 
 //-- Core
 #include "core/Fsm.h"
+#include "core/Join.h"
 
 class NewTransCommand : public QUndoCommand {
   private:

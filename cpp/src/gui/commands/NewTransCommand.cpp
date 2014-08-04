@@ -94,9 +94,6 @@ QGraphicsItem * NewTransCommand::getIntersectingItem(QGraphicsSceneMouseEvent * 
 
 
 bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
-  // TODO: is the case JOIN to JOIN legal?
-  // In the old FSMDesigner, this case is not described, but could occur.
-  
   // return false, if command is already ready.
   if ( commandReady() ) {
     return false;
@@ -107,8 +104,7 @@ bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
   if ( startItem == NULL ) {
     if ( getIntersectingItem(e) == NULL )
       return false;
-    if ( getIntersectingItem(e)->type() == StateItem::Type ||
-         getIntersectingItem(e)->type() == JoinItem::Type ) {
+    if ( getIntersectingItem(e)->type() == StateItem::Type ) {
       startItem = getIntersectingItem(e);
       Transline * transition = new Transline( NULL, startItem, NULL );
       transition->setEndPoint( e->scenePos() );
@@ -159,7 +155,6 @@ bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
     if ( !trackList.empty() )
       trackList.last()->setEndItem( endItem );
     transList.last()->setEndItem( endItem );
-    // stateToState
     if ( startItem->type() == StateItem::Type ) {
       trans = fsm->addTrans(
           dynamic_cast<StateItem*>( startItem )->getModel(),
@@ -167,11 +162,6 @@ bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
       this->addTrackPointsToTransModel( );
       this->addModelToTranslines( );
       this->createText( );
-    }
-    // joinToState
-    else if ( startItem->type() == JoinItem::Type ) {
-      // TODO: implement
-      Q_ASSERT( false );
     }
   }
   // 4th case, a start item is set, any number of trackpoints are added
@@ -182,23 +172,22 @@ bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
     if ( !trackList.empty() )
       trackList.last()->setEndItem( endItem );
     transList.last()->setEndItem( endItem );
-    // stateToJoin
+    State * targetState = dynamic_cast<JoinItem *>(endItem)->getModel()->getTargetState();
     if ( startItem->type() == StateItem::Type ) {
-      //this->createText( transition );
-      // TODO: implement
-      Q_ASSERT( false );
+      trans = fsm->addTrans(
+          dynamic_cast<StateItem*>( startItem )->getModel(), targetState );
+      this->addTrackPointsToTransModel( );
+      Trackpoint * joinPoint = new Trackpoint(0,0);
+      joinPoint->setJoin( dynamic_cast<JoinItem *>(endItem)->getModel() );
+      trans->appendTrackpoint( joinPoint );
+      this->addModelToTranslines( );
+      this->createText( );
     }
-    // joinToJoin
-    else if ( startItem->type() == JoinItem::Type ) {
-      // TODO: implement
-      Q_ASSERT( false );
-    }
-    // TODO: implement
-    Q_ASSERT( false );
+
   } else {
     return false;
   }
-  return true;
+  return false;
 }
 
 

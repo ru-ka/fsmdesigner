@@ -68,7 +68,7 @@ void  NewLinkCommand::undo(){
   relatedScene->removeItem( endTrans   );
   relatedScene->removeItem( linkArrival);
   this->fsm->deleteLink( link );
-  //this->fsm->deleteTrans( transModel );
+  this->fsm->deleteTrans( transModel );
 
   relatedScene->update();
   relatedScene->bLastCommand = this->bLastCommand;
