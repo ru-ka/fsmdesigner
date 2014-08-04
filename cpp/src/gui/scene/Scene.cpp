@@ -1043,108 +1043,18 @@ void Scene::setFsm(Fsm * fsm) {
   this->fsm = fsm;
 }
 
-#define CLEAN_POINTER_QLIST(list)\
-    while (!list.isEmpty()) \
-       delete list.takeFirst();
-
 void Scene::setPlaceMode(FSMDesigner::Item mode) {
-  qDebug() << "-----------------";
-  qDebug() << "setPlaceMode";
-  qDebug() << "-----------------";
 
-  // -- Quick hack.
-  // -- TODO: develop a fool proof approach
-  if (activeTransCommand != NULL) {
-    undoStack.push(activeTransCommand);
-    activeTransCommand = NULL;
-  }
-  // END - quick hack.
-
-
-  //-- If back to choose requested, then perform cleaning and such
-  //-------------------------------------
-  if (mode==FSMDesigner::CHOOSE) {
-
-    //-- Restore any cursor change
-//    QApplication::restoreOverrideCursor();
-
-    //-- Clear selected elements
-    this->clearSelection();
-
-
-
-    // Clean to place stack
-    //-----------------------------------
-
-    //-- Clean things to be placed as they will never come up
-    while (!this->toPlaceStack.isEmpty()) {
-
-      QGraphicsItem* firstItem = this->toPlaceStack.takeFirst();
-      //-- Transline that belong to a trackpoint are removed by trackpoint
-      if (FSMGraphicsItem<>::isTransline(firstItem) &&
-        FSMGraphicsItem<>::isTrackPoint(FSMGraphicsItem<>::toTransline(firstItem)->getStartItem())) {
-
-      } else
-        delete firstItem;
-    }
-    //CLEAN_POINTER_QLIST(this->toPlaceStack)
-
-    // Clean Transition place stack
-    //---------------------------------------
-
-    //-- Clear Trackpoints that were in placement
-    while (!this->placeTransitionStack.isEmpty()) {
-
-      QGraphicsItem* firstItem = this->placeTransitionStack.takeFirst();
-      //-- Transline that belong to a trackpoint are removed by trackpoint
-      if (FSMGraphicsItem<>::isTrackPoint(firstItem)) {
-        this->removeItem(firstItem);
-        //delete firstItem;
-      }
-    }
-    if ( activeTransCommand != NULL ) {
-      delete activeTransCommand;
-      activeTransCommand = NULL;
-    }
-
-    // Reset variables
-    //---------------------
-    this->placeLinkStartState = NULL;
-    this->placeLinkEndState = NULL;
-  }
-
-
-  //-- If In Lock mode, don't change back to choose and repeat
   if (this->getPlaceModeLock() != FSMDesigner::LOCKED ) {
     //-- Record
     this->placeMode = mode;
-    emit modeChanged(); 
+  }
+  if ( getPlaceMode() == LINKDEPARTURE ) {
+    if ( !activeJoinCommand )
+      activeLinkCommand = new NewLinkCommand(this);
   }
 
-  //-- Make some preparation
-  switch (this->placeMode) {
-
-    case LINKDEPARTURE: {
-        //-- Change cursor
-//        QApplication::setOverrideCursor(Qt::CrossCursor);
-
-        //-- Highligh all the states that don't already have a link
-        this->clearSelection();
-        QList<QGraphicsItem*> items = this->items();
-        for (QList<QGraphicsItem*>::iterator it = items.begin(); it
-                < items.end(); it++) {
-
-            if ((*it)->type() == StateItem::Type) {
-                (*it)->setSelected(true);
-            }
-
-        }
-
-        break;
-    }
-    default:
-      break;
-  }
+  emit modeChanged(); 
 }
 
 LinkArrival * Scene::placeLinkToState(StateItem * endState, Link * link) {

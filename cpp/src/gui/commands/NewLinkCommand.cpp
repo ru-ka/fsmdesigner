@@ -20,6 +20,7 @@ NewLinkCommand::NewLinkCommand( Scene * _relatedScene,
                                   link      ( NULL ),
                                   finished  ( false)
 {
+  QApplication::setOverrideCursor(Qt::CrossCursor);
 }
 
 
@@ -40,15 +41,20 @@ NewLinkCommand::~NewLinkCommand() {
     delete endTrans;
   if ( linkArrival )
     delete linkArrival;
+  // Restore the cursor, if the command gets canceled prematurely.
+  if ( !linkDepart )
+    QApplication::restoreOverrideCursor();
 }
 
 
 void  NewLinkCommand::redo(){
+  qDebug() << "NewLinkCommand: redo()";
+  this->fsm->addTrans( transModel );
+  this->fsm->addLink( link );
   relatedScene->addItem( startTrans );
   relatedScene->addItem( linkDepart );
   relatedScene->addItem( endTrans   );
   relatedScene->addItem( linkArrival);
-  this->fsm->addLink( link );
 
   relatedScene->update();
   relatedScene->bLastCommand = false;
@@ -56,11 +62,13 @@ void  NewLinkCommand::redo(){
 
 
 void  NewLinkCommand::undo(){
+  qDebug() << "NewLinkCommand: undo()";
   relatedScene->removeItem( startTrans );
   relatedScene->removeItem( linkDepart );
   relatedScene->removeItem( endTrans   );
   relatedScene->removeItem( linkArrival);
   this->fsm->deleteLink( link );
+  //this->fsm->deleteTrans( transModel );
 
   relatedScene->update();
   relatedScene->bLastCommand = this->bLastCommand;
@@ -126,13 +134,14 @@ bool NewLinkCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
       trackPoint = transModel->appendTrackpoint( e->scenePos().x(),
                                                  e->scenePos().y() );
       trackPoint->setTargetLink( link );
-    qDebug() << " Placing linkDepart.";
+      qDebug() << " Placing linkDepart.";
       linkDepart = new LinkDeparture( trackPoint, startItem );
       linkDepart->setPos( e->scenePos() );
       relatedScene->addItem( linkDepart );
       startTrans = new Transline( transModel, startItem, linkDepart );
       linkDepart->setPreviousTransline( startTrans );
       relatedScene->addItem( startTrans );
+      QApplication::restoreOverrideCursor();
       return true;
     } else {
       return false;
@@ -142,7 +151,7 @@ bool NewLinkCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
   else if ( !linkArrival ) {
     qDebug() << " Placing linkArrival.";
     linkArrival = new LinkArrival ( link, endItem );
-    endTrans    = new Transline   ( transModel, linkArrival, endItem );
+    endTrans    = new Transline   ( NULL, linkArrival, endItem );
     linkArrival->setNextTransline( endTrans );
     relatedScene->addItem( linkArrival );
     relatedScene->addItem( endTrans );
