@@ -655,6 +655,8 @@ Trans * Fsm::deleteTrans(unsigned int id) {
 }
 
 Trans * Fsm::deleteTrans(Trans * trans) {
+  if ( !trans )
+    return NULL;
 
     //-- Verify ID is set and allright
     if (!trans->isIdSet())
@@ -770,6 +772,8 @@ Link * Fsm::addLink(Link * link) {
 }
 
 Link * Fsm::deleteLink(Link * link) {
+  if ( !link )
+    return NULL;
 
     //-- Check exists
     if (!link->isIdSet()) {

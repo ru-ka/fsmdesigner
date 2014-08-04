@@ -365,6 +365,8 @@ QVariant StateItem::itemChange(GraphicsItemChange change,
 }
 
 void    StateItem::focusOutEvent ( QFocusEvent * event ) {
+  if ( !this->stateText )
+    return;
 
   QGraphicsItemGroup::focusOutEvent(event);
 

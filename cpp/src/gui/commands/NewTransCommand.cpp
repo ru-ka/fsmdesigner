@@ -9,7 +9,8 @@ NewTransCommand::NewTransCommand( Scene * _relatedScene,
                                   bLastCommand( _relatedScene->bLastCommand ),
                                   text      ( NULL ),
                                   startItem ( NULL ),
-                                  endItem   ( NULL )
+                                  endItem   ( NULL ),
+                                  trans     ( NULL )
 {
 }
 

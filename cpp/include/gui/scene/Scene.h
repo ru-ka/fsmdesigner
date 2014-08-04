@@ -60,6 +60,8 @@ class Scene: public QGraphicsScene, public VerificationListener {
     NewJoinCommand       * activeJoinCommand;
     NewLinkCommand       * activeLinkCommand;
 
+    void clearCommands();
+
     void moveItem(); // Move the selected item.
     void moveItem(QGraphicsItem * item);
 
@@ -82,7 +84,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
      *  - Trackpoint
      *  - State
      */
-    QList<QGraphicsItem*> placeTransitionStack;
+    //QList<QGraphicsItem*> placeTransitionStack;
 
     /**
      * Stack of elements that have to follow the mouse to be placed
@@ -91,12 +93,12 @@ class Scene: public QGraphicsScene, public VerificationListener {
      * On click it is placed and the next one is shown and sticks to mouse etc...
      *
      */
-    QList<QGraphicsItem*> toPlaceStack;
+    //QList<QGraphicsItem*> toPlaceStack;
 
     /**\defgroup Place link */
 
-    StateItem * placeLinkStartState;
-    StateItem * placeLinkEndState;
+    //StateItem * placeLinkStartState;
+    //StateItem * placeLinkEndState;
 
     /**@} */
 
@@ -105,7 +107,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
      * This method applies important rules, like setting elements to not visible
      * @param
      */
-    void addToToPlaceStack(QGraphicsItem *);
+    //void addToToPlaceStack(QGraphicsItem *);
 
     /**
      * Place the provided item under the mouse, centering it by using its dimensions
@@ -179,7 +181,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
 
   protected:
 
-    LinkArrival * placeLinkToState(StateItem * state, Link * link);
+    //LinkArrival * placeLinkToState(StateItem * state, Link * link);
 
     /**@}*/
 

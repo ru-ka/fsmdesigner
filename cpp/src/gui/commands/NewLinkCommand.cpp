@@ -25,8 +25,6 @@ NewLinkCommand::NewLinkCommand( Scene * _relatedScene,
 
 
 NewLinkCommand::~NewLinkCommand() {
-  if ( startItem )
-    delete startItem;
   if ( startTrans )
     delete startTrans;
   if ( transModel )
@@ -35,8 +33,6 @@ NewLinkCommand::~NewLinkCommand() {
     delete trackPoint;
   if ( linkDepart )
     delete linkDepart;
-  if ( endItem )
-    delete endItem;
   if ( endTrans )
     delete endTrans;
   if ( linkArrival )

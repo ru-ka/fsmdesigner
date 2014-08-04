@@ -89,11 +89,6 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
   this->placeMode = FSMDesigner::NONE;
   this->placeLock = FSMDesigner::UNLOCKED;
 
-  // Variables
-  //------------------
-  this->placeLinkEndState   = NULL;
-  this->placeLinkStartState = NULL;
-
   // Verification
   //---------------
   this->setFSMVerificator(new FSMVerificator(this));
@@ -640,6 +635,7 @@ void Scene::redo() {
     this->setPlaceMode(FSMDesigner::CHOOSE);
 }
 
+/*
 void Scene::addToToPlaceStack(QGraphicsItem * item) {
 
   //-- If the stack is not empty,
@@ -656,50 +652,12 @@ void Scene::addToToPlaceStack(QGraphicsItem * item) {
   //-- Add to stack
   this->toPlaceStack.push_front(item);
 }
+*/
 
 void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 
   QGraphicsScene::mousePressEvent(e);
 
-  //-- First element has to be placed, removed from stack and reenabled
-  if (this->toPlaceStack.size() > 0) {
-
-    qDebug() << "Mouse Press, releasing to be placed element:"
-        << e->scenePos();
-
-    //-- If the first is a transline, we don't really want to place it
-    //-- Invisible elements are not yet to be considered. They will be made visible after first movement
-    if (!this->toPlaceStack.first()->isVisible()) {
-
-    } else if (this->toPlaceStack.first()->type() == Transline::Type) {
-
-      QGraphicsItem * tr = this->toPlaceStack.takeFirst();
-
-      //this->toPlaceStack.first()->setVisible(false);
-
-      //-- only ensure the line is enabled
-      tr->setEnabled(true);
-
-
-      //-- If the transline does not lead to anywhere, and don't be long to a trackpoint delete
-      /*
-      if (FSMGraphicsItem<>::toTransline(tr)->getEndItem()==NULL &&
-          !FSMGraphicsItem<>::isTrackPoint(FSMGraphicsItem<>::toTransline(tr)->getStartItem() )) {
-        delete tr;
-      }
-      */
-    } else {
-
-      // Get and remove
-      QGraphicsItem * first = this->toPlaceStack.takeFirst();
-
-      // Reenable
-      first->setEnabled(true);
-
-      // Position
-      this->placeUnderMouse(first, e->scenePos());
-    }
-  }
 }
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
@@ -777,7 +735,6 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
       //-- END OF STATE -------//
     case TRANS:
       {
-        qDebug() << "placeTransitionStack.size() = " << placeTransitionStack.size();
         if ( activeTransCommand == NULL ) {
           activeTransCommand = new NewTransCommand( this );
           activeTransCommand->handleMouseReleaseEvent(e);
@@ -884,14 +841,6 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
 
   // Mouse following
   //---------------------------------
-
-  if (this->toPlaceStack.size() > 0) {
-
-    QGraphicsItem * stackFirst = this->toPlaceStack.first();
-    stackFirst->setVisible(true);
-    stackFirst->setEnabled(true);
-    this->placeUnderMouse(stackFirst, e->scenePos());
-  }
 
 
   QGraphicsScene::mouseMoveEvent(e);
@@ -1044,6 +993,8 @@ void Scene::setFsm(Fsm * fsm) {
 }
 
 void Scene::setPlaceMode(FSMDesigner::Item mode) {
+  // TODO: double check correctness.
+  clearCommands();
 
   if (this->getPlaceModeLock() != FSMDesigner::LOCKED ) {
     //-- Record
@@ -1057,6 +1008,7 @@ void Scene::setPlaceMode(FSMDesigner::Item mode) {
   emit modeChanged(); 
 }
 
+/*
 LinkArrival * Scene::placeLinkToState(StateItem * endState, Link * link) {
 
   // Find An eventual LinkArrival to this state, using the StateItem incoming transitions
@@ -1081,6 +1033,7 @@ LinkArrival * Scene::placeLinkToState(StateItem * endState, Link * link) {
 
   return linkArrival;
 }
+*/
 
 void Scene::alignSelectionVertical() {
 
@@ -1257,7 +1210,6 @@ StateItem * Scene::findStateItem(State * stateModel) {
 JoinItem * Scene::findJoinItem(Join * joinModel) {
 
     QList<QGraphicsItem*> allItems = this->items();
-    JoinItem * result;
 
     //-- Search for the transline
     for (QList<QGraphicsItem*>::iterator it = allItems.begin();it!=allItems.end();it++) {
@@ -1350,3 +1302,28 @@ void Scene::setPlaceModeSlot(FSMDesigner::Item mode) {
   }
   this->setPlaceMode( mode );
 }
+
+
+void Scene::clearCommands() {
+  if ( activeTransCommand ) {
+    activeTransCommand->undo();
+    delete activeTransCommand;
+    activeTransCommand = NULL;
+  }
+  if ( activeHyperTransCommand ) {
+    activeHyperTransCommand->undo();
+    delete activeHyperTransCommand;
+    activeHyperTransCommand = NULL;
+  }
+  if ( activeJoinCommand ) {
+    activeJoinCommand->undo();
+    delete activeJoinCommand;
+    activeJoinCommand = NULL;
+  }
+  if ( activeLinkCommand ) {
+    activeLinkCommand->undo();
+    delete activeLinkCommand;
+    activeLinkCommand = NULL;
+  }
+}
+
