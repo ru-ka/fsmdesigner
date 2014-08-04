@@ -191,7 +191,7 @@ void Transline::preparePath(bool propagate) {
 		//this->setLine(workLine);
   } else if ( this->endItem != NULL && 
     this->endItem->type() == LinkDeparture::Type ) {
-    lineToPaint.setLength( lineToPaint.length() - 12 );
+    lineToPaint.setLength( lineToPaint.length() - 26 );
 	} else if (this->endItem != NULL && this->endItem->type() == JoinItem::Type) {
     lineToPaint.setLength( lineToPaint.length() - 20 );
 

@@ -63,7 +63,7 @@ public:
 	virtual void preparePath();
 
 	/// Removing the link Item is the same as removing its or All transition we can find back (Through joins for example)
-	virtual QList<QUndoCommand*> remove(QUndoCommand * parentComand = NULL);
+//	virtual QList<QUndoCommand*> remove(QUndoCommand * parentComand = NULL);
 
 	/// @overload
     virtual void modelChanged();

@@ -134,7 +134,7 @@ void StateItem::verificationErrorAdded(FSMVerifyError * error)  {
   exclamation->setParentItem(this);
   exclamation->setZValue(1000);
 
-  exclamation->setTransform(QTransform::fromTranslate(-16, -16));
+  exclamation->setTransform(QTransform::fromTranslate(-41, -41));
   this->addToGroup(exclamation);
 
   //-- Register Item as verification mark

@@ -48,82 +48,44 @@ LinkDeparture::LinkDeparture(Trackpoint * model,QGraphicsItem * startItem) :
 	// Prepare Base shapte Painting path
 	//-----------------------------
 	qreal height=15;
-	qreal width=20;
-
-	/*
-	this->shapePath.moveTo(0,0);
-	this->shapePath.quadTo(width-width/8,0,width,height/2);
-	this->shapePath.quadTo(width-width/8,height,0,height);
-	this->shapePath.closeSubpath();
-	this->shapePath.translate(0,-height/2);*/
 
 	this->shapePath.moveTo(0,0);
-	this->shapePath.addEllipse(0,0,height,height);
+	this->shapePath.addEllipse(-height/2,-height/2,height,height);
 
 	this->setPath(this->shapePath);
 
 	// Infos from model
 	//-------------------------
 	if (this->getModel()!=NULL) {
+    qDebug() << "LinkDeparture: Model != NULL-> color should be set.";
+    //qDebug() << this->getModel()->getTargetLink()->getColor();
 
 
-	    //-- Color: Local one or link one ?
-        unsigned int targetColor = this->getModel()->getTargetLink() !=NULL ? this->getModel()->getTargetLink()->getColor() : this->getModel()->getColor();
+    //-- Color: Local one or link one ?
+      unsigned int targetColor = this->getModel()->getTargetLink() !=NULL ? this->getModel()->getTargetLink()->getColor() : this->getModel()->getColor();
 
-        // Take in predefined list
-        //this->getModel()->
-        //this->setBrush(QBrush(LinkArrival::getDefaultLinkColor(this->getModel()->lid)));
-        if (targetColor>0){
+      if (targetColor>0){
 
-            this->setBrush(QBrush(QColor::fromRgb(targetColor)));
+          this->setBrush(QBrush(QColor::fromRgb(targetColor)));
 
-        } else if(this->getModel()->getTargetLink() !=NULL) {
+      } else if(this->getModel()->getTargetLink() !=NULL) {
 
-            // Take in predefined list
-            this->setBrush(QBrush(LinkArrival::getDefaultLinkColor(this->getModel()->getTargetLink()->getId())));
-        }
+          // Take in predefined list
+          this->setBrush(QBrush(LinkArrival::getDefaultLinkColor(this->getModel()->getTargetLink()->getId())));
+      }
 
 
 	}
-
-
-
-
 }
 
-LinkDeparture::~LinkDeparture() {
 
+LinkDeparture::~LinkDeparture() {
 }
 
 
 void LinkDeparture::modelChanged() {
-
-    TrackpointItem::modelChanged();
-
-
-
-
+  TrackpointItem::modelChanged();
 }
-
-QList<QUndoCommand*> LinkDeparture::remove(QUndoCommand * parentComand) {
-
-	//-- Prepare Undo
-	QList<QUndoCommand*> undoCommands;
-
-
-	// Remove itself (relies on a full transition deletion)
-	DeleteLinkDepartureAction * deleteThis = new DeleteLinkDepartureAction(this,parentComand);
-	//UndoDeleteLinkConnection * undoDeleteThis = new UndoDeleteLinkConnection(this->getPreviousTransline(),this->getModel()->getTransition(),parentComand);
-	undoCommands.append(deleteThis);
-
-	//-- Find back all other transitions through joins
-	//------------------------
-
-
-	return undoCommands;
-
-}
-
 
 void LinkDeparture::preparePath() {
 
@@ -173,8 +135,6 @@ void LinkDeparture::setPreviousTransline(Transline * previousTransline) {
 	// Determine orientation using transition and previous element
 	//---------
 	this->preparePath();
-
-
 }
 
 void LinkDeparture::setEndItem(QGraphicsItem * item) {
@@ -188,17 +148,13 @@ void LinkDeparture::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	// Let parent paint
 	painter->setRenderHint(QPainter::Antialiasing);
 	QGraphicsPathItem::paint(painter,option,widget);
-
 }
 
 void LinkDeparture::mouseMoveEvent ( QGraphicsSceneMouseEvent * event ) {
-
-
 	// Delegate
 	TrackpointItem::mouseMoveEvent(event);
 
 	this->preparePath();
-
 }
 
 void LinkDeparture::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event ) {
@@ -212,9 +168,6 @@ void LinkDeparture::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event ) {
 		//scene()->update();
 		//((View*) this->scene()->views()[0])->redraw();
 	}
-
-
-
 }
 
 QVariant LinkDeparture::itemChange(GraphicsItemChange change,
@@ -223,15 +176,8 @@ QVariant LinkDeparture::itemChange(GraphicsItemChange change,
 	// Added to Scene
 	//---------------------
 	if (change == QGraphicsItem::ItemSceneHasChanged && this->scene()!=NULL) {
-
-
 		//-- Need a start item
 		if (this->startItem!=NULL && FSMGraphicsItem<>::isStateItem(this->startItem)) {
-      qDebug() << "this->startItem = "
-        << this->startItem;
-      qDebug() << "this->startItem->getModel() = " <<
-						FSMGraphicsItem<>::toStateItem(this->startItem)->getModel()->getName().c_str();
-
 
 			// Tooltip (if we have a model)
 			//-----------------------------
@@ -265,7 +211,5 @@ bool LinkDeparture::recordPosition() {
 
 	this->model->setPosition(make_pair(this->pos().x(),this->pos().y()));
 
-
 	return true;
-
 }

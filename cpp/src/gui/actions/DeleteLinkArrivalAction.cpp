@@ -52,7 +52,7 @@ DeleteLinkArrivalAction::DeleteLinkArrivalAction(LinkArrival * item,QUndoCommand
         LinkDeparture * departure = departures.takeFirst();
 
         // Delete
-        departure->remove(this);
+        //departure->remove(this);
 
     }
 

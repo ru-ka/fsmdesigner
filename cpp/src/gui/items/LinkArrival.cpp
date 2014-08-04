@@ -71,12 +71,9 @@ QColor& LinkArrival::getDefaultLinkColor(int index) {
 }
 
 LinkArrival::LinkArrival(Link * model,StateItem * targetState) :
-	QGraphicsPathItem() {
+	QGraphicsPathItem(), nextTransline( NULL ), targetState( targetState ) {
 
 	setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
-	this->nextTransline = NULL;
-	this->targetState = targetState;
-
 	// Prepare Painting path
 	//---------
 	qreal height = 15;
