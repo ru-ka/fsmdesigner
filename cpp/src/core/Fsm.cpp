@@ -230,6 +230,7 @@ void Fsm::setOutputName(unsigned int i, string name) {
 }
 
 void Fsm::deleteInput(int i) {
+  qDebug() << "Fsm::deleteInput(int i)";
 
 
     if (i < inputnames.size()) {
@@ -269,6 +270,7 @@ void Fsm::deleteInput(int i) {
 }
 
 void Fsm::deleteOutput(int i) {
+  qDebug() << "Fsm::deleteOutput(int i)";
 
     if (i < this->outputnames.size()) {
 
@@ -536,45 +538,50 @@ State* Fsm::addState() {
 }
 
 State * Fsm::addState(State * state) {
+  qDebug() << "addState(State * state)";
+  if ( !state )
+    return NULL;
 
-    //-- If already in the FSM, don't add
-    if (state->isIdSet() && this->statesMap.count(state->getId())>0)
-        return state;
+  //-- If already in the FSM, don't add
+  if (state->isIdSet() && this->statesMap.count(state->getId())>0)
+      return state;
+
+  //-- Register to ID manager
+  this->idManager.assignID(state);
 
 
-    //-- Register to ID manager
-   this->idManager.assignID(state);
+  //-- Should be reset state ?
+  bool isReset = false;
+  if (this->statesMap.size() == 0)
+      isReset = true;
+  state->setReset(isReset);
+  if (isReset)
+      this->setResetState(state->getId());
 
+  //-- Add
+  this->statesMap[state->getId()] = state;
 
-    //-- Should be reset state ?
-    bool isReset = false;
-    if (this->statesMap.size() == 0)
-        isReset = true;
-    state->setReset(isReset);
-    if (isReset)
-        this->setResetState(state->getId());
-
-    //-- Add
-    this->statesMap[state->getId()] = state;
-
-    return state;
+  return state;
 }
 
 void Fsm::deleteState(State * state) {
+  qDebug() << "deleteState(State * state)";
+  if ( !state )
+    return; 
 
-    //-- Verify state is present in this FSM
-    if (this->statesMap.count(state->getId()) == 0) {
-        stringstream message;
-        message << "Trying to delete state with id " << state->getId()
-                << "not possible because state does not belong to FSM";
-        throw new invalid_argument(message.str());
-    }
+  //-- Verify state is present in this FSM
+  if (this->statesMap.count(state->getId()) == 0) {
+      stringstream message;
+      message << "Trying to delete state with id " << state->getId()
+              << "not possible because state does not belong to FSM";
+      throw new invalid_argument(message.str());
+  }
 
-    //-- Remove
-    this->statesMap.erase(state->getId());
+  //-- Remove
+  this->statesMap.erase(state->getId());
 
-    //-- Deassign from ID manager
-    this->idManager.derefenceObject(state);
+  //-- Deassign from ID manager
+  this->idManager.derefenceObject(state);
 
 }
 
@@ -582,6 +589,7 @@ void Fsm::deleteState(State * state) {
 
 
 Trans * Fsm::addTrans(unsigned int startId, unsigned int endId) {
+  qDebug() << "Fsm::addTrans(unsigned int startId, unsigned int endId";
 
     // Get Start State
     //--------------------
@@ -604,36 +612,40 @@ Trans * Fsm::addTrans(unsigned int startId, unsigned int endId) {
 }
 
 Trans * Fsm::addTrans(State * start, State * end) {
+  qDebug() << "Fsmd::addTrans(State * start, State * end)";
 
-    //-- Create transition
-    Trans * newTrans = new Trans(start, end);
+  //-- Create transition
+  Trans * newTrans = new Trans(start, end);
 
-    //-- Add (ID assigned in there)
-    newTrans = this->addTrans(newTrans);
+  //-- Add (ID assigned in there)
+  newTrans = this->addTrans(newTrans);
 
-    //-- Auto Adjust name
-    newTrans->setName(string("trans_") + Utils::itos(this->transitionsMap.size()));
+  //-- Auto Adjust name
+  newTrans->setName(string("trans_") + Utils::itos(this->transitionsMap.size()));
 
 
-    return newTrans;
+  return newTrans;
 }
 
 Trans * Fsm::addTrans(Trans * transition) {
+  qDebug() << "Fsm::addTrans(Trans * transition)";
+  if( !transition )
+    return NULL;
 
-    //-- If already in the FSM, don't add
-    if (transition->isIdSet() && this->transitionsMap.count(transition->getId())>0)
-        return transition;
+  //-- If already in the FSM, don't add
+  if (transition->isIdSet() && this->transitionsMap.count(transition->getId())>0)
+      return transition;
 
-    //-- Set ID
-    this->idManager.assignID(transition);
+  //-- Set ID
+  this->idManager.assignID(transition);
 
-    //-- Add
-    this->transitionsMap[transition->getId()] = transition;
+  //-- Add
+  this->transitionsMap[transition->getId()] = transition;
 
-    //-- Register to start state
-    transition->getStartState()->addStartingTransition(transition);
+  //-- Register to start state
+  transition->getStartState()->addStartingTransition(transition);
 
-    return transition;
+  return transition;
 
 }
 

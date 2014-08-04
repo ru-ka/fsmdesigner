@@ -338,6 +338,7 @@ QVariant StateItem::itemChange(GraphicsItemChange change,
 
     //-- If removed from scene
     //-- Ensure the incoming transitions forget about us
+    /*
     for (QList<Transline*>::iterator it = this->incomingTransitions.begin(); it
         < this->incomingTransitions.end(); it++)
       (*it)->setEndItem(NULL);
@@ -348,6 +349,7 @@ QVariant StateItem::itemChange(GraphicsItemChange change,
         < this->outgoingTransitions.end(); it++)
       (*it)->setStartItem(NULL);
     this->outgoingTransitions.clear();
+    */
 
   } else if (change==QGraphicsItem::ItemScaleHasChanged && this->scene()!=NULL) {
 

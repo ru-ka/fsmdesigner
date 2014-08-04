@@ -32,9 +32,11 @@ NewTransCommand::~NewTransCommand() {
 
 void  NewTransCommand::redo(){
   qDebug() << "Adding transline items. Transline items.size() = " << transList.size();
-  QList<Transline *>::iterator it;
-  for (it = transList.begin(); it != transList.end(); ++it) {
-    relatedScene->addItem( *it );
+  //QList<Transline *>::iterator it;
+  //for (it = transList.begin(); it != transList.end(); ++it) {
+  for ( auto currentTrans : transList ) {
+    relatedScene->addItem( currentTrans );
+    qDebug() << "currentTrans = " << currentTrans;
   }
   qDebug() << "Adding text"; 
   if ( text != NULL ) {
@@ -103,13 +105,12 @@ bool NewTransCommand::handleMouseReleaseEvent(QGraphicsSceneMouseEvent * e) {
   // 1st case, there is no start item yet.
   // Intent: Add the intersecting join or state item.
   if ( startItem == NULL ) {
-    if ( getIntersectingItem(e) == NULL )
+    if ( getIntersectingItem(e) == NULL ) {
       return false;
-    if ( getIntersectingItem(e)->type() == StateItem::Type ) {
+    } else if ( getIntersectingItem(e)->type() == StateItem::Type ) {
       startItem = getIntersectingItem(e);
       Transline * transition = new Transline( NULL, startItem, NULL );
       transition->setEndPoint( e->scenePos() );
-      qDebug() << "transition->boundingRect() = " << transition->boundingRect();
       relatedScene->addItem( transition );
       transList.append( transition );
       return true;
