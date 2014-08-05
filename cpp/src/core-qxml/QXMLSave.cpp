@@ -288,23 +288,6 @@ void QXMLSave::writeFSM(Fsm * f, stringstream& out) {
                 out << "        </condition>" << endl;
 			END_FOREACH_HYPERTRANSITION_CONDITIONS
 
-			//-- Trackpoints
-            FOREACH_HYPERTRANSITION_TRACKPOINTS(hypertransition)
-
-                out << "        <trackpoint posx='"
-                        << trackpoint->getPosition().first << "' posy='"
-                        << trackpoint->getPosition().second;
-
-                out << "' link='" << trackpoint->isLink()
-                        << "' linkid='" << (trackpoint->getTargetLink()!=NULL?trackpoint->getTargetLink()->getId():0);
-
-                //qDebug() << "Transaction trackpoint join is: " << f->getTransTrackpointJoin();
-
-                out << "' join='" << trackpoint->getJoin()->getId()
-                        << "' color='" << trackpoint->getColor();
-                out << "' />" << endl;
-                END_FOREACH_HYPERTRANSITION_TRACKPOINTS
-
 			// Close hypertrans
 			out << "    </hypertrans>" << endl;
 

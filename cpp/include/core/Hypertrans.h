@@ -48,7 +48,6 @@ using namespace std;
 #include <core/TransitionBase.h>
 class Condition;
 class State;
-class Trackpoint;
 
 
 
@@ -154,19 +153,6 @@ class Hypertrans : public TransitionBase {
 
 
         /** @} */
-
-        /** \defgroup Trackpoints Trackpoints Utilities */
-        /** @{ */
-
-        #define FOREACH_HYPERTRANSITION_TRACKPOINTS(hyperTransition) \
-         for (vector<Trackpoint*>::iterator it = hyperTransition->getTrackpoints().begin();it!=hyperTransition->getTrackpoints().end();it++) { \
-             ::Trackpoint* trackpoint = *it;
-
-        #define END_FOREACH_HYPERTRANSITION_TRACKPOINTS }
-
-
-        /** @} */
-
 
 };
 
