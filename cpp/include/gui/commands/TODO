@@ -10,11 +10,3 @@ items and generate a itemGroup. Add another state. Create another group.
 6) bLastCommandItemGroup (undo, if no move event occurs)
 7) lastSelectedItemGroup (DeleteItemGroupCommand, if there is a selection of
 any other mode like STATE or TRANS)
-
-
-DeleteItemGroupCommand:
-1) When to delete an itemGroup?
-
-
-
-Add MoveItemGroup command.

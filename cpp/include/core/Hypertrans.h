@@ -50,7 +50,6 @@ class Condition;
 class State;
 
 
-
 /**
  * @memory Managed by the owner FSM
  */

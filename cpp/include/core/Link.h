@@ -61,7 +61,7 @@ class Link : public UniqueIDObject {
 
         State *                 targetState;
         pair<double, double>    position;
-        unsigned int                     color;
+        unsigned int            color;
 
 
     public:

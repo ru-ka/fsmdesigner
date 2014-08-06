@@ -40,6 +40,7 @@ using namespace std;
 #include <gui/commands/NewTransCommand.h>
 //-- HyperTrans
 #include <gui/commands/NewHyperTransCommand.h>
+#include <gui/commands/RemoveHyperTransCommand.h>
 //-- Join
 #include <gui/commands/NewJoinCommand.h>
 //-- Link
@@ -917,8 +918,61 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
   //---------------------
   else if (keyEvent->key() == Qt::Key_Delete) {
 
+    qDebug() << "keyEvent->key() == Qt::Key_Delete.";
+    qDebug() << "this->selectedItems().size() = " << this->selectedItems().size();
+    // Flatten item groups.
+    QList<QGraphicsItem* > selectedItems;
+    for ( auto currentItem : this->selectedItems() ) {
+      switch ( currentItem->type() ) {
+        case ( QGraphicsItemGroup::Type ) :
+          selectedItems.append( currentItem->childItems() );
+          break;
+        case ( FSMGraphicsItem<>::STATEITEM ) :
+          qDebug() << "Add all connected translines.";
+          break;
+        case ( FSMGraphicsItem<>::TRACKPOINT ) :
+          qDebug() << "Implement special treatment of trackpoints in an itemgroup.";
+          break;
+        default:
+          selectedItems.append( currentItem );
+          break;
+      }
+    }
+
+    for( auto currentItem : selectedItems ) {
+      // Only deal with objects still on the scene.
+      if ( currentItem->scene() == this ) {
+        switch ( currentItem->type() ) {
+          case ( FSMGraphicsItem<>::TRANSLINE ) :
+            {
+              // Hypertrans?
+              if ( dynamic_cast<Transline*>(currentItem)->getStartItem()->type()
+                   == FSMGraphicsItem<>::HYPERTRANS ) {
+                RemoveHyperTransCommand * command =
+                  new RemoveHyperTransCommand( this, dynamic_cast<Transline*>(currentItem) );
+                this->undoStack.push( command );
+              }
+              // Trans? Link..
+              break;
+            }
+          case ( FSMGraphicsItem<>::HYPERTRANS ) :
+            {
+              RemoveHyperTransCommand * command =
+                new RemoveHyperTransCommand( this, dynamic_cast<HyperTransition*>(currentItem) );
+              this->undoStack.push( command );
+              break;
+            }
+          default:
+            qDebug() << "Selected item to be removed. But not implemented yet.";
+            break;
+        }
+      }
+    }
+
+    /*
     QList<QGraphicsItem*> selectedItems = this->selectedItems();
     // TODO:
+    //
     for (QList<QGraphicsItem*>::iterator it = selectedItems.begin(); it
         < selectedItems.end(); it++) {
 
@@ -934,7 +988,6 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
         undoStack.push(stateCommand);
       }
 
-      /*
       QList<QUndoCommand*> undoCommands;
       if ((*it)->type() == StateItem::Type) {
 
@@ -971,12 +1024,12 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
           < undoCommands.end(); cit++) {
         this->undoStack.push(*cit);
       }
-      */
 
       // Only do once
       break;
 
     }
+      */
 
   } 
 }
@@ -1158,7 +1211,6 @@ QList<TrackpointItem *> Scene::findTransitionBaseTrackpoint(TransitionBase * tra
     //-- Search for the transline
     for (QList<QGraphicsItem*>::iterator it = allItems.begin();it!=allItems.end();it++) {
 
-        TransitionBase * itemTransitionModel = NULL;
         if (FSMGraphicsItem<>::isTrackPoint((*it))
                 && FSMGraphicsItem<>::toTrackPoint(*it)->getModel()!= NULL
                 && FSMGraphicsItem<>::toTrackPoint(*it)->getModel()->getTransition()==transitionBaseModel) {
