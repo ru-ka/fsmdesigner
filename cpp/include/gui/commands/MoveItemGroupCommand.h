@@ -18,6 +18,7 @@
 
 //-- Items
 #include "gui/items/StateItem.h"
+#include "gui/items/TrackpointItem.h"
 
 //-- Core
 #include "core/Fsm.h"
@@ -46,13 +47,16 @@ class MoveItemGroupCommand : public QUndoCommand {
     MoveItemGroupCommand( Scene               * _relatedScene,
                           QGraphicsItemGroup  * _itemGroup,
                           QPointF               _oldPos,
-                          QPointF               _newPos,
+                          QPointF               _newPos = QPointF(0,0),
                           QUndoCommand        * _parentCommand = NULL);
 
     /**
      * Default Destructor
      */
     virtual ~MoveItemGroupCommand();
+
+    void updateTranslines();
+    void setNewPos( QPointF _newPos);
 
     /** \defgroup UndoRedo Undo Redo Methods to be implemented */
     /** @{ */

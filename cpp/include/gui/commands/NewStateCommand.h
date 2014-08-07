@@ -29,10 +29,11 @@ class NewStateCommand : public QUndoCommand {
   private:
     // Related objects
     Scene     * relatedScene;
-    StateItem * stateItem   ; // Related GUI object.
-    State     * state       ; // Related fsm object.
     Fsm       * fsm         ;
     bool        bLastCommand; // NewItemGroupCommand?
+
+    StateItem * stateItem   ; // Related GUI object.
+    State     * state       ; // Related fsm object.
 
     QGraphicsSceneMouseEvent * mouseEvent;
 

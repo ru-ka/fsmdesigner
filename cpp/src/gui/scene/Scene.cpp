@@ -75,7 +75,8 @@ Scene::Scene(Fsm * fsm, QObject *parent) :
   activeTransCommand( NULL ),
   activeHyperTransCommand( NULL ),
   activeJoinCommand( NULL ),
-  activeLinkCommand( NULL )
+  activeLinkCommand( NULL ),
+  activeMoveItemGroupCommand( NULL )
 {
 
   this->setBackgroundBrush(Qt::white);
@@ -685,31 +686,39 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     } else if ( this->selectedItems().size() ==1 && bLastCommand &&
         this->selectedItems().first()->type() != QGraphicsItemGroup::Type ) {
       undoStack.undo();
-    } else if (this->selectedItems().size() > 1) { // Create an itemGroup
+    } else if (this->selectedItems().size() > 1) {
+      //REMOVE
+      // 1) flatten selected items 
+      QList<QGraphicsItem*> selectedItems;
+      for( auto item : this->selectedItems() ) {
+        switch ( item->type() ) {
+          case ( QGraphicsItemGroup::Type ) :
+            {
+              RemoveItemGroupCommand * command =
+                new RemoveItemGroupCommand( this, dynamic_cast<QGraphicsItemGroup*>(item) );
+              this->undoStack.push( command );
+            }
+            break;
+        }
+      }
+      //ENDREMOVE
+      // Create an itemGroup
       // TODO: Do not split up translines in several items. This requires an
       // major update of the internal data structures. But for now,
       // create an item group, if there are other items than trackpoints or
       // translines in the selection.
-      bool bCreateGroup = false;
-      QList<QGraphicsItem *>::iterator it;
-      QList<QGraphicsItem *> currentItems = this->selectedItems();
-      cout << endl;
-      for ( it = currentItems.begin(); it != currentItems.end(); ++it) {
-        qDebug() << "&(*it) = " << &(*it);
-        qDebug() << "*it = " << (*it);
-        if ( (*it)->type() != FSMGraphicsItem<>::TRANSLINE &&
-             (*it)->type() != FSMGraphicsItem<>::TRANSLINETEXT &&
-             (*it)->type() != FSMGraphicsItem<>::TRACKPOINT ) {
-          bCreateGroup = true;
-          break;
+      for ( auto item : this->selectedItems() ) {
+        if (    item->type() == FSMGraphicsItem<>::STATEITEM
+             || item->type() == FSMGraphicsItem<>::TRACKPOINT ) {
+        selectedItems.append( item );
+        } else {
+          item->setSelected( false );
         }
       }
-      if ( bCreateGroup ) {
-        CreateItemGroupCommand * groupCommand =
-          new CreateItemGroupCommand( this, this->selectedItems() );
-        undoStack.push(groupCommand);
-        e->setAccepted(true);
-      }
+      CreateItemGroupCommand * groupCommand =
+        new CreateItemGroupCommand( this, selectedItems );
+      undoStack.push(groupCommand);
+      e->setAccepted(true);
       // ENDTODO
     }
   }
@@ -724,7 +733,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 
     // State
     //----------------------
-    case STATE:
+    case ( STATE ) :
       {
         // Generate the appropriate command and pass it to the undostack. 
         NewStateCommand *stateCommand = new NewStateCommand( this, e );
@@ -772,7 +781,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 
     // Place a JointPoint
     //--------------------------
-    case JOIN: {
+    case JOIN: 
       {
         if ( activeJoinCommand == NULL ) {
           activeJoinCommand = new NewJoinCommand( this );
@@ -787,38 +796,32 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
         }
       }
       break;
-    }
     //-- EOF JoinItem
 
     // Place an HyperTransition
     //---------------------------------
-    case HYPERTRANS: {
-      if ( activeHyperTransCommand == NULL ) {
-        activeHyperTransCommand = new NewHyperTransCommand( this );
-        activeHyperTransCommand->handleMouseReleaseEvent(e);
-      } else {
-        activeHyperTransCommand->handleMouseReleaseEvent(e);
-        if ( activeHyperTransCommand->commandReady() ) {
-          undoStack.push( activeHyperTransCommand );
-          activeHyperTransCommand =  NULL;
-          if ( placeLock == FSMDesigner::UNLOCKED )
-            setPlaceMode( FSMDesigner::CHOOSE );
+    case ( HYPERTRANS ) :
+      {
+        if ( activeHyperTransCommand == NULL ) {
+          activeHyperTransCommand = new NewHyperTransCommand( this );
+          activeHyperTransCommand->handleMouseReleaseEvent(e);
+        } else {
+          activeHyperTransCommand->handleMouseReleaseEvent(e);
+          if ( activeHyperTransCommand->commandReady() ) {
+            undoStack.push( activeHyperTransCommand );
+            activeHyperTransCommand =  NULL;
+            if ( placeLock == FSMDesigner::UNLOCKED )
+              setPlaceMode( FSMDesigner::CHOOSE );
+          }
         }
       }
       break;
     }
-
-    }
-
-
-
     //-- EOF Place Mode --------------//
-
   }
 
   // To Place elements Stack
   //------------------------------
-
 
 
   //-- Parent job
@@ -828,6 +831,19 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 }
 
 void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
+  // Move detected.
+  if( this->selectedItems().size() == 1 &&
+      oldPos != this->selectedItems().first()->pos() ) {
+    auto firstItem = this->selectedItems().first();
+    if ( firstItem->type() == QGraphicsItemGroup::Type ) {
+      if ( !activeMoveItemGroupCommand )
+        activeMoveItemGroupCommand = new MoveItemGroupCommand(
+            this, dynamic_cast<QGraphicsItemGroup*>(firstItem), oldPos );
+      activeMoveItemGroupCommand->updateTranslines();
+    }
+  }
+
+
   // TODO: Is this the right place to dispatch the event, or should a function
   // help to structure the dispatch?
   if ( activeHyperTransCommand )
@@ -1307,13 +1323,13 @@ void Scene::moveItem() {
   Q_ASSERT( this->selectedItems().size() == 1 );
   QGraphicsItem * currentItem = this->selectedItems().first();
   switch( currentItem->type() ) {
-    case ( QGraphicsItemGroup::Type ) : {
-      MoveItemGroupCommand * moveCommand =
-        new MoveItemGroupCommand( this,
-            dynamic_cast<QGraphicsItemGroup*>(currentItem),
-            oldPos, currentItem->pos() );
-      undoStack.push( moveCommand );
-      break;
+    case ( QGraphicsItemGroup::Type ) :
+      {
+        Q_ASSERT( activeMoveItemGroupCommand );
+        activeMoveItemGroupCommand->setNewPos( currentItem->scenePos() );
+        undoStack.push( activeMoveItemGroupCommand );
+        activeMoveItemGroupCommand = NULL;
+        break;
     }
     default: {
       qDebug() << "moveItem() default case";

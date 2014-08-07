@@ -26,6 +26,7 @@ void  RemoveItemGroupCommand::redo() {
   for (child_it = selectedItems.begin(); child_it != selectedItems.end(); ++child_it) {
     itemGroup->removeFromGroup( *child_it );
   }
+  relatedScene->removeItem( itemGroup );
 
   relatedScene->clearSelection();
 
@@ -39,6 +40,7 @@ void  RemoveItemGroupCommand::undo() {
   qDebug() << "-------------------------";
   qDebug() << "Delete item group undo() ";
   qDebug() << "-------------------------";
+  relatedScene->addItem( itemGroup );
   QList<QGraphicsItem *>::Iterator it;
   for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
     itemGroup->addToGroup( *it );

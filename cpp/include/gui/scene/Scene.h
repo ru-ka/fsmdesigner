@@ -39,6 +39,7 @@ class NewTransCommand;
 class NewHyperTransCommand;
 class NewJoinCommand;
 class NewLinkCommand;
+class MoveItemGroupCommand;
 
 class Scene: public QGraphicsScene, public VerificationListener {
 
@@ -59,6 +60,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
     NewHyperTransCommand * activeHyperTransCommand;
     NewJoinCommand       * activeJoinCommand;
     NewLinkCommand       * activeLinkCommand;
+    MoveItemGroupCommand * activeMoveItemGroupCommand;
 
     void clearCommands();
 

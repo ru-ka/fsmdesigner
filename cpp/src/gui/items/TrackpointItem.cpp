@@ -357,3 +357,10 @@ QList<QUndoCommand*> TrackpointItem::remove() {
 
 }
 
+
+void TrackpointItem::updateTranslines() {
+  if (this->getPreviousTransline() != NULL)
+    this->getPreviousTransline()->preparePath();
+  if (this->getNextTransline() != NULL)
+    this->getNextTransline()->preparePath();
+}

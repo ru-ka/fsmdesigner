@@ -26,6 +26,7 @@ void  MoveItemGroupCommand::redo(){
   qDebug() << "-------------------------";
   itemGroup->setPos(newPos);
 
+  this->updateTranslines();
   relatedScene->update();
   relatedScene->bLastCommand = false;
 }
@@ -37,6 +38,7 @@ void  MoveItemGroupCommand::undo(){
   qDebug() << "-------------------------";
   itemGroup->setPos(oldPos);
 
+  this->updateTranslines();
   relatedScene->update();
   relatedScene->bLastCommand = this->bLastCommand;
 }
@@ -50,4 +52,22 @@ void  MoveItemGroupCommand::undo(){
 bool  MoveItemGroupCommand::mergeWith(const QUndoCommand * command) {
   //TODO
   return false;
+}
+
+void MoveItemGroupCommand::setNewPos( QPointF _newPos ) {
+  newPos = _newPos;
+}
+
+void MoveItemGroupCommand::updateTranslines() {
+  // Update connected translines.
+  for( auto item : itemGroup->childItems() ) {
+    switch ( item ->type() ) {
+      case ( FSMGraphicsItem<>::STATEITEM ) :
+        dynamic_cast<StateItem*>(item)->updateTranslines();
+        break;
+      case ( FSMGraphicsItem<>::TRACKPOINT ) :
+        dynamic_cast<TrackpointItem*>(item)->updateTranslines();
+        break;
+    }
+  }
 }

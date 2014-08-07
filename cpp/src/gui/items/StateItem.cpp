@@ -965,4 +965,11 @@ bool StateItemText::sceneEvent(QEvent * event) {
 }
 
 
-
+void StateItem::updateTranslines() {
+  for( auto item : incomingTransitions ) {
+    item->preparePath();
+  }
+  for( auto item: outgoingTransitions ) {
+    item->preparePath();
+  }
+}

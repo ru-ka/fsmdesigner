@@ -76,6 +76,7 @@ public:
    */
   void prepareGraphics();
 
+
 protected:
 
   /// Implemented to support delete
@@ -183,6 +184,8 @@ public:
   StateItemEllipse * getStateEllipse() {
     return this->stateEllipse;
   }
+
+  void updateTranslines();
 
   void addIncomingTransition(Transline *);
 
