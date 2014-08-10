@@ -689,34 +689,40 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
     } else if (this->selectedItems().size() > 1) {
       //REMOVE
       // 1) flatten selected items 
-      QList<QGraphicsItem*> selectedItems;
+      QList<QGraphicsItem*> selectedItemsList;
       for( auto item : this->selectedItems() ) {
         switch ( item->type() ) {
           case ( QGraphicsItemGroup::Type ) :
             {
+              for( auto child : item->childItems() ) {
+                if (    child->type() == FSMGraphicsItem<>::STATEITEM
+                     || child->type() == FSMGraphicsItem<>::TRACKPOINT
+                   ) {
+                  selectedItemsList.append( child );
+                } else {
+                  child->setSelected( false );
+                }
+              }
               RemoveItemGroupCommand * command =
                 new RemoveItemGroupCommand( this, dynamic_cast<QGraphicsItemGroup*>(item) );
               this->undoStack.push( command );
             }
             break;
-        }
-      }
-      //ENDREMOVE
-      // Create an itemGroup
-      // TODO: Do not split up translines in several items. This requires an
-      // major update of the internal data structures. But for now,
-      // create an item group, if there are other items than trackpoints or
-      // translines in the selection.
-      for ( auto item : this->selectedItems() ) {
-        if (    item->type() == FSMGraphicsItem<>::STATEITEM
-             || item->type() == FSMGraphicsItem<>::TRACKPOINT ) {
-        selectedItems.append( item );
-        } else {
-          item->setSelected( false );
+          case ( FSMGraphicsItem<>::STATEITEM     ) :
+          case ( FSMGraphicsItem<>::TRACKPOINT    ) :
+          case ( FSMGraphicsItem<>::HYPERTRANS    ) :
+          case ( FSMGraphicsItem<>::JOINITEM      ) :
+          case ( FSMGraphicsItem<>::LINKARRIVAL   ) :
+          case ( FSMGraphicsItem<>::LINKDEPARTURE ) :
+            selectedItemsList.append( item );
+            break;
+          default:
+            item->setSelected( false );
+            break;
         }
       }
       CreateItemGroupCommand * groupCommand =
-        new CreateItemGroupCommand( this, selectedItems );
+        new CreateItemGroupCommand( this, selectedItemsList );
       undoStack.push(groupCommand);
       e->setAccepted(true);
       // ENDTODO

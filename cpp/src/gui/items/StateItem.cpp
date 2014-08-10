@@ -472,10 +472,9 @@ bool StateItem::recordPosition() {
   if (this->x()==this->getModel()->getPosition().first && this->y()==this->getModel()->getPosition().second)
       return false;
 
-  // Record using an action
-  ///------------------
-//  MoveStateAction * moveState = new MoveStateAction(this->pos(),this);
-//  dynamic_cast<Scene*>(this->scene())->getUndoStack()->push(moveState);
+    this->getModel()->setPosition(
+        pair<double,double>(this->scenePos().x(),this->scenePos().y()));
+    this->modelChanged();
 
 
   // Modified

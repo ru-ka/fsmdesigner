@@ -22,13 +22,12 @@ void  RemoveItemGroupCommand::redo() {
   qDebug() << "Delete item group redo() ";
   qDebug() << "-------------------------";
   // Deselect the children.
-  QList<QGraphicsItem *>::iterator child_it;;
-  for (child_it = selectedItems.begin(); child_it != selectedItems.end(); ++child_it) {
-    itemGroup->removeFromGroup( *child_it );
+  for( auto item : selectedItems ) {
+    itemGroup->removeFromGroup( item );
   }
-  relatedScene->removeItem( itemGroup );
-
   relatedScene->clearSelection();
+
+  relatedScene->removeItem( itemGroup );
 
   relatedScene->update();
   relatedScene->bLastCommand = false;
@@ -41,11 +40,11 @@ void  RemoveItemGroupCommand::undo() {
   qDebug() << "Delete item group undo() ";
   qDebug() << "-------------------------";
   relatedScene->addItem( itemGroup );
-  QList<QGraphicsItem *>::Iterator it;
-  for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
-    itemGroup->addToGroup( *it );
-    (*it)->setSelected(false);
-    (*it)->clearFocus();
+
+  for( auto item : selectedItems ) {
+    itemGroup->addToGroup( item );
+    item->setSelected( false );
+    item->clearFocus();
   }
   itemGroup->setFlags(   QGraphicsItem::ItemIsSelectable
                        | QGraphicsItem::ItemIsMovable

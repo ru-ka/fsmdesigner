@@ -23,8 +23,8 @@ class RemoveItemGroupCommand : public QUndoCommand {
   private:
     // Related objects
     Scene               *   relatedScene ;
-    QList<QGraphicsItem *>  selectedItems;
     QGraphicsItemGroup  *   itemGroup    ;
+    QList<QGraphicsItem *>  selectedItems;
 
     bool bLastCommand; // CreateItemGroupCommand?
 
@@ -33,9 +33,9 @@ class RemoveItemGroupCommand : public QUndoCommand {
     /**
      * Constructor.
      */
-    RemoveItemGroupCommand( Scene         * _relatedScene,
+    RemoveItemGroupCommand( Scene              * _relatedScene,
                             QGraphicsItemGroup * _itemGroup,
-                            QUndoCommand  * _parentCommand = NULL);
+                            QUndoCommand       * _parentCommand = NULL);
 
     /**
      * Default Destructor

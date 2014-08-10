@@ -26,8 +26,8 @@ void  MoveItemGroupCommand::redo(){
   qDebug() << "-------------------------";
   itemGroup->setPos(newPos);
 
-  this->updateTranslines();
   relatedScene->update();
+  this->updateTranslines();
   relatedScene->bLastCommand = false;
 }
 
@@ -38,8 +38,8 @@ void  MoveItemGroupCommand::undo(){
   qDebug() << "-------------------------";
   itemGroup->setPos(oldPos);
 
-  this->updateTranslines();
   relatedScene->update();
+  this->updateTranslines();
   relatedScene->bLastCommand = this->bLastCommand;
 }
 
@@ -59,6 +59,7 @@ void MoveItemGroupCommand::setNewPos( QPointF _newPos ) {
 }
 
 void MoveItemGroupCommand::updateTranslines() {
+  relatedScene->update();
   // Update connected translines.
   for( auto item : itemGroup->childItems() ) {
     switch ( item ->type() ) {
