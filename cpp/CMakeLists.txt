@@ -8,7 +8,7 @@ set (FSMDesigner_VERSION_MINOR 2)
 set (FSMDesigner_VERSION_PATCH 1)
 
 #SET (CMAKE_CXX_COMPILER             "/usr/bin/g++")
-SET (CMAKE_CXX_FLAGS                "-Wall")
+SET (CMAKE_CXX_FLAGS                "-Wall -pedantic")
 
 ### Determine revision
 SET(revisionsCount 0)

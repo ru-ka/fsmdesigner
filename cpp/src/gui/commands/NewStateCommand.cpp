@@ -7,9 +7,9 @@ NewStateCommand::NewStateCommand( Scene * _relatedScene,
                                   QUndoCommand(_parentCommand), 
                                   relatedScene(_relatedScene),
                                   fsm( _relatedScene->getFsm() ),
+                                  bLastCommand( _relatedScene->bLastCommand ),
                                   stateItem( NULL ),
                                   state( NULL ),
-                                  bLastCommand( _relatedScene->bLastCommand ),
                                   mouseEvent(_e)
 {
   //-- New new GUI item to the Scene
