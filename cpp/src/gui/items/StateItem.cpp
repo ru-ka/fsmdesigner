@@ -16,7 +16,7 @@ using namespace std;
 #include <core/Link.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- GUI
@@ -316,7 +316,7 @@ QVariant StateItem::itemChange(GraphicsItemChange change,
         //-- Move text with it
         QGraphicsItem* textItem = this->scene()->itemAt(
                 (((Trans*)tr->getModel()))->getTextPosition().first,
-                (((Trans*)tr->getModel()))->getTextPosition().second);
+                (((Trans*)tr->getModel()))->getTextPosition().second, QTransform() );
         if (textItem != NULL) {
           textItem->moveBy(dx, dy);
         }
@@ -832,8 +832,10 @@ void StateItemText::paint(QPainter *painter,
 
 
   // Draw Rect
+  QColor text_bg_color = QColor(SETTINGS_STATE_TEXT_BG_DEFAULT);
+  QVariant text_bg_variant = text_bg_color;
   QColor settingsTextColor = GuiSettings::value(SETTINGS_STATE_TEXT_BG,
-      QVariant(SETTINGS_STATE_TEXT_BG_DEFAULT)).value<QColor> ();
+      text_bg_variant ).value<QColor>();
   if (settingsTextColor != painter->brush().color())
     painter->setBrush(QBrush(settingsTextColor));
 

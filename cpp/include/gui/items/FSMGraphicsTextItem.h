@@ -16,7 +16,7 @@
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 /**
  * This class is a QGraphicsTextItem that implements non editable

@@ -32,7 +32,7 @@
 using namespace std;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- Core
@@ -346,7 +346,8 @@ Qt::ItemFlags TableStateModel::flags ( const QModelIndex & index ) const {
 QModelIndex TableStateModel::index ( int row, int column, const QModelIndex & parent) const {
 
 
-    return createIndex(row, column, 0);
+  //TODO: double check
+    return createIndex(row, column, quintptr(0) );
 
 }
 

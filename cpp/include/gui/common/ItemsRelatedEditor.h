@@ -12,7 +12,7 @@
 //----------------
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- Core

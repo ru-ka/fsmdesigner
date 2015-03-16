@@ -1,6 +1,42 @@
 cmake_minimum_required (VERSION 2.8)
 project (FSMDesigner)
 
+## TODO
+## QT5 ##
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Test REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Gui  REQUIRED)
+find_package(Qt5Xml  REQUIRED)
+find_package(Qt5Script REQUIRED)
+find_package(Qt5PrintSupport REQUIRED)
+find_package(Qt5Svg REQUIRED)
+#include dirs
+include_directories(${Qt5Core_INCLUDES})
+include_directories(${Qt5Test_INCLUDES})
+include_directories(${Qt5Widgets_INCLUDES})
+include_directories(${Qt5Gui_INCLUDES})
+include_directories(${Qt5Xml_INCLUDES})
+include_directories(${Qt5Script_INCLUDES})
+include_directories(${Qt5PrintSupport_INCLUDES})
+include_directories(${Qt5Svg_INCLUDES})
+#definitions
+add_definitions(${Qt5Core_DEFINITIONS})
+add_definitions(${Qt5Test_DEFINITIONS})
+add_definitions(${Qt5Widgets_DEFINITIONS})
+add_definitions(${Qt5Gui_DEFINITIONS})
+add_definitions(${Qt5Xml_DEFINITIONS})
+add_definitions(${Qt5Script_DEFINITIONS})
+add_definitions(${Qt5PrintSupport_DEFINITIONS})
+add_definitions(${Qt5Svg_DEFINITIONS})
+#TODO: dobulecheck next. END TODO
+set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+
+set(CMAKE_AUTOMOC ON)
+
+## END TODO
+
 # Set version number
 #########################
 set (FSMDesigner_VERSION_MAJOR 5)
@@ -38,9 +74,9 @@ message(STATUS "Patch version set from GIT to: ${revisionsCount}")
 set(CMAKE_MODULE_PATH "./macros/")
 
 ## QT4 ###################################
-find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtSVG QtScript REQUIRED )
-message(STATUS "QT4 use File to include: ${QT_USE_FILE} with incdir: ${QT_INCLUDE_DIR}")
-include(${QT_USE_FILE})
+#find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtSVG QtScript REQUIRED )
+#message(STATUS "QT4 use File to include: ${QT_USE_FILE} with incdir: ${QT_INCLUDE_DIR}")
+#include(${QT_USE_FILE})
  
 
 ##########################################
@@ -146,7 +182,7 @@ endforeach(package)
 #####################
 message(STATUS "QT Libraries")
 add_library(core_lib SHARED ${core_src})
-target_link_libraries(core_lib ${QT_LIBRARIES})
+target_link_libraries(core_lib ${QT_LIBRARIES} Qt5::Core Qt5::Gui Qt5::Xml Qt5::Widgets Qt5::PrintSupport Qt5::Svg Qt5::Script)
 add_library(core_qxml_lib SHARED ${core-qxml_src})
 target_link_libraries(core_qxml_lib core_lib ${QT_LIBRARIES})
 
@@ -164,29 +200,30 @@ target_link_libraries(genverilog_lib core_qxml_lib verification_lib)
 ###########################
 
 #### MOC
-set(QT4_WRAP_CPP_OUT_DIR ${GENERATED_PATH})
+#set(QT4_WRAP_CPP_OUT_DIR ${GENERATED_PATH})
 
 foreach (package ${GUI_PACKAGES})
     file(GLOB package_moc_src ${FSMDesigner_SOURCE_DIR}/include/${package}/*.h )
-    qt4_wrap_cpp(gui_moced_src ${package_moc_src})
+    qt5_wrap_cpp(gui_moced_src ${package_moc_src})
 endforeach(package)
  
 
 #### UI
-set(QT4_WRAP_UI_OUT_DIR ${GENERATED_PATH})
+#set(QT4_WRAP_UI_OUT_DIR ${GENERATED_PATH})
 
 foreach (package ${GUI_PACKAGES})
     file(GLOB package_ui_src ${FSMDesigner_SOURCE_DIR}/include/${package}/*.ui )
     list(APPEND gui_ui_src ${package_ui_src})
 endforeach(package)
 
-qt4_wrap_ui(gui_ui_headers ${gui_ui_src} -h)
+#qt4_wrap_ui(gui_ui_headers ${gui_ui_src} -h)
+qt5_wrap_ui(gui_ui_headers ${gui_ui_src} -h)
 
 #### Resources
-set(QT4_ADD_RESOURCES_OUT_DIR ${GENERATED_PATH})
+#set(QT4_ADD_RESOURCES_OUT_DIR ${GENERATED_PATH})
 
 file(GLOB gui_resources_src ${FSMDesigner_SOURCE_DIR}/src/gui/resources/*.qrc )
-QT4_ADD_RESOURCES(gui_ui_resources ${gui_resources_src})
+QT5_ADD_RESOURCES(gui_ui_resources ${gui_resources_src})
 
 
 #### Custom target to put together generated files
@@ -212,6 +249,16 @@ target_link_libraries(fsmdesigner gui_lib)
 add_executable(fsmdesignerGenVerilog src/fsmdesignerGenVerilog.cpp)
 target_link_libraries(fsmdesignerGenVerilog genverilog_lib )
 
+## TODO
+enable_testing()
+
+#qt5_wrap_ui(gui5_ui_headers ${gui_ui_src} -h)
+
+#add_executable( gui_test WIN32 src/fsmdesigner.cpp test.cpp ${gui_ui_src} )
+#target_link_libraries( gui_test gui_lib Qt5::Widgets Qt5::Core Qt5::Test ${gui_ui_src} )
+#add_test( NAME gut_test_case COMMAND gui_test )
+
+## END TODO
 
 
 ##########################################

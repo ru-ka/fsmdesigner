@@ -14,7 +14,7 @@
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Actions
 #include <gui/actions/ObjectFocusedAction.h>

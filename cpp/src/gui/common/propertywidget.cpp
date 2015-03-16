@@ -44,7 +44,7 @@ using namespace std;
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Gui
 #include <gui/scene/Scene.h>
@@ -131,7 +131,7 @@ void PropertyWidget::createActions() {
 	addCondiToTrans->setObjectName(QString::fromUtf8("CondiToTrans"));
 	addCondiToTrans->setEnabled(true);
 	addCondiToTrans->setText(QApplication::translate("PropertyWidget",
-			"Add Condition", 0, QApplication::UnicodeUTF8));
+			"Add Condition", 0));
 
 
 	connect(this->addCondiToTrans, SIGNAL(triggered()), this,
@@ -142,7 +142,7 @@ void PropertyWidget::createActions() {
 	deleteCondiOfTrans->setObjectName(QString::fromUtf8("deleteCondiOfTrans"));
 	deleteCondiOfTrans->setEnabled(true);
 	deleteCondiOfTrans->setText(QApplication::translate("PropertyWidget",
-			"Delete Condition", 0, QApplication::UnicodeUTF8));
+			"Delete Condition", 0));
 
 	connect(this->deleteCondiOfTrans, SIGNAL(triggered()), this,
 					SLOT(deleteConditionFromTransitionBase()));

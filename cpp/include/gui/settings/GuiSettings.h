@@ -12,7 +12,7 @@
 //-------------
 
 //-- QT Includes
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 // Properties paths and default values

@@ -31,7 +31,7 @@
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Scene
 #include <gui/scene/SceneRelatedObject.h>

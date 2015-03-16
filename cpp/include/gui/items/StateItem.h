@@ -27,7 +27,7 @@ class Transline;
 class LinkArrival;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- Verification

@@ -28,7 +28,7 @@
 //-----------------
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 #include <core/State.h>
@@ -162,16 +162,14 @@ void InputWidget::createActions() {
 	renameAction = new QAction(this);
 	renameAction->setObjectName(QString::fromUtf8("rename"));
 	renameAction->setEnabled(true);
-	renameAction->setText(QApplication::translate("InputWidget", "Rename", 0,
-			QApplication::UnicodeUTF8));
+	renameAction->setText(QApplication::translate("InputWidget", "Rename", 0));
 	renameAction->connect(renameAction,SIGNAL(activated()),this,SLOT(rename()));
 
 	//-- New input
 	newinputAction = new QAction(this);
 	newinputAction->setObjectName(QString::fromUtf8("newInput"));
 	newinputAction->setEnabled(true);
-	newinputAction->setText(QApplication::translate("InputWidget", "New Input", 0,
-			QApplication::UnicodeUTF8));
+	newinputAction->setText(QApplication::translate("InputWidget", "New Input", 0));
 	newinputAction->connect(newinputAction,SIGNAL(activated()),this,SLOT(newInput()));
 
 	//-- Delete last
@@ -179,7 +177,7 @@ void InputWidget::createActions() {
 	deleteinputAction->setObjectName(QString::fromUtf8("deleteInput"));
 	deleteinputAction->setEnabled(true);
 	deleteinputAction->setText(QApplication::translate("InputWidget",
-			"Delete last Input", 0, QApplication::UnicodeUTF8));
+			"Delete last Input", 0));
 	deleteinputAction->connect(deleteinputAction,SIGNAL(activated()),this,SLOT(deleteLast()));
 
 	//-- Delete selected
@@ -187,23 +185,21 @@ void InputWidget::createActions() {
 	deleteselectedinputAction->setObjectName(QString::fromUtf8("deleteSelectedInput"));
 	deleteselectedinputAction->setEnabled(true);
 	deleteselectedinputAction->setText(QApplication::translate("InputWidget",
-			"Delete selected Input", 0, QApplication::UnicodeUTF8));
+			"Delete selected Input", 0));
 	deleteselectedinputAction->connect(deleteselectedinputAction,SIGNAL(activated()),this,SLOT(deleteSelected()));
 
 	//-- Input Up
 	inputupAction = new QAction(this);
 	inputupAction->setObjectName(QString::fromUtf8("moveupInput"));
 	inputupAction->setEnabled(true);
-	inputupAction->setText(QApplication::translate("InputWidget", "Move up", 0,
-			QApplication::UnicodeUTF8));
+	inputupAction->setText(QApplication::translate("InputWidget", "Move up", 0));
 	inputupAction->connect(inputupAction,SIGNAL(activated()),this,SLOT(moveUp()));
 
 	//-- Input Down
 	inputdownAction = new QAction(this);
 	inputdownAction->setObjectName(QString::fromUtf8("movedownInput"));
 	inputdownAction->setEnabled(true);
-	inputdownAction->setText(QApplication::translate("InputWidget", "Move down", 0,
-			QApplication::UnicodeUTF8));
+	inputdownAction->setText(QApplication::translate("InputWidget", "Move down", 0));
 	inputdownAction->connect(inputdownAction,SIGNAL(activated()),this,SLOT(moveDown()));
 }
 

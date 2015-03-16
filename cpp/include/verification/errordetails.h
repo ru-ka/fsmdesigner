@@ -11,16 +11,16 @@
 #define ERRORDETAILS_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QDialog>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QPushButton>
-#include <QtGui/QSpacerItem>
-#include <QtGui/QTextBrowser>
-#include <QtGui/QVBoxLayout>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QTextBrowser>
+#include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
 
@@ -85,8 +85,8 @@ public:
 
     void retranslateUi(QDialog *ErrorDetails)
     {
-        ErrorDetails->setWindowTitle(QApplication::translate("ErrorDetails", "Verification failed", 0, QApplication::UnicodeUTF8));
-        okButton->setText(QApplication::translate("ErrorDetails", "OK", 0, QApplication::UnicodeUTF8));
+        ErrorDetails->setWindowTitle(QApplication::translate("ErrorDetails", "Verification failed", 0));
+        okButton->setText(QApplication::translate("ErrorDetails", "OK", 0));
     } // retranslateUi
 
 };

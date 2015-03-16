@@ -17,7 +17,7 @@ using namespace std;
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 class Fsm;

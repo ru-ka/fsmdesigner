@@ -12,7 +12,7 @@
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Common
 #include <gui/common/FAction.h>

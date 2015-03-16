@@ -36,7 +36,7 @@
 #include <gui/fsm/newfsm.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 

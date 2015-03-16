@@ -31,7 +31,7 @@
 using namespace std;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 #include <core/Core.h>
@@ -110,8 +110,9 @@ int main( int argc, char ** argv )
 
 
     QTextCodec::setCodecForLocale ( QTextCodec::codecForName ( "UTF8" ) );
-    QTextCodec::setCodecForTr ( QTextCodec::codecForName ( "UTF8" ) );
-    QTextCodec::setCodecForCStrings ( QTextCodec::codecForName ( "UTF8" ) );
+    // TODO: double check whether UTF8 is default for qt5 or not
+//    QTextCodec::setCodecForTr ( QTextCodec::codecForName ( "UTF8" ) );
+//    QTextCodec::setCodecForCStrings ( QTextCodec::codecForName ( "UTF8" ) );
     qDebug() << "System Locale: " << lc.name();
     qDebug() << "System encoding: "<< QTextCodec::codecForLocale()->name();
 

@@ -30,7 +30,7 @@ using namespace std;
 #include <gui/actions/DeleteFSMAction.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 #include "FSMTabPane.h"
 

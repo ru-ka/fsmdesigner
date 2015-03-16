@@ -38,7 +38,7 @@ using namespace std;
 #include <core/FSMRelatedObject.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- UI

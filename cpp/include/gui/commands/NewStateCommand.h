@@ -11,7 +11,7 @@
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Gui
 #include <gui/scene/Scene.h>

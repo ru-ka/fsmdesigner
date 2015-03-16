@@ -13,7 +13,7 @@
 #include <core/Fsm.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 

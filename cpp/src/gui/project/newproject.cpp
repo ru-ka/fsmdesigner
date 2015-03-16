@@ -34,7 +34,7 @@
 #include <gui/common/filterkeywords.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 #include "newproject.h"

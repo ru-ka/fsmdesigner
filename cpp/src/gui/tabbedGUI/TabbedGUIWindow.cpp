@@ -33,7 +33,7 @@ using namespace std;
 #include <core/Fsm.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 
 #include "TabbedGUIWindow.h"

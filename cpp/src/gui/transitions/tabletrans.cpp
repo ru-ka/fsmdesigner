@@ -26,7 +26,7 @@
 // Includes
 //----------------------
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- Core
@@ -66,26 +66,22 @@ TableTrans::TableTrans(QWidget* parent) :
     addTrans->setObjectName(QString::fromUtf8("addtrans"));
     addTrans->setEnabled(true);
     addTrans->setText(
-            QApplication::translate("TableTrans", "Add Transition", 0,
-                    QApplication::UnicodeUTF8));
+            QApplication::translate("TableTrans", "Add Transition", 0));
     deleteTrans = new QAction(this);
     deleteTrans->setObjectName(QString::fromUtf8("deletetrans"));
     deleteTrans->setEnabled(true);
     deleteTrans->setText(
-            QApplication::translate("TableTrans", "Delete Transition", 0,
-                    QApplication::UnicodeUTF8));
+            QApplication::translate("TableTrans", "Delete Transition", 0));
     addCondition = new QAction(this);
     addCondition->setObjectName(QString::fromUtf8("addcondition"));
     addCondition->setEnabled(true);
     addCondition->setText(
-            QApplication::translate("TableTrans", "Add Condition", 0,
-                    QApplication::UnicodeUTF8));
+            QApplication::translate("TableTrans", "Add Condition", 0));
     deleteCondition = new QAction(this);
     deleteCondition->setObjectName(QString::fromUtf8("deleteCondition"));
     deleteCondition->setEnabled(true);
     deleteCondition->setText(
-            QApplication::translate("TableTrans", "Delete Condition", 0,
-                    QApplication::UnicodeUTF8));
+            QApplication::translate("TableTrans", "Delete Condition", 0));
 }
 
 TableTrans::~TableTrans() {

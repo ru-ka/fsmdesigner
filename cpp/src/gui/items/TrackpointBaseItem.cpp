@@ -9,7 +9,7 @@
 //-----------------
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 #include <core/Trackpoint.h>

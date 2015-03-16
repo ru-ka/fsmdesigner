@@ -6,7 +6,7 @@
  */
 
 #include <QObject>
-#include <QtGui>
+#include <QtWidgets>
 
 
 #include "selectionanimator.h"

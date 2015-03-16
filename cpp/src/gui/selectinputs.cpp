@@ -33,7 +33,7 @@
 //-- Gui
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 #include "selectinputs.h"

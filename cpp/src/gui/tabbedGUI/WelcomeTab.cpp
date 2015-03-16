@@ -13,7 +13,7 @@
 using namespace std;
 
 //-- QT
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Gui
 #include <gui/common/RoundedPanel.h>

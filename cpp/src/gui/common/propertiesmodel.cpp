@@ -72,7 +72,7 @@ using namespace std;
 #include <gui/actions/ChangeHyperTransitionTargetAction.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 #include "propertiesmodel.h"
 PropertiesModel::PropertiesModel(QObject* parent) :

@@ -36,7 +36,7 @@
 #include <gui/common/filterkeywords.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 #include "newinput.h"
 

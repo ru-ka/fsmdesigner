@@ -22,7 +22,7 @@ using namespace std;
 
 //-- QT
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- UI
 #include <gui/scene/Scene.h>

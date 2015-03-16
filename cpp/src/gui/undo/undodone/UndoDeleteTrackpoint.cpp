@@ -19,7 +19,7 @@ using namespace std;
 #include <core/Trans.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- Gui

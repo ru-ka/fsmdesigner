@@ -36,7 +36,7 @@
 using namespace std;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 #include <core/Fsm.h>
@@ -638,7 +638,8 @@ void TabbedGUISceneView::mousePressEvent(QMouseEvent* e) {
 
 		// Init area selection if nothing else selected
 		if (this->scene()->selectedItems().size() == 0) {
-			this->areaSelectionInitial = new QPointF(e->posF());
+      // TODO: double ckeck: posF -> screenPos? or to pos?
+			this->areaSelectionInitial = new QPointF(e->screenPos());
 			this->scene()->setSelectionArea(QPainterPath(
 					*this->areaSelectionInitial));
 		}

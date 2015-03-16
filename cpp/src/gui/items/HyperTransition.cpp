@@ -16,7 +16,7 @@ using namespace std;
 
 //-- Qt
 #include <QtGui/QPainter>
-#include <QtGui/QGraphicsScene>
+#include <QtWidgets/QGraphicsScene>
 #include <QtCore/QRect>
 #include <QtGui/QPainterPath>
 #include <QtGui/QPainterPathStroker>

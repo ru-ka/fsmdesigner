@@ -22,7 +22,7 @@ using namespace std;
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Gui Forwards
 class StateItem;

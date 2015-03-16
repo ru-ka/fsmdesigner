@@ -36,7 +36,7 @@
 #include <verification/logicmin.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 #include "min.h"
@@ -46,11 +46,9 @@ Min::Min(Fsm * fsm, QWidget* parent) :
     setupUi(this);
     this->fsm = fsm;
     label->setText(
-            QApplication::translate("Min", "<u>Choose Trans:</u>", 0,
-                    QApplication::UnicodeUTF8));
+            QApplication::translate("Min", "<u>Choose Trans:</u>", 0 ));
     this->setWindowTitle(
-            QApplication::translate("Min", "Minimization", 0,
-                    QApplication::UnicodeUTF8));
+            QApplication::translate("Min", "Minimization", 0));
     int count = 0;
     int i = 0;
 

@@ -22,7 +22,7 @@ class Link;
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- GUI
 #include <gui/items/FSMGraphicsItem.h>

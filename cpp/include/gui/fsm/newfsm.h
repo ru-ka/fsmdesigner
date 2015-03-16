@@ -34,7 +34,7 @@
 using namespace std;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- Core
@@ -50,7 +50,7 @@ class NewFsm : public QDialog, public Ui_FSMsetup {
   Q_OBJECT
 
  public:
-  NewFsm(Fsm * fsm,QWidget* parent =NULL, Qt::WFlags f = Qt::Dialog);
+  NewFsm(Fsm * fsm,QWidget* parent =NULL, Qt::WindowFlags f = Qt::Dialog);
 
   void inText(QString qs);
   void outText(QString qs);

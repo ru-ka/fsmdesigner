@@ -15,7 +15,7 @@
 
 //-- QT
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 #include <QtXml>
 
 /**

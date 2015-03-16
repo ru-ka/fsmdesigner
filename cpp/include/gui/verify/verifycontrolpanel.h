@@ -8,7 +8,7 @@
 //----------------
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- Gui

@@ -12,7 +12,7 @@
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Verification
 #include <verification/VerificationListener.h>

@@ -35,7 +35,7 @@
 #include <gui/common/filterkeywords.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 #include "newfsmname.h"
 FsmName::FsmName(Fsm * fsm , QWidget * parent) :

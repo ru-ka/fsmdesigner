@@ -14,8 +14,10 @@
 //-- Std
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
+#include <QPrintDialog>
+#include <QPrintPreviewDialog>
 
 
 //-- Ui

@@ -33,7 +33,7 @@
 using namespace std;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 

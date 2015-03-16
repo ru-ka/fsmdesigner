@@ -13,7 +13,7 @@
 using namespace std;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 #include <core/FSMDesigner.h>

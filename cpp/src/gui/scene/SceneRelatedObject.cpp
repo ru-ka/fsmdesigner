@@ -9,7 +9,7 @@
 //------------
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Gui
 #include <gui/scene/Scene.h>

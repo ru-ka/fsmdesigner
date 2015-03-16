@@ -33,7 +33,7 @@
 class Fsm;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 #include <ui_connectordialog.h>

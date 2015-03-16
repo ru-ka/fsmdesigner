@@ -27,7 +27,7 @@
 //----------------------
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- Core
@@ -68,16 +68,14 @@ TableState::TableState(QWidget* parent) :
     this->addState->setObjectName(QString::fromUtf8("addstate"));
     this->addState->setEnabled(true);
     this->addState->setText(
-            QApplication::translate("TableState", "Add State", 0,
-                    QApplication::UnicodeUTF8));
+            QApplication::translate("TableState", "Add State", 0));
 
     //-- Delete state
     this->deleteState = new QAction(this);
     this->deleteState->setObjectName(QString::fromUtf8("deletestate"));
     this->deleteState->setEnabled(true);
     this->deleteState->setText(
-            QApplication::translate("TableState", "Delete State", 0,
-                    QApplication::UnicodeUTF8));
+            QApplication::translate("TableState", "Delete State", 0));
 }
 
 TableState::~TableState() {

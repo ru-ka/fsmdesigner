@@ -13,7 +13,7 @@ using namespace std;
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 #include <core/Core.h>

@@ -31,7 +31,7 @@ class FSMVerificator;
 class VerificatorRule;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 class StateItem;

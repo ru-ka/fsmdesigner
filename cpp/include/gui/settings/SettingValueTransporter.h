@@ -15,7 +15,7 @@
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Settings
 #include <gui/settings/GuiSettings.h>

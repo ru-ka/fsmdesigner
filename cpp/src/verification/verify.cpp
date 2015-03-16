@@ -36,7 +36,7 @@
 using namespace std;
 
 //-- QT
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtCore/QList>
 
 //-- Core

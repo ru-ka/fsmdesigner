@@ -27,7 +27,7 @@
 //-----------------
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 #include <core/State.h>
@@ -142,16 +142,14 @@ void OutputWidget::createActions() {
 	rename = new QAction(this);
 	rename->setObjectName(QString::fromUtf8("rename"));
 	rename->setEnabled(true);
-	rename->setText(QApplication::translate("OutputWidget", "Rename", 0,
-			QApplication::UnicodeUTF8));
+	rename->setText(QApplication::translate("OutputWidget", "Rename", 0));
 	rename->connect(rename,SIGNAL(activated()),this,SLOT(renameOutput()));
 
 	//-- New output
 	newoutput = new QAction(this);
 	newoutput->setObjectName(QString::fromUtf8("newOutput"));
 	newoutput->setEnabled(true);
-	newoutput->setText(QApplication::translate("OutputWidget", "New Output", 0,
-			QApplication::UnicodeUTF8));
+	newoutput->setText(QApplication::translate("OutputWidget", "New Output", 0));
 	newoutput->connect(newoutput,SIGNAL(activated()),this,SLOT(newOutput()));
 
 
@@ -160,7 +158,7 @@ void OutputWidget::createActions() {
 	deleteoutput->setObjectName(QString::fromUtf8("deleteOutput"));
 	deleteoutput->setEnabled(true);
 	deleteoutput->setText(QApplication::translate("OutputWidget",
-			"Delete last Output", 0, QApplication::UnicodeUTF8));
+			"Delete last Output", 0));
 	deleteoutput->connect(deleteoutput,SIGNAL(activated()),this,SLOT(deleteLast()));
 
 
@@ -170,23 +168,21 @@ void OutputWidget::createActions() {
 			"deleteSelectedOutput"));
 	deleteselectedoutput->setEnabled(true);
 	deleteselectedoutput->setText(QApplication::translate("OutputWidget",
-			"Delete selected Output", 0, QApplication::UnicodeUTF8));
+			"Delete selected Output", 0));
 	deleteselectedoutput->connect(deleteselectedoutput,SIGNAL(activated()),this,SLOT(deleteSelected()));
 
 	//-- Move up
 	outputup = new QAction(this);
 	outputup->setObjectName(QString::fromUtf8("moveupOutput"));
 	outputup->setEnabled(true);
-	outputup->setText(QApplication::translate("OutputWidget", "Move up", 0,
-			QApplication::UnicodeUTF8));
+	outputup->setText(QApplication::translate("OutputWidget", "Move up", 0));
 	outputup->connect(outputup,SIGNAL(activated()),this,SLOT(moveUp()));
 
 	//-- Move down
 	outputdown = new QAction(this);
 	outputdown->setObjectName(QString::fromUtf8("movedownOutput"));
 	outputdown->setEnabled(true);
-	outputdown->setText(QApplication::translate("OutputWidget", "Move down", 0,
-			QApplication::UnicodeUTF8));
+	outputdown->setText(QApplication::translate("OutputWidget", "Move down", 0));
 	outputdown->connect(outputdown,SIGNAL(activated()),this,SLOT(moveDown()));
 }
 

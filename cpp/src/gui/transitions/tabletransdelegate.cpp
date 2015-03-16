@@ -28,7 +28,7 @@
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 #include <core/Fsm.h>

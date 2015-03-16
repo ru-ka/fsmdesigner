@@ -17,7 +17,7 @@
 #include <iostream>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 #include <QtSvg>
 
@@ -614,8 +614,9 @@ void MergedMainWindow::print(QPrinter * printer) {
     QRectF brect = selectedScene->itemsBoundingRect();
 
     // Do rendering
-    QPainter painter(printer);
-    selectedScene->render(&painter,QRectF(),brect);
+    // TODO: reimplement the rendering
+    //QPainter painter(printer);
+    //selectedScene->render(&painter,QRectF(),brect);
 
 
 
@@ -675,7 +676,7 @@ void MergedMainWindow::about() {
      , QMessageBox::Critical, QMessageBox::Ok
      , QMessageBox::NoButton, QMessageBox::NoButton
      , this
-     , (Qt::WFlags) Qt::Dialog );
+     , (Qt::WindowFlags) Qt::Dialog );
   //TODO set icon
   QPixmap logo(":/icons/FSMDesignerlogosmall.png");
   qmb.setIconPixmap(logo);

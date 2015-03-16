@@ -19,7 +19,7 @@ using namespace std;
 
 //-- QT
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 #include <QtXml>
 
 //-- Core XML

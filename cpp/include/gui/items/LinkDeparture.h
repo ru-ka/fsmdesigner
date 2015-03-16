@@ -21,7 +21,7 @@ using namespace std;
 class Link;
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 //-- GUI

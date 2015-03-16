@@ -37,7 +37,7 @@ using namespace std;
 
 //-- Qt
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 
 //-- Core
 #include <core/Fsm.h>
@@ -464,7 +464,9 @@ void FSMSceneView::mousePressEvent(QMouseEvent* e) {
 
 		// Init area selection if nothing else selected
 		if (this->scene()->selectedItems().size() == 0) {
-			this->areaSelectionInitial = new QPointF(e->posF());
+      // TODO: double check if screenPos == pos() ?
+      // what was intented by posF?
+			this->areaSelectionInitial = new QPointF(e->screenPos());
 			this->scene()->setSelectionArea(QPainterPath(
 					*this->areaSelectionInitial));
 		}

@@ -36,11 +36,11 @@
 #include <gui/input/newinputinit.h>
 
 //-- Qt
-#include <QtGui>
+#include <QtWidgets>
 #include <QtCore>
 
 #include "newfsm.h"
-NewFsm::NewFsm(Fsm * fsm,QWidget* parent, Qt::WFlags f) :
+NewFsm::NewFsm(Fsm * fsm,QWidget* parent, Qt::WindowFlags f) :
 	QDialog(parent, f) {
 	setupUi(this);
 	connections();

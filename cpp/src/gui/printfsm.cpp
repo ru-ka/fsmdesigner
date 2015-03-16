@@ -24,7 +24,7 @@
 ***********************************************************************/
 
 #include "printfsm.h"
-#include <QtGui/QPrintDialog>
+#include <QtPrintSupport/QPrintDialog>
 
 PrintFSM::PrintFSM(QPrinter* printer,QWidget* p) :QDialog(p),Ui_printfsm()
 {
