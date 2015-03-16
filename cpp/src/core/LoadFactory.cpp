@@ -31,6 +31,7 @@ using namespace std;
 
 //Xmlload  LoadFactory::l;
 
+Load_I* LoadFactory::loader;
 
 Load_I& LoadFactory::getLoad_I() {
   

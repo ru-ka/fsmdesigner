@@ -31,6 +31,7 @@ using namespace std;
 
 //Xmlsave  SaveFactory::s;
 
+Save_I* SaveFactory::saver;
 
 Save_I& SaveFactory::getSave_I() {
   
