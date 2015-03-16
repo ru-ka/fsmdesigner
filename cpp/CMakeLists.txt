@@ -254,9 +254,9 @@ enable_testing()
 
 #qt5_wrap_ui(gui5_ui_headers ${gui_ui_src} -h)
 
-#add_executable( gui_test WIN32 src/fsmdesigner.cpp test.cpp ${gui_ui_src} )
-#target_link_libraries( gui_test gui_lib Qt5::Widgets Qt5::Core Qt5::Test ${gui_ui_src} )
-#add_test( NAME gut_test_case COMMAND gui_test )
+add_executable( gui_test WIN32 test.cpp )
+target_link_libraries( gui_test Qt5::Widgets Qt5::Core Qt5::Test gui_lib )
+add_test( NAME gut_test_case COMMAND gui_test )
 
 ## END TODO
 
