@@ -31,7 +31,27 @@ using namespace std;
 void LineEditTest::testGui() {
   MergedMainWindow w;
   w.show();
-//  QTest::mouseMoveEvent(& 
+  // Connect signals
+  connect( this, SIGNAL(signal_select_choose(bool) ), w.action_Choose,
+      SLOT( setChecked(bool) ) );
+  emit signal_select_choose( true );
+
+
+
+  //w.action_State->trigger();
+  QTest::qWait(1000);
+  //w.action_New->trigger();
+  //QTest::qWait(1000);
+  //QTest::mouseMove( &w, QPointF() ); // Move to center?
+  QTest::mouseMove(w.centralwidget, w.centralwidget->geometry().center() );
+  QTest::qWait(1000);
+  //QTest::mousePress(&w, Qt::LeftButton, 0, w.centralwidget->geometry().center() );
+  QTest::qWait(10);
+  //QTest::mouseRelease(&w, Qt::LeftButton, 0, w.centralwidget->geometry().center() );
+  QTest::qWait(1000);
+  //QTest::mouseMove( &w, w.action_ZoomIn->geometry().center() );
+  QTest::keyClicks( &w, QString("Hallo"), Qt::NoModifier, 1304);
+  //QTest::mouseMoveEvent(& 
 }
 
 QTEST_MAIN( LineEditTest )
