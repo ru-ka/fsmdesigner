@@ -464,9 +464,8 @@ void FSMSceneView::mousePressEvent(QMouseEvent* e) {
 
 		// Init area selection if nothing else selected
 		if (this->scene()->selectedItems().size() == 0) {
-      // TODO: double check if screenPos == pos() ?
-      // what was intented by posF?
-			this->areaSelectionInitial = new QPointF(e->screenPos());
+      // TODO: double check if pos() == posF() ? Most likely ;)
+			this->areaSelectionInitial = new QPointF(e->pos());
 			this->scene()->setSelectionArea(QPainterPath(
 					*this->areaSelectionInitial));
 		}

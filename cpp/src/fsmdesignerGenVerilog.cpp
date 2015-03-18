@@ -65,7 +65,6 @@ void cmdsyntaxerror() {
             << " (-force)? : Force generation even if errors occured" << endl
             ;
 }
-;
 
 int main(int argc, char ** argv, char** envp) {
 
@@ -74,9 +73,6 @@ int main(int argc, char ** argv, char** envp) {
 
     string st;
     string s;
-    bool c1;
-    bool c2;
-    bool c3;
 
     if (argc < 7) {
         cmdsyntaxerror();

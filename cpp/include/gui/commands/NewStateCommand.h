@@ -14,7 +14,8 @@
 #include <QtWidgets>
 
 //-- Gui
-#include <gui/scene/Scene.h>
+//#include <gui/scene/Scene.h>
+class Scene;
 
 //-- Items
 #include "gui/items/StateItem.h"

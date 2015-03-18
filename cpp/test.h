@@ -8,4 +8,7 @@ class LineEditTest: public QObject
   private slots:
     void testGui();
 //    void testOther();
+
+  signals:
+    void signal_select_choose(bool);
 };

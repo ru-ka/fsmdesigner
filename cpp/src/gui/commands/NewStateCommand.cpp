@@ -1,4 +1,5 @@
 #include "gui/commands/NewStateCommand.h"
+#include "gui/scene/Scene.h"
 
 
 NewStateCommand::NewStateCommand( Scene * _relatedScene,

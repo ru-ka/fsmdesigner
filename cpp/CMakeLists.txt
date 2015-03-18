@@ -206,6 +206,10 @@ foreach (package ${GUI_PACKAGES})
     file(GLOB package_moc_src ${FSMDesigner_SOURCE_DIR}/include/${package}/*.h )
     qt5_wrap_cpp(gui_moced_src ${package_moc_src})
 endforeach(package)
+## TODO : REMOVE
+file(GLOB package_moc_src *.h )
+qt5_wrap_cpp(test_moced_src ${package_moc_src})
+## END REMOVE
  
 
 #### UI

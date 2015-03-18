@@ -91,6 +91,7 @@ void TableTransModel::setRelatedScene(Scene * scene) {
 
         // Add Row with transition name
         //--------------
+        // TODO: memory leak?
         QStandardItem *item = new QStandardItem(QString::fromStdString(transition->getName()));
 
         // Add Conditions
