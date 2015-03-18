@@ -35,6 +35,8 @@
 #include <string>
 using namespace std;
 
+#include <cassert>
+
 //-- Core
 #include <core/Fsm.h>
 #include <core/Condition.h>
@@ -230,10 +232,11 @@ void Fsm::setOutputName(unsigned int i, string name) {
 }
 
 void Fsm::deleteInput(int i) {
+  assert( i >= 0 );
   qDebug() << "Fsm::deleteInput(int i)";
 
 
-    if (i < inputnames.size()) {
+    if ( (unsigned int) i < inputnames.size()) {
 
 
         //-- Update Parameters
@@ -270,9 +273,10 @@ void Fsm::deleteInput(int i) {
 }
 
 void Fsm::deleteOutput(int i) {
+  assert( i >= 0 );
   qDebug() << "Fsm::deleteOutput(int i)";
 
-    if (i < this->outputnames.size()) {
+    if ( (unsigned int) i < this->outputnames.size()) {
 
         //-- Remove corresponding output bit in state
         FOREACH_STATE(this)
@@ -300,8 +304,9 @@ void Fsm::deleteOutput(int i) {
 }
 
 void Fsm::moveupInput(int i) {
+  assert( i >= 0 );
 
-    if (i < this->inputnames.size() && i > 0) {
+    if ( (unsigned int) i < this->inputnames.size() && i > 0) {
 
 
         //-- Update parameters
@@ -343,7 +348,8 @@ void Fsm::moveupInput(int i) {
 }
 
 void Fsm::moveupOutput(int i) {
-    if (i < this->outputnames.size() && i > 0) {
+  assert( i >= 0 );
+    if ( (unsigned int) i < this->outputnames.size() && i > 0) {
 
         FOREACH_STATE(this)
 
@@ -364,7 +370,8 @@ void Fsm::moveupOutput(int i) {
 }
 
 void Fsm::movedownInput(int i) {
-    if (i < this->inputnames.size() - 1) {
+  assert( i >= 0 );
+    if ( (unsigned int) i < this->inputnames.size() - 1) {
 
         //-- Update parameters
         vector<Condition>::iterator ci;
@@ -407,7 +414,8 @@ void Fsm::movedownInput(int i) {
 }
 
 void Fsm::movedownOutput(int i) {
-    if (i < this->outputnames.size() - 1) {
+  assert( i >= 0 );
+    if ( (unsigned int) i < this->outputnames.size() - 1) {
 
         FOREACH_STATE(this)
 
@@ -429,7 +437,8 @@ void Fsm::movedownOutput(int i) {
 
 
 string Fsm::getOutputName(int pos) {
-    if (pos >= 0 && pos < this->outputnames.size()) {
+  assert( pos >= 0 );
+    if ( (unsigned int) pos >= 0 && (unsigned int) pos < this->outputnames.size()) {
         return outputnames[pos];
     } else {
         cerr << "Error OutPutNamePosition " << pos << "does not exist" << endl;
@@ -438,7 +447,8 @@ string Fsm::getOutputName(int pos) {
 }
 
 string Fsm::getInputName(int pos) {
-    if (pos < this->inputnames.size()) {
+  assert( pos >= 0 );
+    if ( (unsigned int) pos < this->inputnames.size()) {
         return inputnames[pos];
     } else {
         cerr << "Error InputNamePosition does not exist" << endl;
@@ -742,7 +752,7 @@ Link * Fsm::getLinkbyID(unsigned int id) {
 Link * Fsm::getLinkbyGoal(State * state) {
 
     //-- Foreach Links
-    Link * result = NULL;
+    //Link * result = NULL;
     FOREACH_LINKS(this)
         if (link->getTargetState()==state)
             return link;
