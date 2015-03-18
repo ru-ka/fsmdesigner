@@ -18,3 +18,7 @@ cpp/include/Utils.h
 *.tar.bz2
 *.deb
 
+# Qt related generated files
+ui_*
+moc_*
+*_automoc*
