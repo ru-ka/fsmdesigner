@@ -496,7 +496,8 @@ void FSMSceneView::wheelEvent(QWheelEvent *event) {
 		factor = event->delta() < 0 ? 1 / factor : factor;
 
 		//-- Get the new scenePos
-		QPointF scenePos = this->mapToScene(event->pos());
+    // TODO: double check unused variable
+//		QPointF scenePos = this->mapToScene(event->pos());
 
 		//-- Scale and center or center and scale
 		if (factor<1) {
@@ -658,7 +659,8 @@ void FSMSceneView::fit() {
 
 	//-- Get Items bouding rect
 	QRectF itemsBoundingRect = this->scene()->itemsBoundingRect();
-	QRectF fitRectScene = this->scene()->sceneRect();
+  // TODO: double check unused variable
+	//QRectF fitRectScene = this->scene()->sceneRect();
 
 	//-- Center on it
 	if (itemsBoundingRect.isValid())

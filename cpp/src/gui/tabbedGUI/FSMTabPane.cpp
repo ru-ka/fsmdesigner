@@ -235,7 +235,8 @@ void FSMTabPane::closeFSM(int index) {
 	QWidget * fsmWidget = this->widget(index);
 
 	//-- Get the related fsm
-	Fsm * fsm = dynamic_cast<FSMSceneView*>(fsmWidget)->getRelatedScene()->getFsm();
+  // TODO: double check unused variable
+	//Fsm * fsm = dynamic_cast<FSMSceneView*>(fsmWidget)->getRelatedScene()->getFsm();
 
 	//-- Close tab
     this->removeTab(index);

@@ -68,7 +68,6 @@ class MergedMainWindow: public QMainWindow, public Ui_MergedMainWindow  {
         /** \defgroup FileOpen Methods to open project files */
         /** @{
 
-        /**
          * Reimplements Drop event to fast open Project files
          * @param event
          */

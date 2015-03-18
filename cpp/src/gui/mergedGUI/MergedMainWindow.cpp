@@ -567,8 +567,9 @@ void MergedMainWindow::print() {
         return;
 
     // Space taken by the FSM on the scene
-    QGraphicsView * view = selectedScene->views().first();
-    QRectF brect = selectedScene->itemsBoundingRect();
+    // TOOD: double check unused variable
+    // QGraphicsView * view = selectedScene->views().first();
+    // QRectF brect = selectedScene->itemsBoundingRect();
 
     // Show Print Preview dialog
     //---------------------
@@ -611,7 +612,8 @@ void MergedMainWindow::print(QPrinter * printer) {
         return;
 
     // Space taken by the FSM on the scene
-    QRectF brect = selectedScene->itemsBoundingRect();
+    // TODO: double check unused varibale
+    // QRectF brect = selectedScene->itemsBoundingRect();
 
     // Do rendering
     // TODO: reimplement the rendering
@@ -631,7 +633,8 @@ void MergedMainWindow::exportAsSVG() {
     if (selectedScene == NULL)
         return;
 
-    QRectF brect = selectedScene->itemsBoundingRect();
+    // TODO: double check unused variable
+    // QRectF brect = selectedScene->itemsBoundingRect();
 
     QSvgGenerator generator;
     generator.setFileName("test.svg");

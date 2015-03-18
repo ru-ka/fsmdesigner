@@ -82,7 +82,7 @@ void handler(int sig) {
       std::to_string(hour) + "_m" + std::to_string(min);
     std::ofstream dump_file;
     dump_file.open(path.c_str() );
-    for (int i = 0; i < size; ++i)
+    for (unsigned int i = 0; i < size; ++i)
       dump_file << c_strings[i] << std::endl;
     dump_file.close();
     fprintf(stderr, "Trace dump stored: %s\n", path.c_str() );

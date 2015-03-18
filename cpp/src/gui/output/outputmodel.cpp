@@ -92,10 +92,11 @@ QVariant OutputModel::data(const QModelIndex& index, int role) const {
 
 	string s;
 	QString qs;
-	int ia;
-	int i;
+	//int ia;
+	//int i;
 	stringstream ss;
-	int ifsmid;
+  // TODO: double check unused variable
+	//int ifsmid;
 	int nOutputs;
 	nOutputs = relatedScene->getFsm()->getNumberOfOutputs();
 
@@ -105,7 +106,7 @@ QVariant OutputModel::data(const QModelIndex& index, int role) const {
 	bool isEditOrDisplayRole = isEditRole | isDisplayRole;
 
 	if (editingItemType == FSMDesigner::STATE) {
-		ifsmid = relatedScene->getFsm()->getFsmID();
+		//ifsmid = relatedScene->getFsm()->getFsmID();
 		nOutputs = relatedScene->getFsm()->getNumberOfOutputs();
 
 		// FIRST COLUMN (Output name)

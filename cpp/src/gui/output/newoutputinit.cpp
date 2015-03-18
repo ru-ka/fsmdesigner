@@ -56,7 +56,7 @@ void NewOutputInit::accept() {
     qs = fk->FilterSpecialChars(qs);
     qs = fk->FilterHDLKeywords(qs);
     string name = qs.toStdString();
-    Core& c = *(Core::getInstance());
+    //Core& c = *(Core::getInstance());
     Fsm& f = *(Core::getInstance()->getProject()->getSelectedFSM());
     while(!name.empty()) {
         string::size_type len = name.length();
