@@ -32,9 +32,7 @@ using namespace std;
 #include <gui/settings/GuiSettings.h>
 
 //-- Actions
-#include <gui/actions/DeleteStateAction.h>
 #include <gui/actions/ChangeStateNameAction.h>
-//#include <gui/actions/MoveStateAction.h>
 
 #include <common/SGC.h>
 
