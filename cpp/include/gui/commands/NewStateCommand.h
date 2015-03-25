@@ -37,7 +37,7 @@ class NewStateCommand : public QUndoCommand {
     State     * state       ; // Related fsm object.
 
     //QGraphicsSceneMouseEvent * mouseEvent;
-    QPointF     scenePos;
+    QPointF     scenePos    ;
 
     public:
       /**

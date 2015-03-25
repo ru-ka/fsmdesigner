@@ -341,7 +341,7 @@ class Fsm {
 
 
          */
-        State * createNextState( int id );
+        State * createNextState( ) const;
 
         int getNextStateId () const;
 
@@ -360,7 +360,7 @@ class Fsm {
          * @warning Does not delete the memory
          * @param state
          */
-        void removeState(State * state);
+        State * removeState(State * state);
 
         /*!
          \brief getStatebyID

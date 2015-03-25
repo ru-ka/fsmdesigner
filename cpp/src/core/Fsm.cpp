@@ -518,10 +518,10 @@ int Fsm::getNextStateId() const {
 }
 
 
-State * Fsm::createNextState(int id) {
+State * Fsm::createNextState() const {
 
     //-- Create state (ID assigned here)
-    State * newState = new State( id );
+    State * newState = new State( outputnames.size() );
 
     //-- Set a default name
     newState->setName("State_" + Utils::itos( this->statesMap.size() + 1) );
@@ -557,10 +557,11 @@ State * Fsm::addState(State * state) {
   return state;
 }
 
-void Fsm::removeState(State * state) {
+// TODO: return NULL on failure, a pointer to the state on success.
+State * Fsm::removeState(State * state) {
   qDebug() << "removeState(State * state)";
   if ( !state )
-    return; 
+    return NULL; 
 
   //-- Verify state is present in this FSM
   if (this->statesMap.count(state->getId()) == 0) {
@@ -570,12 +571,14 @@ void Fsm::removeState(State * state) {
       throw new invalid_argument(message.str());
   }
 
+  // TOOD: add additional safety.
   //-- Remove
   this->statesMap.erase(state->getId());
 
   //-- Deassign from ID manager
   this->stateIdManager.derefenceObject(state);
 
+  return state;
 }
 
 

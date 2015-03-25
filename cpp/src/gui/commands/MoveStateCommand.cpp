@@ -5,17 +5,13 @@ MoveStateCommand::MoveStateCommand( Scene * _relatedScene,
                                     QUndoCommand * _parentCommand) :
                                     QUndoCommand(_parentCommand), 
                                     relatedScene(_relatedScene),
-                                    stateItem(_stateItem),
-                                    state( _stateItem->getModel() ),
                                     fsm( _relatedScene->getFsm() ),
+                                    movedStateId( _stateItem->getModel()->getId() ),
                                     newPos( _stateItem->scenePos() ),
                                     bLastCommand( _relatedScene->bLastCommand )
 {
-  // TODO: do not use pointers any more.
-  // instead, use the item id and search in both, the scene and the data model
-  // for the related items.
-  oldPos.setX( stateItem->getModel()->getPosition().first  );
-  oldPos.setY( stateItem->getModel()->getPosition().second );
+  oldPos.setX( _stateItem->getModel()->getPosition().first  );
+  oldPos.setY( _stateItem->getModel()->getPosition().second );
 }
 
 
@@ -24,6 +20,8 @@ MoveStateCommand::~MoveStateCommand() {
 
 
 void  MoveStateCommand::redo(){
+  State * state = fsm->getStateByID( movedStateId );
+  StateItem * stateItem = relatedScene->findStateItem( state );
   stateItem->setPos(newPos);
   state->setPosition(std::make_pair(newPos.x(), newPos.y()));
   stateItem->modelChanged();
@@ -34,6 +32,8 @@ void  MoveStateCommand::redo(){
 
 
 void  MoveStateCommand::undo(){
+  State * state = fsm->getStateByID( movedStateId );
+  StateItem * stateItem = relatedScene->findStateItem( state );
   stateItem->setPos(oldPos);
   state->setPosition(std::make_pair(oldPos.x(), oldPos.y()));
   stateItem->modelChanged();
@@ -51,16 +51,18 @@ int   MoveStateCommand::id() const {
 bool  MoveStateCommand::mergeWith(const QUndoCommand * command) {
   // Ensure, that merely MoveStateCommands of the same item are merged.
   const MoveStateCommand *moveCommand = static_cast<const MoveStateCommand *>(command);
-  StateItem * nextItem = moveCommand->getItem();
-  if (stateItem != nextItem) 
+  int nextItemID = moveCommand->getItemID();
+  if (movedStateId != nextItemID) 
     return false;
 
   // Merge the commands for the same item.
+  State * state = fsm->getStateByID( movedStateId );
+  StateItem * nextItem = relatedScene->findStateItem( state );
   newPos = nextItem->scenePos();
   return true;
 }
 
 
-StateItem* MoveStateCommand::getItem() const {
-  return stateItem;
+int MoveStateCommand::getItemID() const {
+  return movedStateId;
 }

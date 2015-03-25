@@ -29,9 +29,9 @@ class MoveStateCommand : public QUndoCommand {
   private:
     // Related objects
     Scene     * relatedScene;
-    StateItem * stateItem   ; // Related GUI object.
-    State     * state       ; // Related fsm object.
     Fsm       * fsm         ;
+
+    int         movedStateId;
 
     QPointF     oldPos      ;
     QPointF     newPos      ;
@@ -63,7 +63,7 @@ class MoveStateCommand : public QUndoCommand {
     virtual bool mergeWith(const QUndoCommand * command);
     /** @} */
 
-    StateItem * getItem()   const;
+    int getItemID()   const;
 };
 
 #endif /* __MOVESTATECOMMAND_H__ */
