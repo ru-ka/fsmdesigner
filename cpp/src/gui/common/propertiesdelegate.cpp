@@ -283,7 +283,7 @@ void PropertiesDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
 			bool reset = static_cast<QComboBox*> (editor)->currentIndex() == 0 ? false : true;
 
 			//-- If there is anoter default StateItem, set it as not default in the UI
-			State * actualReset = relatedScene->getFsm()->getStatebyID(relatedScene->getFsm()->getResetState());
+			State * actualReset = relatedScene->getFsm()->getStateByID(relatedScene->getFsm()->getResetState());
 			if (actualReset!=NULL && reset) {
 			    actualReset->setReset(false);
 			    relatedScene->findStateItem(actualReset)->modelChanged();

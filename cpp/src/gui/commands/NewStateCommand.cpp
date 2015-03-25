@@ -11,34 +11,12 @@ NewStateCommand::NewStateCommand( Scene * _relatedScene,
                                   bLastCommand( _relatedScene->bLastCommand ),
                                   stateItem( NULL ),
                                   state( NULL ),
-                                  mouseEvent(_e)
+                                  scenePos( _e->scenePos() )
 {
-  //-- New new GUI item to the Scene
-  stateItem = new StateItem();
-  // Set GUI properties.
-  stateItem->setVisible( true );
-  stateItem->setEnabled( true );
-
-  //-- Create a new state to the underlying model and refer to it in the GUI item
-  state = fsm->addState();
-  stateItem->setModel( state );
-  // The state should be added via the redo-method. The Fsm.h API currently
-  // does not support the feature to generate a new state, but not to add it
-  // internally yet.
-  fsm->deleteState(state);
-
-  //-- Place centered on mouse
-  state->setPosition(pair<double,double>(mouseEvent->scenePos().x(),mouseEvent->scenePos().y()));
-  stateItem->setPos(mouseEvent->scenePos());
 }
 
 
 NewStateCommand::~NewStateCommand() {
-  // The command will only be destroyed in the undo-state.
-  // In this state, the command has the ownership of the GUI and of the FSM
-  // objects.
-  delete stateItem;
-  delete state;
 }
 
 
@@ -46,9 +24,25 @@ void  NewStateCommand::redo(){
   qDebug() << "-------------------------";
   qDebug() << "New state item    redo() ";
   qDebug() << "-------------------------";
+  //-- New new GUI item to the Scene
+  stateItem = new StateItem();
+  // Set GUI properties.
+  stateItem->setVisible( true );
+  stateItem->setEnabled( true );
+
+  //-- Create a new state to the underlying model and refer to it in the GUI item
+  int next_state_id = fsm->getNextStateId();
+  state = fsm->createNextState( next_state_id );
+  stateItem->setModel( state );
+
+  //-- Place centered on mouse
+  state->setPosition(pair<double,double>( scenePos.x(),scenePos.y()) );
+  stateItem->setPos( scenePos );
+
   // Pass the ownership of the state objects to the scene and the model.
   relatedScene->addItem( stateItem ); 
-  fsm->addState( state );
+  State * statePointer = fsm->addState( state );
+  Q_ASSERT( statePointer != NULL );
 
   relatedScene->update();
   relatedScene->bLastCommand = false;
@@ -61,8 +55,12 @@ void  NewStateCommand::undo(){
   qDebug() << "-------------------------";
   // Get the ownership of the state objects.
   relatedScene->removeItem(   stateItem );
-  fsm->deleteState( state );
+  fsm->removeState( state );
 
   relatedScene->update();
   relatedScene->bLastCommand = this->bLastCommand;
+
+  delete stateItem;
+  delete state;
+
 }

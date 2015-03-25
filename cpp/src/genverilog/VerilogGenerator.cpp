@@ -440,7 +440,7 @@ void VerilogGenerator::generate(Fsm * fsm, QDataStream * dataStream) {
     a = 1 << numberofoutputs;
     if (!(a == fsm->getStateCount())) {
         out << "    default:  next_state = ";
-        out << this->cleanString(fsm->getStatebyID(fsm->getResetState())->getName()) << ";" << endl;
+        out << this->cleanString(fsm->getStateByID(fsm->getResetState())->getName()) << ";" << endl;
     }
 
     out << "  endcase" << endl;
@@ -465,14 +465,14 @@ void VerilogGenerator::generate(Fsm * fsm, QDataStream * dataStream) {
 
     //-- Reset: Current State
     out << "        current_state <= ";
-    out << this->cleanString(fsm->getStatebyID(fsm->getResetState())->getName())<< ";" << endl;
+    out << this->cleanString(fsm->getStateByID(fsm->getResetState())->getName())<< ";" << endl;
 
 
     //-- Reset: Current state delayed
     if (this->getParameter("forward.delayed").toBool()) {
 
         out << "        forward_state_delayed <= ";
-        out << this->cleanString(fsm->getStatebyID(fsm->getResetState())->getName()) << ";" << endl;
+        out << this->cleanString(fsm->getStateByID(fsm->getResetState())->getName()) << ";" << endl;
 
     }
 

@@ -62,7 +62,7 @@ StatesComboBox::~StatesComboBox() {
 
 State * StatesComboBox::getSelectedState() {
 
-    return this->fsm->getStatebyID(this->itemData(this->currentIndex(), Qt::UserRole).toInt());
+    return this->fsm->getStateByID(this->itemData(this->currentIndex(), Qt::UserRole).toInt());
 
 }
 

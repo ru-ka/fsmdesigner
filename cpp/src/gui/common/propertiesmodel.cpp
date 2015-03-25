@@ -582,9 +582,9 @@ bool PropertiesModel::setData(const QModelIndex& index, const QVariant& value,
 		case PropertiesDelegate::ROW_TRANS_START: {
 
 		    //-- Check there is really a change
-		    State * targetState = relatedScene->getFsm()->getStatebyID(value.toInt());
+		    State * targetState = relatedScene->getFsm()->getStateByID(value.toInt());
 		    if (trans->getStartState()!=targetState) {
-		        ChangeTransitionStartAction * changeTransitionStart= new ChangeTransitionStartAction(relatedScene->getFsm()->getStatebyID(value.toInt()),static_cast<Transline*>(editingItem));
+		        ChangeTransitionStartAction * changeTransitionStart= new ChangeTransitionStartAction(relatedScene->getFsm()->getStateByID(value.toInt()),static_cast<Transline*>(editingItem));
 		        this->getRelatedScene()->getUndoStack()->push(changeTransitionStart);
 
 		    }
@@ -594,9 +594,9 @@ bool PropertiesModel::setData(const QModelIndex& index, const QVariant& value,
 		case PropertiesDelegate::ROW_TRANS_END: {
 
 		    //-- Check there is really a change
-            State * targetState = relatedScene->getFsm()->getStatebyID(value.toInt());
+            State * targetState = relatedScene->getFsm()->getStateByID(value.toInt());
             if (trans->getStartState()!=targetState) {
-                ChangeTransitionEndAction * changeTransitionEnd= new ChangeTransitionEndAction(relatedScene->getFsm()->getStatebyID(value.toInt()),static_cast<Transline*>(editingItem));
+                ChangeTransitionEndAction * changeTransitionEnd= new ChangeTransitionEndAction(relatedScene->getFsm()->getStateByID(value.toInt()),static_cast<Transline*>(editingItem));
                 this->getRelatedScene()->getUndoStack()->push(changeTransitionEnd);
             }
 
@@ -683,7 +683,7 @@ bool PropertiesModel::setData(const QModelIndex& index, const QVariant& value,
 
                 // FIXME: Use action
                 //-- Check there is really a change
-                State * targetState = relatedScene->getFsm()->getStatebyID(value.toInt());
+                State * targetState = relatedScene->getFsm()->getStateByID(value.toInt());
                 if (hypertrans->getTargetState()!=targetState) {
 
                     ChangeHyperTransitionTargetAction * changeAction = new ChangeHyperTransitionTargetAction(targetState,static_cast<HyperTransition*>(editingItem));

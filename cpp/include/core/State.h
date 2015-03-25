@@ -173,7 +173,8 @@ class State: public UniqueIDObject {
 
 #define FOREACH_STATE_STARTING_TRANSITIONS(state) \
      for (list<Trans*>::iterator it = state->getStartingTransitions().begin();it!=state->getStartingTransitions().end();it++) { \
-         ::Trans* transition = *it;
+         ::Trans* transition = *it; \
+         (void) transition;
 
 #define END_FOREACH_STATE_STARTING_TRANSITIONS }
 

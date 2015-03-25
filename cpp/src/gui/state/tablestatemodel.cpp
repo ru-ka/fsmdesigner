@@ -112,6 +112,8 @@ QVariant TableStateModel::data(const QModelIndex& index, int role) const {
         return QVariant();
     }
 
+    State * statePointer = relatedScene->getFsm()->getStateByID( index.row() );
+    Q_ASSERT( statePointer != NULL );
     // Switch on column
     //---------------------------
     switch (index.column()) {
@@ -120,7 +122,7 @@ QVariant TableStateModel::data(const QModelIndex& index, int role) const {
         //------------------
         case 0: {
 
-            return QString::fromStdString(relatedScene->getFsm()->getStatesArray()[index.row()]->getName());
+            return QString::fromStdString( statePointer->getName() );
 
             break;
         }
@@ -128,9 +130,7 @@ QVariant TableStateModel::data(const QModelIndex& index, int role) const {
         //------------------
         case 1: {
 
-
-
-            return QString::fromStdString(relatedScene->getFsm()->getStatesArray()[index.row()]->getOutput());
+            return QString::fromStdString( statePointer->getOutput() );
 
             break;
         }
@@ -138,7 +138,7 @@ QVariant TableStateModel::data(const QModelIndex& index, int role) const {
         //------------------
         case 2:{
 
-            QColor col = QColor::fromRgb(relatedScene->getFsm()->getStatesArray()[index.row()]->getColor());
+            QColor col = QColor::fromRgb( statePointer->getColor() );
             //qDebug() << "Got Color for display : " << col.rgb();
 
             return col;
@@ -149,7 +149,7 @@ QVariant TableStateModel::data(const QModelIndex& index, int role) const {
         //------------------
         case 3:{
 
-            return relatedScene->getFsm()->getStatesArray()[index.row()]->isReset();
+            return statePointer->isReset();
 
             break;
         }
@@ -177,7 +177,9 @@ bool TableStateModel::setData(const QModelIndex& index, const QVariant& value,
 
            // Do change
            //---------------
-           StateItem * item = relatedScene->findStateItem(relatedScene->getFsm()->getStatesArray()[index.row()]);
+           State * statePointer = relatedScene->getFsm()->getStateByID( index.row() );
+           Q_ASSERT( statePointer != NULL );
+           StateItem * item = relatedScene->findStateItem( statePointer );
            relatedScene->getUndoStack()->push(new ChangeStateNameAction(newName,item));
 
            return true;
@@ -193,7 +195,9 @@ bool TableStateModel::setData(const QModelIndex& index, const QVariant& value,
 
            // Do change
            //---------------
-           StateItem * item = relatedScene->findStateItem(relatedScene->getFsm()->getStatesArray()[index.row()]);
+           State * statePointer = relatedScene->getFsm()->getStateByID( index.row() );
+           Q_ASSERT( statePointer != NULL );
+           StateItem * item = relatedScene->findStateItem( statePointer );
            relatedScene->getUndoStack()->push(new ChangeStateOutputAction(newOutput,item));
 
            return true;
@@ -212,7 +216,9 @@ bool TableStateModel::setData(const QModelIndex& index, const QVariant& value,
 
            // Do change
            //---------------
-           StateItem * item = relatedScene->findStateItem(relatedScene->getFsm()->getStatesArray()[index.row()]);
+           State * statePointer = relatedScene->getFsm()->getStateByID( index.row() );
+           Q_ASSERT( statePointer != NULL );
+           StateItem * item = relatedScene->findStateItem( statePointer );
            relatedScene->getUndoStack()->push(new ChangeStateColorAction(newColor,item));
 
            return true;

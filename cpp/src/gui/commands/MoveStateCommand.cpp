@@ -11,6 +11,9 @@ MoveStateCommand::MoveStateCommand( Scene * _relatedScene,
                                     newPos( _stateItem->scenePos() ),
                                     bLastCommand( _relatedScene->bLastCommand )
 {
+  // TODO: do not use pointers any more.
+  // instead, use the item id and search in both, the scene and the data model
+  // for the related items.
   oldPos.setX( stateItem->getModel()->getPosition().first  );
   oldPos.setY( stateItem->getModel()->getPosition().second );
 }

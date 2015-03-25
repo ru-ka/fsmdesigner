@@ -78,7 +78,7 @@ QWidget* TableTransDelegate::createEditor(QWidget* parent,
 
         // Create a list of states name
         //-------------------
-        StatesComboBox* cb = new StatesComboBox(relatedScene->getFsm(),false,relatedScene->getFsm()->getStatebyID(index.data(Qt::EditRole).toInt()),parent);
+        StatesComboBox* cb = new StatesComboBox(relatedScene->getFsm(),false,relatedScene->getFsm()->getStateByID(index.data(Qt::EditRole).toInt()),parent);
 
 
         return cb;

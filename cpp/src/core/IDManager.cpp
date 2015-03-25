@@ -95,7 +95,7 @@ unsigned int IDManager::assignID(UniqueIDObject * object) {
 
 void IDManager::derefenceObject(UniqueIDObject * reference) {
 
-    QMutexLocker locker(&(this->mutex));
+    QMutexLocker locker( &(this->mutex) );
 
     //-- Find objects ID
     if (this->referenceToIdMap.count(reference)>0) {
@@ -108,7 +108,5 @@ void IDManager::derefenceObject(UniqueIDObject * reference) {
         reference->setId(0);
 
     }
-
-
 
 }

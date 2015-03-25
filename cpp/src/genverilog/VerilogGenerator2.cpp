@@ -150,7 +150,7 @@ void VerilogGenerator2::generate(Fsm * fsm, QDataStream * dataStream) {
     out << "always @(*) begin" << endl;
     out << "   if (!res_n) begin" << endl;
     out << "       transition_matched = 0;" << endl;
-    out << "       next_state = "<< this->cleanString(fsm->getStatebyID(fsm->getResetState())->getName()) <<";" << endl;
+    out << "       next_state = "<< this->cleanString(fsm->getStateByID(fsm->getResetState())->getName()) <<";" << endl;
     out << "   end else begin" << endl << endl;
 
 
@@ -182,7 +182,7 @@ void VerilogGenerator2::generate(Fsm * fsm, QDataStream * dataStream) {
     //---- State setting case
     //---    - Generate a full_case to determine which state is the next one
     //---    - We cqn use a full_case because the final state decision is covered by the transition_matched signal
-    out << "       next_state = " << this->cleanString(fsm->getStatebyID(fsm->getResetState())->getName())<< ";" << endl;
+    out << "       next_state = " << this->cleanString(fsm->getStateByID(fsm->getResetState())->getName())<< ";" << endl;
     out << "       casex({input_vector,output_state}) // cadence full_case" << endl;
     FOREACH_STATE(fsm)
         FOREACH_STATE_STARTING_TRANSITIONS(state)
@@ -216,7 +216,7 @@ void VerilogGenerator2::generate(Fsm * fsm, QDataStream * dataStream) {
             << ") begin" << endl;
     out << "`endif" << endl;
     out << "    if (!res_n) begin" << endl;
-    out << "        output_state <= "<< this->cleanString(fsm->getStatebyID(fsm->getResetState())->getName()) <<";" << endl;
+    out << "        output_state <= "<< this->cleanString(fsm->getStateByID(fsm->getResetState())->getName()) <<";" << endl;
     out << "    end else if (!transition_matched) begin" << endl << endl;
 
     //---- Default transition if no match

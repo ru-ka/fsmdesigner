@@ -271,7 +271,7 @@ void QXMLLoad::parseFSM(QDomElement fsmElement) {
 	for (QList<QDomElement>::iterator it=links.begin();it!=links.end();it++,loopcounter++) {
 
 	    //-- Create
-	    Link * link = new Link(fsm->getStatebyID(atoi(QXMLLoad::getAttributeValue("goal",*it))),atof(QXMLLoad::getAttributeValue("posx",*it)),
+	    Link * link = new Link(fsm->getStateByID(atoi(QXMLLoad::getAttributeValue("goal",*it))),atof(QXMLLoad::getAttributeValue("posx",*it)),
                 atof(QXMLLoad::getAttributeValue("posy",*it)));
 	    link->setId(atoi(QXMLLoad::getAttributeValue("id",*it)));
 
@@ -296,7 +296,7 @@ void QXMLLoad::parseFSM(QDomElement fsmElement) {
 	    hyperTransition->setType(atoi(QXMLLoad::getChildText("type",*it).c_str()) == 0 ? Hypertrans::FromReset : Hypertrans::FromAllStates);
 	    hyperTransition->setPosition(make_pair( atof(QXMLLoad::getAttributeValue("posx",*it)),atof(QXMLLoad::getAttributeValue("posy",*it))));
 	    hyperTransition->setId(atoi(QXMLLoad::getAttributeValue("id",*it)));
-	    hyperTransition->setTargetState(fsm->getStatebyID(atoi(QXMLLoad::getAttributeValue("targetState",*it))));
+	    hyperTransition->setTargetState(fsm->getStateByID(atoi(QXMLLoad::getAttributeValue("targetState",*it))));
 	    hyperTransition->setName(QXMLLoad::getChildText("name",*it));
 
 
@@ -342,7 +342,7 @@ void QXMLLoad::parseFSM(QDomElement fsmElement) {
 		newJoin->setPosy(atof(QXMLLoad::getAttributeValue("posy",*it)));
 
 		//-- target State
-		newJoin->setTargetState(fsm->getStatebyID(atoi(QXMLLoad::getAttributeValue("targetState",*it))));
+		newJoin->setTargetState(fsm->getStateByID(atoi(QXMLLoad::getAttributeValue("targetState",*it))));
 
 		//-- Add join to FSM
         fsm->addJoin(newJoin);
@@ -385,8 +385,8 @@ void QXMLLoad::parseFSM(QDomElement fsmElement) {
         //cout << "Trans: " <<atoi(QXMLLoad::getChildText("start",*it)) <<"->" <<atoi(QXMLLoad::getChildText("end",*it)) << ", Default: "<< (atoi(QXMLLoad::getChildText("default",*it))==1?true:false)  <<endl;
 
         //-- Get start and end
-        State * start = fsm->getStatebyID(atoi(QXMLLoad::getChildText("start",*it).c_str()));
-        State * end   = fsm->getStatebyID(atoi(QXMLLoad::getChildText("end",*it).c_str()));
+        State * start = fsm->getStateByID(atoi(QXMLLoad::getChildText("start",*it).c_str()));
+        State * end   = fsm->getStateByID(atoi(QXMLLoad::getChildText("end",*it).c_str()));
 
 
         //-- Create

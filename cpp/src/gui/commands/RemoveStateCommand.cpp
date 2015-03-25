@@ -23,7 +23,7 @@ void  RemoveStateCommand::redo(){
   qDebug() << "Remove state item undo() ";
   qDebug() << "-------------------------";
   relatedScene->removeItem(   stateItem );
-  fsm->deleteState( state );
+  fsm->removeState( state );
 
   relatedScene->update();
   relatedScene->bLastCommand = false;

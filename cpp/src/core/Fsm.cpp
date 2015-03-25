@@ -137,18 +137,18 @@ string Fsm::getParameter(string key, string defaultValue) {
 }
 
 
-void Fsm::setResetState(unsigned int id) {
+void Fsm::setResetState(int id) {
 
     //-- Find the actual reset state and set it to not reset
-    if (this->getStatebyID(resetstate) != NULL)
-        this->getStatebyID(resetstate)->setReset(false);
+    if (this->getStateByID(resetstate) != NULL)
+        this->getStateByID(resetstate)->setReset(false);
 
     //-- Record new reset state
     this->resetstate = id;
 
     //-- Set new reset state to reset
-    if (this->getStatebyID(id) != NULL)
-        this->getStatebyID(id)->setReset(true);
+    if (this->getStateByID(id) != NULL)
+        this->getStateByID(id)->setReset(true);
 
 }
 
@@ -217,15 +217,17 @@ void Fsm::addOutput(string name,int defaultValue) {
 
 }
 
-void Fsm::setInputName(unsigned int i, string name) {
-    if (i < inputnames.size()) {
+void Fsm::setInputName(int i, string name) {
+  assert( i>= 0 );
+    if ( (unsigned int) i < inputnames.size()) {
         inputnames[i] = name;
     } else
         throw invalid_argument("Cannot change input name because the index is out of bound");
 }
 
-void Fsm::setOutputName(unsigned int i, string name) {
-    if (i < outputnames.size()) {
+void Fsm::setOutputName(int i, string name) {
+  assert( i>= 0 );
+    if ( (unsigned int) i < outputnames.size()) {
         outputnames[i] = name;
     } else
         throw invalid_argument("Cannot change output name because the index is out of bound");
@@ -499,49 +501,30 @@ string Fsm::getResetName() {
 }
 
 
-State* Fsm::getStatebyID(int id) {
+State* Fsm::getStateByID(int id) {
     if (this->statesMap.count(id) == 0)
         return NULL;
     return this->statesMap[id];
 }
 
 
-map<unsigned int, State*>& Fsm::getStates() {
+map<int, State*>& Fsm::getStates() {
 
     return this->statesMap;
 }
 
-State** Fsm::getStatesArray() {
-
-    // Create array
-    //-------------
-    State ** array = (State**) malloc(this->getStateCount()*sizeof(State*));
-    //list<State*> statesList;
-
-    // Add all States
-    //----------------------
-    int i=0;
-    FOREACH_STATE(this)
-        array[i] = state;
-    i++;
-        //statesList.push_back(state);
-    END_FOREACH_STATE
-
-    // Return list
-    //----------------
-    return array;
+int Fsm::getNextStateId() const {
+  return this->statesMap.size() + 1;
 }
 
 
-State* Fsm::addState() {
-
+State * Fsm::createNextState(int id) {
 
     //-- Create state (ID assigned here)
-    State * newState = this->addState(new State(this->outputnames.size()));
+    State * newState = new State( id );
 
     //-- Set a default name
-    newState->setName("State_" + Utils::itos(this->statesMap.size()));
-
+    newState->setName("State_" + Utils::itos( this->statesMap.size() + 1) );
 
     return newState;
 
@@ -554,10 +537,10 @@ State * Fsm::addState(State * state) {
 
   //-- If already in the FSM, don't add
   if (state->isIdSet() && this->statesMap.count(state->getId())>0)
-      return state;
+      return NULL;    // Indicate an error by returning NULL
 
   //-- Register to ID manager
-  this->idManager.assignID(state);
+  this->stateIdManager.assignID(state);
 
 
   //-- Should be reset state ?
@@ -574,15 +557,15 @@ State * Fsm::addState(State * state) {
   return state;
 }
 
-void Fsm::deleteState(State * state) {
-  qDebug() << "deleteState(State * state)";
+void Fsm::removeState(State * state) {
+  qDebug() << "removeState(State * state)";
   if ( !state )
     return; 
 
   //-- Verify state is present in this FSM
   if (this->statesMap.count(state->getId()) == 0) {
       stringstream message;
-      message << "Trying to delete state with id " << state->getId()
+      message << "Trying to remove state with id " << state->getId()
               << "not possible because state does not belong to FSM";
       throw new invalid_argument(message.str());
   }
@@ -591,20 +574,20 @@ void Fsm::deleteState(State * state) {
   this->statesMap.erase(state->getId());
 
   //-- Deassign from ID manager
-  this->idManager.derefenceObject(state);
+  this->stateIdManager.derefenceObject(state);
 
 }
 
 
 
 
-Trans * Fsm::addTrans(unsigned int startId, unsigned int endId) {
-  qDebug() << "Fsm::addTrans(unsigned int startId, unsigned int endId";
+Trans * Fsm::addTrans(int startId, int endId) {
+  qDebug() << "Fsm::addTrans(int startId, int endId";
 
     // Get Start State
     //--------------------
-    State * start = this->getStatebyID(startId);
-    State * end = this->getStatebyID(endId);
+    State * start = this->getStateByID(startId);
+    State * end = this->getStateByID(endId);
 
     if (start == NULL || end == NULL) {
         stringstream ss;
@@ -647,7 +630,7 @@ Trans * Fsm::addTrans(Trans * transition) {
       return transition;
 
   //-- Set ID
-  this->idManager.assignID(transition);
+  this->transIdManager.assignID(transition);
 
   //-- Add
   this->transitionsMap[transition->getId()] = transition;
@@ -659,7 +642,7 @@ Trans * Fsm::addTrans(Trans * transition) {
 
 }
 
-Trans * Fsm::deleteTrans(unsigned int id) {
+Trans * Fsm::deleteTrans(int id) {
 
     //-- Check transition is in the map
     if (this->transitionsMap.count(id)==0)
@@ -688,7 +671,7 @@ Trans * Fsm::deleteTrans(Trans * trans) {
     this->transitionsMap.erase(trans->getId());
 
     //-- Remove from ID manager
-    this->idManager.derefenceObject(trans);
+    this->transIdManager.derefenceObject(trans);
 
     return trans;
 
@@ -712,7 +695,7 @@ Hypertrans * Fsm::addHypertrans(Hypertrans * hypertrans) {
         return hypertrans;
 
     //-- Assign ID
-    this->idManager.assignID(hypertrans);
+    this->hyperIdManager.assignID(hypertrans);
 
     //-- Add to map
     this->hyperTransMap[hypertrans->getId()] = hypertrans;
@@ -731,12 +714,12 @@ Hypertrans* Fsm::deleteHypertrans(Hypertrans* hypertransition) {
     this->hyperTransMap.erase(hypertransition->getId());
 
     //-- Deassign ID
-    this->idManager.derefenceObject(hypertransition);
+    this->hyperIdManager.derefenceObject(hypertransition);
 
     return hypertransition;
 
 }
-Hypertrans* Fsm::deleteHypertrans(unsigned int id) {
+Hypertrans* Fsm::deleteHypertrans(int id) {
 
     //-- Call Pointer version of function
     return this->deleteHypertrans(this->getHypertransbyID(id));
@@ -745,7 +728,7 @@ Hypertrans* Fsm::deleteHypertrans(unsigned int id) {
 }
 
 
-Link * Fsm::getLinkbyID(unsigned int id) {
+Link * Fsm::getLinkbyID(int id) {
     return this->linksMap.count(id) > 0 ? this->linksMap[id] : NULL;
 }
 
@@ -784,7 +767,7 @@ Link * Fsm::addLink(Link * link) {
         return link;
 
     //-- Register to ID manager
-    this->idManager.assignID(link);
+    this->linkIdManager.assignID(link);
 
     //-- Add to map
     this->linksMap[link->getId()] = link;
@@ -822,7 +805,7 @@ Link * Fsm::deleteLink(Link * link) {
     this->linksMap.erase(link->getId());
 
     //-- Remove from ID manager
-    this->idManager.derefenceObject(link);
+    this->linkIdManager.derefenceObject(link);
 
 
 
@@ -831,13 +814,13 @@ Link * Fsm::deleteLink(Link * link) {
 }
 
 
-map<unsigned int, Link*>& Fsm::getLinks() {
+map<int, Link*>& Fsm::getLinks() {
     return this->linksMap;
 }
 
 
 
-map<unsigned int, Trans*>& Fsm::getTransitions() {
+map<int, Trans*>& Fsm::getTransitions() {
     return this->transitionsMap;
 }
 
@@ -863,7 +846,7 @@ Trans** Fsm::getTransitionsArray() {
 }
 
 
-Trans * Fsm::getTransbyID(unsigned int id) {
+Trans * Fsm::getTransbyID(int id) {
 
     return this->transitionsMap.count(id) > 0 ? this->transitionsMap[id] : NULL;
 
@@ -871,11 +854,11 @@ Trans * Fsm::getTransbyID(unsigned int id) {
 
 
 
-map<unsigned int, Hypertrans*>& Fsm::getHypertransitions() {
+map<int, Hypertrans*>& Fsm::getHypertransitions() {
     return this->hyperTransMap;
 }
 
-Hypertrans * Fsm::getHypertransbyID(unsigned int id) {
+Hypertrans * Fsm::getHypertransbyID(int id) {
 
     return this->hyperTransMap.count(id) > 0 ? this->hyperTransMap[id] : NULL;
 
@@ -903,7 +886,7 @@ Join * Fsm::addJoin(Join * join) {
         return join;
 
     //-- Assign an ID
-    this->idManager.assignID(join);
+    this->joinIdManager.assignID(join);
 
     //-- Add to map
     this->joinsMap[join->getId()] = join;
@@ -927,17 +910,17 @@ Join * Fsm::deleteJoin(Join * join) {
     this->joinsMap.erase(join->getId());
 
     //-- Deassign ID
-    this->idManager.derefenceObject(join);
+    this->joinIdManager.derefenceObject(join);
 
     return join;
 
 }
 
-map<unsigned int, Join*>& Fsm::getJoins() {
+map<int, Join*>& Fsm::getJoins() {
     return this->joinsMap;
 }
 
-Join * Fsm::getJoin(unsigned int id) {
+Join * Fsm::getJoin(int id) {
     if (this->joinsMap.count(id) == 0)
             return NULL;
     return this->joinsMap[id];

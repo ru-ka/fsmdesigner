@@ -1,6 +1,12 @@
 cmake_minimum_required (VERSION 2.8)
 project (FSMDesigner)
 
+# Set version number
+#########################
+set (FSMDesigner_VERSION_MAJOR 5)
+set (FSMDesigner_VERSION_MINOR 2)
+set (FSMDesigner_VERSION_PATCH 1)
+
 ## TODO
 ## QT5 ##
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -12,36 +18,33 @@ find_package(Qt5Xml  REQUIRED)
 find_package(Qt5Script REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
 find_package(Qt5Svg REQUIRED)
-#include dirs
-include_directories(${Qt5Core_INCLUDES})
-include_directories(${Qt5Test_INCLUDES})
-include_directories(${Qt5Widgets_INCLUDES})
-include_directories(${Qt5Gui_INCLUDES})
-include_directories(${Qt5Xml_INCLUDES})
-include_directories(${Qt5Script_INCLUDES})
-include_directories(${Qt5PrintSupport_INCLUDES})
-include_directories(${Qt5Svg_INCLUDES})
-#definitions
-add_definitions(${Qt5Core_DEFINITIONS})
-add_definitions(${Qt5Test_DEFINITIONS})
-add_definitions(${Qt5Widgets_DEFINITIONS})
-add_definitions(${Qt5Gui_DEFINITIONS})
-add_definitions(${Qt5Xml_DEFINITIONS})
-add_definitions(${Qt5Script_DEFINITIONS})
-add_definitions(${Qt5PrintSupport_DEFINITIONS})
-add_definitions(${Qt5Svg_DEFINITIONS})
+##include dirs
+#include_directories(${Qt5Core_INCLUDES})
+#include_directories(${Qt5Test_INCLUDES})
+#include_directories(${Qt5Widgets_INCLUDES})
+#include_directories(${Qt5Gui_INCLUDES})
+#include_directories(${Qt5Xml_INCLUDES})
+#include_directories(${Qt5Script_INCLUDES})
+#include_directories(${Qt5PrintSupport_INCLUDES})
+#include_directories(${Qt5Svg_INCLUDES})
+##definitions
+#add_definitions(${Qt5Core_DEFINITIONS})
+#add_definitions(${Qt5Test_DEFINITIONS})
+#add_definitions(${Qt5Widgets_DEFINITIONS})
+#add_definitions(${Qt5Gui_DEFINITIONS})
+#add_definitions(${Qt5Xml_DEFINITIONS})
+#add_definitions(${Qt5Script_DEFINITIONS})
+#add_definitions(${Qt5PrintSupport_DEFINITIONS})
+#add_definitions(${Qt5Svg_DEFINITIONS})
 #TODO: dobulecheck next. END TODO
-set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+#set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 set(CMAKE_AUTOMOC ON)
-
 ## END TODO
 
-# Set version number
-#########################
-set (FSMDesigner_VERSION_MAJOR 5)
-set (FSMDesigner_VERSION_MINOR 2)
-set (FSMDesigner_VERSION_PATCH 1)
+#include dirs for QtCreator
+include_directories("${FSMDesigner_SOURCE_DIR}/include/core/")
+
 
 #SET (CMAKE_CXX_COMPILER             "/usr/bin/g++")
 SET (CMAKE_CXX_FLAGS                "-Wall -pedantic")
@@ -71,7 +74,7 @@ message(STATUS "Patch version set from GIT to: ${revisionsCount}")
 # Libraries needed
 ##########################################
     
-set(CMAKE_MODULE_PATH "./macros/")
+#set(CMAKE_MODULE_PATH "./macros/")
 
 ## QT4 ###################################
 #find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtSVG QtScript REQUIRED )

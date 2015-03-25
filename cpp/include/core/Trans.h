@@ -128,7 +128,8 @@ public:
 
 #define FOREACH_TRANSITION_CONDITIONS(transition) \
      for (vector<Condition*>::iterator it = transition->getConditions().begin();it!=transition->getConditions().end();it++) { \
-         ::Condition * condition = (*it);
+         ::Condition * condition = (*it); \
+         (void) condition;
 
 #define END_FOREACH_TRANSITION_CONDITIONS }
 
@@ -140,7 +141,8 @@ public:
 
 #define FOREACH_TRANSITION_TRACKPOINTS(transition) \
      for (vector<Trackpoint*>::iterator it = transition->getTrackpoints().begin();it!=transition->getTrackpoints().end();it++) { \
-         ::Trackpoint* trackpoint = *it;
+         ::Trackpoint* trackpoint = *it; \
+         (void) trackpoint;
 
 #define END_FOREACH_TRANSITION_TRACKPOINTS }
 

@@ -36,7 +36,8 @@ class NewStateCommand : public QUndoCommand {
     StateItem * stateItem   ; // Related GUI object.
     State     * state       ; // Related fsm object.
 
-    QGraphicsSceneMouseEvent * mouseEvent;
+    //QGraphicsSceneMouseEvent * mouseEvent;
+    QPointF     scenePos;
 
     public:
       /**

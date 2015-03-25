@@ -66,9 +66,6 @@ class Fsm {
 
     protected:
 
-        /// The IDManager for this FSM
-        IDManager idManager;
-
         /// ID of the FSM (useless now, but anyway there for name setting)
         int fid;
 
@@ -76,25 +73,31 @@ class Fsm {
         string fname;
 
         /// The ID of the reset state
-        unsigned int resetstate;
+        int resetstate;
 
         /// Link to the parent Project
         Project * project;
 
+        /// The IDManager for states
+        IDManager stateIdManager;
         /// States Map
-        map<unsigned int, State *>      statesMap;
+        map<int, State *>      statesMap;
 
+        IDManager transIdManager;
         /// Transitions Map
-        map<unsigned int, Trans *>      transitionsMap;
+        map<int, Trans *>      transitionsMap;
 
+        IDManager linkIdManager;
         /// Links Map
-        map<unsigned int, Link *>       linksMap;
+        map<int, Link *>       linksMap;
 
+        IDManager hyperIdManager;
         /// Hypertransition Map
-        map<unsigned int, Hypertrans*>  hyperTransMap;
+        map<int, Hypertrans*>  hyperTransMap;
 
+        IDManager joinIdManager;
         /// Joins map
-        map<unsigned int, Join*>        joinsMap;
+        map<int, Join*>        joinsMap;
 
         /// Path to last generated verilog source depending on userID
         /*map<string, string> lastGeneratedVerilogFile;*/
@@ -190,7 +193,7 @@ class Fsm {
          \param name New name of input.
          */
 
-        void setInputName(unsigned int i, string name);
+        void setInputName(int i, string name);
 
         /*!
          \brief outputName
@@ -200,7 +203,7 @@ class Fsm {
          \param name New name of output.
          */
 
-        void setOutputName(unsigned int i, string name);
+        void setOutputName(int i, string name);
 
 
         /*!
@@ -264,7 +267,7 @@ class Fsm {
          \param id ID of new resetstate.
          */
 
-        void setResetState(unsigned int id);
+        void setResetState(int id);
 
         /*!
          \brief fsmName
@@ -314,40 +317,33 @@ class Fsm {
         /** @} */
 
         /// State FOREACH Macro:
-        ///    - Map<unsigned long int,State*> iterator is accessible under the it variable
+        ///    - Map<int,State*> iterator is accessible under the it variable
         ///    - State is accessible under the state variable
         /// Don't forget to #include <map> !!
 #define FOREACH_STATE(fsm) \
-     for (map<unsigned int,::State*>::iterator it = fsm->getStates().begin();it!=fsm->getStates().end();it++) { \
-         ::State * state = it->second;
+     for (map<int,::State*>::iterator it = fsm->getStates().begin();it!=fsm->getStates().end();it++) { \
+         ::State * state = it->second; \
+         (void) state;
 
 #define END_FOREACH_STATE }
 
         /**
-         * Returns a copy of the states map (to avoid unwished concurrent modifications)
-         * Example:
-         *
-         *    FOREACH_STATE(fsm) {
-         *        ...
-         *    }
-         *
          * @return A reference to the map ! Modifications allowed then!
          */
-        map<unsigned int, State*>& getStates();
-
-        /**
-         * Returns an array with pointers to all the states
-         * This is useful behaviours needing direct offset access
-         * @return
-         */
-        State** getStatesArray();
+        map<int, State*>& getStates();
 
         /*!
-         \brief addState
+         \brief Creates a state object with the properties of the next unused
+         state.
 
-         Adds new State at the end of statevector of Fsm.
+         A pointer to the newly generated state is returned and the ownership
+         is passed to the caller.
+
+
          */
-        State * addState();
+        State * createNextState( int id );
+
+        int getNextStateId () const;
 
         /**
          * Add a provided state object to the model
@@ -357,14 +353,26 @@ class Fsm {
         State * addState(State * state);
 
 
-        /**  Delete State of Fsm by state-ID
+        /**  Remove State of Fsm by state-ID
          *
          * - Does not remove transitions in any way
          *
          * @warning Does not delete the memory
          * @param state
          */
-        void deleteState(State * state);
+        void removeState(State * state);
+
+        /*!
+         \brief getStatebyID
+
+         If there is a State in the statevector with chosen ID it becomes current
+         selected State.
+         \param id ID of wanted %State
+         \return The State or NULL if not found
+         */
+        State* getStateByID(int id);
+
+
 
 
         /**
@@ -373,7 +381,7 @@ class Fsm {
          * @param endId   Id of the beginning state
          * @return
          */
-        Trans * addTrans(unsigned int startId, unsigned int endId);
+        Trans * addTrans(int startId, int endId);
 
         /*!
          \brief addTrans
@@ -406,7 +414,7 @@ class Fsm {
          * @param id ID of a Transition.
          * @return Pointer to the deleted model
          */
-        Trans * deleteTrans(unsigned int id);
+        Trans * deleteTrans(int id);
 
         /** Delete Trans by pointer
          *
@@ -451,7 +459,7 @@ class Fsm {
 
          @return A pointer to the deleted Hyper transition
          */
-        Hypertrans* deleteHypertrans(unsigned int id);
+        Hypertrans* deleteHypertrans(int id);
 
 
         /*!
@@ -565,22 +573,11 @@ class Fsm {
          */
         int getStateCount();
 
-        /*!
-         \brief getStatebyID
-
-         If there is a State in the statevector with chosen ID it becomes current
-         selected State.
-         \param id ID of wanted %State
-         \return The State or NULL if not found
-         */
-
-        State* getStatebyID(int id);
-
-
 
 #define FOREACH_TRANSITIONS(fsm) \
-     for (map<unsigned int,::Trans*>::iterator it = fsm->getTransitions().begin();it!=fsm->getTransitions().end();it++) { \
-         ::Trans * transition = it->second;
+     for (map<int,::Trans*>::iterator it = fsm->getTransitions().begin();it!=fsm->getTransitions().end();it++) { \
+         ::Trans * transition = it->second; \
+         (void) transition;
 
 #define END_FOREACH_TRANSITIONS }
 
@@ -588,7 +585,7 @@ class Fsm {
          *
          * @return A reference to the transitions map
          */
-        map<unsigned int,Trans*>& getTransitions();
+        map<int,Trans*>& getTransitions();
 
 
         /**
@@ -607,13 +604,15 @@ class Fsm {
          \return Trans * The transition if it exists, NULL otherwise
          */
 
-        Trans * getTransbyID(unsigned int id);
+        Trans * getTransbyID(int id);
 
 
 
 #define FOREACH_LINKS(fsm) \
-     for (map<unsigned int,::Link*>::iterator it = fsm->getLinks().begin();it!=fsm->getLinks().end();it++) { \
-         ::Link * link = it->second;
+     for (map<int,::Link*>::iterator it = fsm->getLinks().begin();it!=fsm->getLinks().end();it++) { \
+         ::Link * link = it->second; \
+         (void) link;
+
 
 #define END_FOREACH_LINKS }
 
@@ -621,7 +620,7 @@ class Fsm {
          *
          * @return
          */
-        map<unsigned int,Link*>& getLinks();
+        map<int,Link*>& getLinks();
 
         /*!
          \brief getLinkbyID
@@ -632,7 +631,7 @@ class Fsm {
          \return The searched lin, or NULL if does not exist
          */
 
-        Link * getLinkbyID(unsigned int id);
+        Link * getLinkbyID(int id);
 
         /**
          *
@@ -645,8 +644,9 @@ class Fsm {
 
 
 #define FOREACH_HYPERTRANSITIONS(fsm) \
-     for (map<unsigned int,::Hypertrans*>::iterator it = fsm->getHypertransitions().begin();it!=fsm->getHypertransitions().end();it++) { \
-         ::Hypertrans * hypertransition = it->second;
+     for (map<int,::Hypertrans*>::iterator it = fsm->getHypertransitions().begin();it!=fsm->getHypertransitions().end();it++) { \
+         ::Hypertrans * hypertransition = it->second; \
+         (void) hypertransition;
 
 #define END_FOREACH_HYPERTRANSITIONS }
 
@@ -654,7 +654,7 @@ class Fsm {
          *
          * @return
          */
-        map<unsigned int,Hypertrans*>& getHypertransitions();
+        map<int,Hypertrans*>& getHypertransitions();
 
 
         /*!
@@ -665,7 +665,7 @@ class Fsm {
          \param id ID of wanted Hypertransition.
          \return The hyper trans or NULL if not found
          */
-        Hypertrans * getHypertransbyID(unsigned int id);
+        Hypertrans * getHypertransbyID(int id);
 
         /*!
          \brief clockName
@@ -703,12 +703,13 @@ class Fsm {
         Join * deleteJoin(Join * join);
 
         /// Joins FOREACH Macro:
-        ///    - Map<unsigned long int,Join*> iterator is accessible under the it variable
+        ///    - Map<int,Join*> iterator is accessible under the it variable
         ///    - Join is accessible under the join variable
         /// Don't forget to #include <map> !!
 #define FOREACH_JOIN(fsm) \
-       for (map<unsigned int,::Join*>::iterator it = fsm->getJoins().begin();it!=fsm->getJoins().end();it++) { \
-           ::Join * join = it->second;
+       for (map<int,::Join*>::iterator it = fsm->getJoins().begin();it!=fsm->getJoins().end();it++) { \
+           ::Join * join = it->second; \
+           (void) join;
 
 #define END_FOREACH_JOIN }
 
@@ -716,14 +717,14 @@ class Fsm {
          *
          * @return The Joins map
          */
-        map<unsigned int, Join*>& getJoins();
+        map<int, Join*>& getJoins();
 
         /**
          * Get the join matching provided Id
          * @param id ID of the join to look for
          * @return The join or NULL if not found
          */
-        Join * getJoin(unsigned int id);
+        Join * getJoin(int id);
 
 
         /** \defgroup Generator Parameters */
