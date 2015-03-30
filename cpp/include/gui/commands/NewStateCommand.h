@@ -33,11 +33,8 @@ class NewStateCommand : public QUndoCommand {
     Fsm       * fsm         ;
     bool        bLastCommand; // NewItemGroupCommand?
 
-    StateItem * stateItem   ; // Related GUI object.
-    State     * state       ; // Related fsm object.
-
-    //QGraphicsSceneMouseEvent * mouseEvent;
     QPointF     scenePos    ;
+    int         stateId     ;
 
     public:
       /**

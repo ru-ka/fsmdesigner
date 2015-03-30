@@ -28,6 +28,8 @@ using namespace std;
 
 #include "ChangeStateNameAction.h"
 
+#include <gui/scene/Scene.h>
+
 ChangeStateNameAction::ChangeStateNameAction(QString name,StateItem * item,QUndoCommand * parentCommand) :ItemFocusedAction<StateItem>(item,parentCommand) {
     this->name = name;
 }

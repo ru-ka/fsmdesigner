@@ -27,6 +27,8 @@ using namespace std;
 
 #include "DeleteInputAction.h"
 
+#include <gui/scene/Scene.h>
+
 DeleteInputAction::DeleteInputAction(int position,Fsm * object,QUndoCommand * parentCommand,QTreeView * relatedWidget) : ObjectFocusedAction<Fsm>(object,parentCommand,relatedWidget) {
     this->position = position;
 

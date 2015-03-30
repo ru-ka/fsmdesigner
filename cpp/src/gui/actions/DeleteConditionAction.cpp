@@ -32,6 +32,8 @@ using namespace std;
 
 #include "DeleteConditionAction.h"
 
+#include <gui/scene/Scene.h>
+
 DeleteConditionAction::DeleteConditionAction(TransitionBase * transition,Condition * object,QUndoCommand * parentCommand) :ObjectFocusedAction<Condition>(object,parentCommand) {
     this->object = object;
     this->transition = transition;

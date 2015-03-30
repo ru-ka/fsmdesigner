@@ -28,6 +28,8 @@ using namespace std;
 
 #include "ChangeStateColorAction.h"
 
+#include <gui/scene/Scene.h>
+
 ChangeStateColorAction::ChangeStateColorAction(QColor color,StateItem * item) : ItemFocusedAction<StateItem>(item) {
     this->color = color;
 }

@@ -343,7 +343,7 @@ class Fsm {
          */
         State * createNextState( ) const;
 
-        int getNextStateId () const;
+        int getNextStateId () const; //Obsolete? !! TODO: remove
 
         /**
          * Add a provided state object to the model

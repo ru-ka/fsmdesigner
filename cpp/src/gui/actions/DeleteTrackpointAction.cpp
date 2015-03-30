@@ -33,6 +33,8 @@ using namespace std;
 
 #include "DeleteTrackpointAction.h"
 
+#include <gui/scene/Scene.h>
+
 DeleteTrackpointAction::DeleteTrackpointAction(TrackpointItem * item,QUndoCommand * parentCommand) :ItemFocusedAction<TrackpointItem>(item,parentCommand) {
 
 }

@@ -20,6 +20,7 @@ MoveStateCommand::~MoveStateCommand() {
 
 
 void  MoveStateCommand::redo(){
+  qDebug() << "redo move command";
   State * state = fsm->getStateByID( movedStateId );
   StateItem * stateItem = relatedScene->findStateItem( state );
   stateItem->setPos(newPos);
@@ -32,6 +33,7 @@ void  MoveStateCommand::redo(){
 
 
 void  MoveStateCommand::undo(){
+  qDebug() << "undo move command";
   State * state = fsm->getStateByID( movedStateId );
   StateItem * stateItem = relatedScene->findStateItem( state );
   stateItem->setPos(oldPos);

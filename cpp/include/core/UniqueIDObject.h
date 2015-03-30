@@ -33,13 +33,13 @@ class UniqueIDObject {
          * Returns the ID of this object
          * @return the ID or 0 if not set
          */
-        unsigned int getId();
+        int getId();
 
         /**
          * Set the Id for this object
          * @param id
          */
-        void setId(unsigned int id);
+        void setId(int id);
 
         /**
          * Tests the id: 0 means not set, not 0 means set

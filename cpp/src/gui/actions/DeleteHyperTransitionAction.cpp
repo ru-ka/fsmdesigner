@@ -33,6 +33,8 @@ using namespace std;
 
 #include "DeleteHyperTransitionAction.h"
 
+#include <gui/scene/Scene.h>
+
 DeleteHyperTransitionAction::DeleteHyperTransitionAction(HyperTransition * item,QUndoCommand * parentCommand) :ItemFocusedAction<HyperTransition>(item,parentCommand) {
 
 }

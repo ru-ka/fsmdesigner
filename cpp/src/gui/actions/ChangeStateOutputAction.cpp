@@ -28,6 +28,8 @@ using namespace std;
 
 #include "ChangeStateOutputAction.h"
 
+#include <gui/scene/Scene.h>
+
 ChangeStateOutputAction::ChangeStateOutputAction(QString output,StateItem * item) :ItemFocusedAction<StateItem>(item) {
     this->output = output;
 }

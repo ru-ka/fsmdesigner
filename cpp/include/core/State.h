@@ -83,6 +83,8 @@ class State: public UniqueIDObject {
 
         /// Transitions starting from this state
         list<Trans*> startingTransitions;
+        /// Transitions ending in this state
+        list<Trans*> endingTransitions;
 
     public:
 
@@ -196,6 +198,24 @@ class State: public UniqueIDObject {
          * @param transition
          */
         void removeStartingTransition(Trans * transition);
+
+        /**
+         *
+         * @return
+         */
+        list<Trans*>& getEndingTransitions();
+
+        /**
+         * Add the provided transition to the list of ending transitions
+         * @param transition
+         */
+        void addEndingTransition(Trans * transition);
+
+        /**
+         * Remove the provided transition from the list of ending transitions
+         * @param transition
+         */
+        void removeEndingTransition(Trans * transition);
 
 };
 

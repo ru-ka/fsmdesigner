@@ -9,9 +9,8 @@ NewStateCommand::NewStateCommand( Scene * _relatedScene,
                                   relatedScene(_relatedScene),
                                   fsm( _relatedScene->getFsm() ),
                                   bLastCommand( _relatedScene->bLastCommand ),
-                                  stateItem( NULL ),
-                                  state( NULL ),
-                                  scenePos( _e->scenePos() )
+                                  scenePos( _e->scenePos() ),
+                                  stateId( 0 )
 {
 }
 
@@ -25,14 +24,14 @@ void  NewStateCommand::redo(){
   qDebug() << "New state item    redo() ";
   qDebug() << "-------------------------";
   //-- New GUI item for the Scene.
-  stateItem = new StateItem();
+  StateItem * stateItem = new StateItem();
   //-- Set GUI properties.
   stateItem->setVisible( true );
   stateItem->setEnabled( true );
 
   //-- Create a new state to the underlying model and refer to it in the GUI item
   //int next_state_id = fsm->getNextStateId(); // -- for debugging?
-  state = fsm->createNextState();
+  State * state = fsm->createNextState();
   stateItem->setModel( state );
 
   //-- Place centered on mouse
@@ -42,6 +41,8 @@ void  NewStateCommand::redo(){
   //-- Pass the ownership of the state objects to the scene and the model.
   relatedScene->addItem( stateItem ); 
   State * statePointer = fsm->addState( state );
+  Q_ASSERT( ( stateId == state->getId() ) || ( stateId == 0 ) );
+  stateId = state->getId();
   Q_ASSERT( statePointer != NULL );
 
   relatedScene->update();
@@ -54,6 +55,8 @@ void  NewStateCommand::undo(){
   qDebug() << "New state item    undo() ";
   qDebug() << "-------------------------";
   // Get the ownership of the state objects.
+  State * state = fsm->getStateByID( stateId );
+  StateItem * stateItem = relatedScene->findStateItem( state );
   relatedScene->removeItem(   stateItem );
   fsm->removeState( state );
 
@@ -62,5 +65,4 @@ void  NewStateCommand::undo(){
 
   delete stateItem;
   delete state;
-
 }

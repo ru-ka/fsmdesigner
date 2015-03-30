@@ -37,6 +37,8 @@ using namespace std;
 
 #include "DeleteLinkArrivalAction.h"
 
+#include <gui/scene/Scene.h>
+
 DeleteLinkArrivalAction::DeleteLinkArrivalAction(LinkArrival * item,QUndoCommand * parentCommand) :ItemFocusedAction<LinkArrival>(item,parentCommand) {
 
     // If no related scene already -> Ignore this

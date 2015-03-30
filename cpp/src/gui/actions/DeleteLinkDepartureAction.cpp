@@ -33,6 +33,8 @@ using namespace std;
 
 #include "DeleteLinkDepartureAction.h"
 
+#include <gui/scene/Scene.h>
+
 DeleteLinkDepartureAction::DeleteLinkDepartureAction(LinkDeparture * item,QUndoCommand * parentCommand) :ItemFocusedAction<LinkDeparture>(item,parentCommand) {
 
 

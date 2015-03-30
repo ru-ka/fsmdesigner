@@ -35,6 +35,8 @@ using namespace std;
 #include <gui/items/StateItem.h>
 #include "DeleteJoinAction.h"
 
+#include <gui/scene/Scene.h>
+
 DeleteJoinAction::DeleteJoinAction(JoinItem * item,QUndoCommand * parentCommand) :ItemFocusedAction<JoinItem>(item,parentCommand) {
 
     // Delete All transitions that target this Join Item

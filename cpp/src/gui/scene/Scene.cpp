@@ -616,6 +616,7 @@ void Scene::initializeScene() {
 }
 
 QUndoStack * Scene::getUndoStack() {
+  qDebug() << "requested undoStack";
   return &(this->undoStack);
 }
 
@@ -660,6 +661,9 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *e) {
 
   QGraphicsScene::mousePressEvent(e);
 
+  // TODO: just track mouse movement??
+  oldPos = e->scenePos();
+  qDebug() << " oldPos = " << oldPos;
 }
 
 void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
@@ -680,9 +684,20 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
       e->setAccepted(true);
     } else if ( this->selectedItems().size() == 1 &&
         oldPos != this->selectedItems().first()->pos() ) {
-      qDebug() << "Move detected.";
-      this->moveItem();
-      e->setAccepted(true);
+      // TODO: double check experience: do not move items in a certain range
+      auto newPos = this->selectedItems().first()->pos();
+      auto requiredMoveAmplitude = 2; //  pixels
+      auto xAmplitude = abs( newPos.x() - oldPos.x() );
+      auto yApmlitude = abs( newPos.y() - oldPos.y() );
+      if ( xAmplitude >= requiredMoveAmplitude || yApmlitude >= requiredMoveAmplitude ) {
+        qDebug() << "Move detected.";
+        this->moveItem();
+        e->setAccepted(true);
+      }
+      qDebug() << "oldPos = " << oldPos;
+      qDebug() << "newPos = " << newPos;
+      qDebug() << "e->pos() = " << e->scenePos();
+      //if( oldPos.x() > newPos
     } else if ( this->selectedItems().size() ==1 && bLastCommand &&
         this->selectedItems().first()->type() != QGraphicsItemGroup::Type ) {
       undoStack.undo();
@@ -891,6 +906,7 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
   qDebug() << "keyReleaseEvent";
   qDebug() << "-----------------";
   // TODO: (QUICKHACK) move to the right place, 
+  /*
   if(keyEvent->key() == Qt::Key_Escape) {
     if (bLastCommand) {
       undoStack.undo();
@@ -900,6 +916,7 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
       undoStack.push( groupCommand );
     }
   }
+  */
   // ENDTODO
 
   // Call Parent
@@ -910,8 +927,10 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
 
 
   //-- IF event was already accepted, don't process it
-  if (keyEvent->isAccepted())
+  if (keyEvent->isAccepted()) {
+    qDebug() << "Event already accepted!";
     return;
+  }
 
   // ESC sets place mode to choose
   //---------------
@@ -939,10 +958,32 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
   // Super deletes items
   //---------------------
   else if (keyEvent->key() == Qt::Key_Delete) {
-
     qDebug() << "keyEvent->key() == Qt::Key_Delete.";
     qDebug() << "this->selectedItems().size() = " << this->selectedItems().size();
+
+    // TODO: implement a meaningful delete function
+    if( this->selectedItems().size() == 1 ) {
+      QGraphicsItem* currentItem = this->selectedItems().first();
+      Q_ASSERT( currentItem->scene() == this );
+      switch( currentItem->type() ) {
+        case( FSMGraphicsItem<>::STATEITEM ) :
+        {
+          // TODO: delete incoming and outgoing transitions. ?
+          DeleteStateCommand * command =
+            new DeleteStateCommand( this, dynamic_cast<StateItem*>(currentItem) );
+          this->undoStack.push( command );
+          break;
+        }
+        default :
+        {
+          qDebug() << "Yet to implement";
+          break;
+        }
+      }
+    }
+
     // Flatten item groups.
+    /*
     QList<QGraphicsItem* > selectedItems;
     for ( auto currentItem : this->selectedItems() ) {
       switch ( currentItem->type() ) {
@@ -990,6 +1031,7 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
         }
       }
     }
+    */
 
     /*
     QList<QGraphicsItem*> selectedItems = this->selectedItems();
@@ -1368,8 +1410,11 @@ void Scene::setPlaceModeSlot(FSMDesigner::Item mode) {
 
   // Undo unused CreateItemGroupCommands.
   if (bLastCommand) {
+    qDebug() << "bLastCommand ";
     undoStack.undo();
   } else if (activeGroup) {
+    qDebug() << "else if (activeGroup)  ";
+    undoStack.undo();
     RemoveItemGroupCommand * groupCommand =
       new RemoveItemGroupCommand( this, activeGroup );
     undoStack.push( groupCommand );

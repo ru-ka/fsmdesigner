@@ -30,6 +30,8 @@ using namespace std;
 
 #include "ChangeTransitionNameAction.h"
 
+#include <gui/scene/Scene.h>
+
 ChangeTransitionNameAction::ChangeTransitionNameAction(QString name,Transline * item,QUndoCommand * parentCommand) :
                 ItemFocusedAction<Transline>(item,parentCommand) {
     this->name = name;

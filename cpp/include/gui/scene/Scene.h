@@ -55,7 +55,7 @@ class Scene: public QGraphicsScene, public VerificationListener {
     Fsm * fsm;
 
     bool    selectionChanged;
-    QPointF oldPos; // Remember old position in order to move itemGroups.
+    QPointF oldPos; // Remember old position in order to move items?!
     NewTransCommand      * activeTransCommand;
     NewHyperTransCommand * activeHyperTransCommand;
     NewJoinCommand       * activeJoinCommand;

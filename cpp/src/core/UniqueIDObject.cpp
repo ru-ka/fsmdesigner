@@ -26,12 +26,12 @@ UniqueIDObject::~UniqueIDObject() {
 }
 
 
-unsigned int UniqueIDObject::getId() {
+int UniqueIDObject::getId() {
     return this->id;
 }
 
 
-void UniqueIDObject::setId(unsigned int id) {
+void UniqueIDObject::setId(int id) {
     this->id=id;
 }
 

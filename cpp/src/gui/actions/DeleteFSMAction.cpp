@@ -26,6 +26,8 @@ using namespace std;
 
 #include "DeleteFSMAction.h"
 
+#include <gui/scene/Scene.h>
+
 DeleteFSMAction::DeleteFSMAction(Fsm * item,QUndoCommand * parentCommand) : ObjectFocusedAction<Fsm>(item,parentCommand) {
 
 }

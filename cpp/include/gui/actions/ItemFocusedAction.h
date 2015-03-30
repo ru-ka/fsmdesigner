@@ -18,7 +18,8 @@
 
 //-- Gui
 #include <gui/scene/SceneRelatedObject.h>
-#include <gui/scene/Scene.h>
+//#include <gui/scene/Scene.h>
+class Scene;
 
 /**
  *

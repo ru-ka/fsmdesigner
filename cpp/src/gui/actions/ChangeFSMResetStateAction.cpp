@@ -21,6 +21,8 @@ using namespace std;
 
 #include "ChangeFSMResetStateAction.h"
 
+#include <gui/scene/Scene.h>
+
 ChangeFSMResetStateAction::ChangeFSMResetStateAction(Scene * scene) : FSMAction(scene) {
 
 }

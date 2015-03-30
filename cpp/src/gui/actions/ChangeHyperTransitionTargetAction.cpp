@@ -34,6 +34,9 @@ using namespace std;
 
 #include "ChangeHyperTransitionTargetAction.h"
 
+// Scene
+#include <gui/scene/Scene.h>
+
 ChangeHyperTransitionTargetAction::ChangeHyperTransitionTargetAction(State * targetState,HyperTransition * item,QUndoCommand * parentCommand) :ItemFocusedAction<HyperTransition>(item,parentCommand) {
     this->targetState = targetState;
 }

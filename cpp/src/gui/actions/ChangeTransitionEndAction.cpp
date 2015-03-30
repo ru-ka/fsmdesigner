@@ -32,6 +32,9 @@ using namespace std;
 
 #include "ChangeTransitionEndAction.h"
 
+#include <gui/scene/Scene.h>
+
+
 ChangeTransitionEndAction::ChangeTransitionEndAction(State * targetState,Transline * item,QUndoCommand * parentCommand) :ItemFocusedAction<Transline>(item,parentCommand) {
 
     this->targetState = targetState;

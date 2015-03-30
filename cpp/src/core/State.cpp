@@ -153,3 +153,16 @@ void State::addStartingTransition(Trans * transition) {
 void State::removeStartingTransition(Trans * transition) {
     this->startingTransitions.remove(transition);
 }
+
+list<Trans*>& State::getEndingTransitions() {
+    return this->startingTransitions;
+}
+
+
+void State::addEndingTransition(Trans * transition) {
+    this->startingTransitions.push_back(transition);
+}
+
+void State::removeEndingTransition(Trans * transition) {
+    this->startingTransitions.remove(transition);
+}

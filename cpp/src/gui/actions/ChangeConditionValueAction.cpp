@@ -25,6 +25,8 @@ using namespace std;
 
 #include "ChangeConditionValueAction.h"
 
+#include <gui/scene/Scene.h>
+
 ChangeConditionValueAction::ChangeConditionValueAction(QString value,
         Condition * item, QUndoCommand * parentCommand) :
         ObjectFocusedAction<Condition>(item, parentCommand) {

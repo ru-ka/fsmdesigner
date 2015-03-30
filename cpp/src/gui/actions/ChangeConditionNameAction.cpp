@@ -28,6 +28,9 @@ using namespace std;
 
 #include "ChangeConditionNameAction.h"
 
+
+#include <gui/scene/Scene.h>
+
 ChangeConditionNameAction::ChangeConditionNameAction(QString name,Condition * item,QUndoCommand * parentCommand) :ObjectFocusedAction<Condition>(item,parentCommand) {
     this->name = name;
 }
