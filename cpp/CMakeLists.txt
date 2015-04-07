@@ -44,6 +44,7 @@ set(CMAKE_AUTOMOC ON)
 
 #include dirs for QtCreator
 include_directories("${FSMDesigner_SOURCE_DIR}/include/core/")
+include_directories(/include/core/)
 
 
 #SET (CMAKE_CXX_COMPILER             "/usr/bin/g++")
@@ -205,13 +206,19 @@ target_link_libraries(genverilog_lib core_qxml_lib verification_lib)
 #### MOC
 #set(QT4_WRAP_CPP_OUT_DIR ${GENERATED_PATH})
 
+set(package_moc_src_list)
 foreach (package ${GUI_PACKAGES})
     file(GLOB package_moc_src ${FSMDesigner_SOURCE_DIR}/include/${package}/*.h )
     qt5_wrap_cpp(gui_moced_src ${package_moc_src})
+    LIST( APPEND package_moc_src_list ${package_moc_src} )
 endforeach(package)
+set( core_moc_src )
+file( GLOB core_moc_src ${FSMDesigner_SOURCE_DIR}/include/core/*.h )
+LIST( APPEND package_moc_src_list ${core_moc_src} )
+add_custom_target(project_headers SOURCES ${package_moc_src_list} )
 ## TODO : REMOVE
-file(GLOB package_moc_src *.h )
-qt5_wrap_cpp(test_moced_src ${package_moc_src})
+#file(GLOB package_moc_src *.h )
+#qt5_wrap_cpp(test_moced_src ${package_moc_src})
 ## END REMOVE
  
 
