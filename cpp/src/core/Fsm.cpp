@@ -513,10 +513,6 @@ map<int, State*>& Fsm::getStates() {
     return this->statesMap;
 }
 
-int Fsm::getNextStateId() const {
-  return this->statesMap.size() + 1;
-}
-
 
 State * Fsm::createNextState() const {
 
