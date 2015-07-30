@@ -23,7 +23,16 @@
     <property name="spacing">
      <number>6</number>
     </property>
-    <property name="margin">
+    <property name="leftMargin">
+     <number>9</number>
+    </property>
+    <property name="topMargin">
+     <number>9</number>
+    </property>
+    <property name="rightMargin">
+     <number>9</number>
+    </property>
+    <property name="bottomMargin">
      <number>9</number>
     </property>
    </layout>
@@ -34,7 +43,7 @@
      <x>0</x>
      <y>0</y>
      <width>1166</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -67,6 +76,15 @@
     </property>
     <addaction name="separator"/>
     <addaction name="separator"/>
+    <addaction name="action_ZoomIn"/>
+    <addaction name="action_ZoomOut"/>
+    <addaction name="separator"/>
+    <addaction name="action_EnableDebug"/>
+    <addaction name="action_EnableRedoUndo"/>
+    <addaction name="separator"/>
+    <addaction name="action_ShowPropertyWindow"/>
+    <addaction name="action_ShowOutputListWindow"/>
+    <addaction name="action_ShowInputListWindow"/>
    </widget>
    <widget class="QMenu" name="menu_Edit">
     <property name="title">
@@ -91,6 +109,9 @@
     <addaction name="actionPreferences"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="title">
      <string>&amp;Help</string>
     </property>
@@ -227,7 +248,16 @@
      <property name="spacing">
       <number>6</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>9</number>
+     </property>
+     <property name="topMargin">
+      <number>9</number>
+     </property>
+     <property name="rightMargin">
+      <number>9</number>
+     </property>
+     <property name="bottomMargin">
       <number>9</number>
      </property>
      <item>
@@ -254,7 +284,16 @@
      <property name="spacing">
       <number>6</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>9</number>
+     </property>
+     <property name="topMargin">
+      <number>9</number>
+     </property>
+     <property name="rightMargin">
+      <number>9</number>
+     </property>
+     <property name="bottomMargin">
       <number>9</number>
      </property>
      <item>
@@ -281,7 +320,16 @@
      <property name="spacing">
       <number>6</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>9</number>
+     </property>
+     <property name="topMargin">
+      <number>9</number>
+     </property>
+     <property name="rightMargin">
+      <number>9</number>
+     </property>
+     <property name="bottomMargin">
       <number>9</number>
      </property>
      <item>
@@ -291,6 +339,9 @@
    </widget>
   </widget>
   <widget class="QToolBar" name="ZoomBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="windowTitle">
     <string>ZoomBar</string>
    </property>
@@ -313,6 +364,9 @@
    <addaction name="action_ZoomOut"/>
   </widget>
   <widget class="QToolBar" name="DebugBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -665,6 +719,9 @@
    </property>
   </action>
   <action name="action_Undo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../src/gui/resources/resources.qrc">
      <normaloff>:/icons/undo.png</normaloff>:/icons/undo.png</iconset>
@@ -680,6 +737,9 @@
    </property>
   </action>
   <action name="action_Redo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../src/gui/resources/resources.qrc">
      <normaloff>:/icons/redo.png</normaloff>:/icons/redo.png</iconset>
@@ -695,6 +755,9 @@
    </property>
   </action>
   <action name="actionPreferences">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Pre&amp;ferences...</string>
    </property>
@@ -747,7 +810,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>ZoomIn</string>
+    <string>Zoom In</string>
    </property>
    <property name="toolTip">
     <string>Zoom in</string>
@@ -759,7 +822,7 @@
      <normaloff>:/icons/viewmag-.png</normaloff>:/icons/viewmag-.png</iconset>
    </property>
    <property name="text">
-    <string>ZoomOut</string>
+    <string>Zoom Out</string>
    </property>
    <property name="toolTip">
     <string>Zoom out</string>
@@ -795,6 +858,73 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="action_EnableDebug">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable Debug Bar</string>
+   </property>
+   <property name="toolTip">
+    <string>Enables the debug bar.</string>
+   </property>
+  </action>
+  <action name="action_EnableRedoUndo">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable Redo and Undo</string>
+   </property>
+   <property name="toolTip">
+    <string>Caution! Might be unstable! Enables the experimental redo undo buttons.</string>
+   </property>
+  </action>
+  <action name="action_ShowPropertyWindow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Property Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Shows the property window.</string>
+   </property>
+  </action>
+  <action name="action_ShowOutputListWindow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show OutputList Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Shows the OutputList window.</string>
+   </property>
+  </action>
+  <action name="action_ShowInputListWindow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show InputList Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Shows the InputList window.</string>
    </property>
   </action>
  </widget>

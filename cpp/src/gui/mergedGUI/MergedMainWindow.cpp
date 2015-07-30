@@ -202,6 +202,27 @@ MergedMainWindow::MergedMainWindow() :
     //---- Debug related
     this->connect(this->action_Killme, SIGNAL(triggered()), SLOT(killme()));
 
+    // Enable and disable debug features and the experimental redo undo actions.
+    this->connect(this->action_EnableDebug, SIGNAL(triggered() ),
+                  SLOT( enableDebug() ) );
+    this->DebugBar->setVisible(false);
+    this->connect(this->action_EnableRedoUndo, SIGNAL(triggered() ),
+                  SLOT( enableRedoUndo() ) );
+
+    this->connect(this->action_ShowPropertyWindow, SIGNAL(triggered() ),
+                  SLOT( showPropertyWindow() ) );
+    this->connect(this->action_ShowInputListWindow, SIGNAL(triggered() ),
+                  SLOT( showInputListWindow() ) );
+    this->connect(this->action_ShowOutputListWindow, SIGNAL(triggered() ),
+                  SLOT( showOutputListWindow() ) );
+
+    this->connect(this->Properties, SIGNAL( visibilityChanged(bool )),
+                   this            , SLOT  ( updateSelectStatus(bool)) );
+    this->connect(this->OutputList, SIGNAL( visibilityChanged(bool )),
+                   this            , SLOT  ( updateSelectStatus(bool)) );
+    this->connect(this->InputList , SIGNAL( visibilityChanged(bool )),
+                   this            , SLOT  ( updateSelectStatus(bool)) );
+
 }
 
 MergedMainWindow::~MergedMainWindow() {
@@ -647,6 +668,9 @@ void MergedMainWindow::about() {
   QString fsm_version = QString::fromStdString(Utils::getMajorVersion());
   fsm_version.append(".");
   fsm_version += QString::fromStdString(Utils::getMinorVersion());
+  //TODO: Hard coded patch version for now
+  fsm_version.append(".");
+  fsm_version.append("1");
   //TODO: include patch version?
 //  fsm_version.append(".");
 //  fsm_version += QString::fromStdString(Utils::getPatchVersion());
@@ -687,4 +711,46 @@ void MergedMainWindow::about() {
 void MergedMainWindow::killme() {
   int* killme_pointer = NULL;
   *killme_pointer += 7;
+}
+
+
+void MergedMainWindow::enableDebug() {
+    auto isChecked = this->action_EnableDebug->isChecked();
+    this->DebugBar->setVisible( isChecked );
+}
+
+void MergedMainWindow::enableRedoUndo() {
+    auto isChecked = this->action_EnableRedoUndo->isChecked();
+    if( isChecked ) {
+        QMessageBox cautionBox;
+        cautionBox.setText("Enables the unstable feature of redo and undo commands. Please save frequently.");
+        cautionBox.exec();
+    }
+    this->action_Redo->setEnabled( isChecked );
+    this->action_Undo->setEnabled( isChecked );
+}
+
+void MergedMainWindow::showPropertyWindow() {
+    auto isChecked = this->action_ShowPropertyWindow->isChecked();
+    Properties->setVisible( isChecked );
+}
+
+void MergedMainWindow::showInputListWindow() {
+    auto isChecked = this->action_ShowInputListWindow->isChecked();
+    InputList->setVisible( isChecked );
+}
+
+void MergedMainWindow::showOutputListWindow() {
+    auto isChecked = this->action_ShowOutputListWindow->isChecked();
+    OutputList->setVisible( isChecked );
+}
+
+// Update selected status based on visibility of dockwidgets.
+void MergedMainWindow::updateSelectStatus(bool) {
+    auto isSelected = this->Properties->isVisible();
+    this->action_ShowPropertyWindow->setChecked( isSelected );
+    isSelected = this->OutputList->isVisible();
+    this->action_ShowOutputListWindow->setChecked( isSelected );
+    isSelected = this->InputList->isVisible();
+    this->action_ShowInputListWindow->setChecked( isSelected );
 }

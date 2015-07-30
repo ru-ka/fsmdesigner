@@ -196,6 +196,15 @@ class MergedMainWindow: public QMainWindow, public Ui_MergedMainWindow  {
         void about();
 
         void killme();
+        void enableDebug();
+
+        void enableRedoUndo();
+
+        void showPropertyWindow();
+        void showInputListWindow();
+        void showOutputListWindow();
+        void updateSelectStatus(bool);
+
 
 };
 
