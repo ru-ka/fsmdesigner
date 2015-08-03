@@ -33,9 +33,9 @@ using namespace std;
 #include <gui/commands/RemoveStateCommand.h>
 #include <gui/commands/MoveStateCommand.h>
 //-- ItemGroup
-#include <gui/commands/CreateItemGroupCommand.h>
-#include <gui/commands/RemoveItemGroupCommand.h>
-#include <gui/commands/MoveItemGroupCommand.h>
+//#include <gui/commands/CreateItemGroupCommand.h>
+//#include <gui/commands/RemoveItemGroupCommand.h>
+//#include <gui/commands/MoveItemGroupCommand.h>
 //-- Trans
 #include <gui/commands/NewTransCommand.h>
 //-- HyperTrans
@@ -667,6 +667,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
   qDebug() << "mouseReleaseEvent";
   qDebug() << "-----------------";
 
+  /*
   if ( this->placeMode == CHOOSE ) {
     // Handle item groups
     if ( this->selectedItems().size() == 0 && bLastCommand ) {
@@ -728,6 +729,7 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
       // ENDTODO
     }
   }
+  */
 
 
   // Placing if not in choose mode
@@ -837,7 +839,9 @@ void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent* e) {
 }
 
 void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
+  // TODO update item pos
   // Move detected.
+  /*
   if( this->selectedItems().size() == 1 &&
       oldPos != this->selectedItems().first()->pos() ) {
     auto firstItem = this->selectedItems().first();
@@ -848,6 +852,7 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent* e) {
       activeMoveItemGroupCommand->updateTranslines();
     }
   }
+  */
 
 
   // TODO: Is this the right place to dispatch the event, or should a function
@@ -895,9 +900,11 @@ void Scene::keyReleaseEvent(QKeyEvent * keyEvent) {
     if (bLastCommand) {
       undoStack.undo();
     } else if (activeGroup ) {
+        /*
       RemoveItemGroupCommand * groupCommand =
         new RemoveItemGroupCommand( this, activeGroup );
       undoStack.push( groupCommand );
+      */
     }
   }
   // ENDTODO
@@ -1331,10 +1338,12 @@ void Scene::moveItem() {
   switch( currentItem->type() ) {
     case ( QGraphicsItemGroup::Type ) :
       {
+        /*
         Q_ASSERT( activeMoveItemGroupCommand );
         activeMoveItemGroupCommand->setNewPos( currentItem->scenePos() );
         undoStack.push( activeMoveItemGroupCommand );
         activeMoveItemGroupCommand = NULL;
+        */
         break;
     }
     default: {
@@ -1370,9 +1379,11 @@ void Scene::setPlaceModeSlot(FSMDesigner::Item mode) {
   if (bLastCommand) {
     undoStack.undo();
   } else if (activeGroup) {
+      /*
     RemoveItemGroupCommand * groupCommand =
       new RemoveItemGroupCommand( this, activeGroup );
     undoStack.push( groupCommand );
+    */
   }
   this->setPlaceMode( mode );
 }
